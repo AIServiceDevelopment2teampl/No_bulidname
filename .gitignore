@@ -3,3 +3,10 @@
 
 # 저장한 쇼핑몰 페이지의 부속 파일(이미지·JS·CSS): 용량이 크고 타사 파일이라 올리지 않는다. HTML 본문만 올린다
 docs/site_html/*_files/
+
+# 개발 환경
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+node_modules/

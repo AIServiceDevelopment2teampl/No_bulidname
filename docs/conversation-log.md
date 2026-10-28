@@ -154,6 +154,8 @@ ZOZOTOWN 상품 페이지 구조를 확인하고, 사용자가 쇼핑몰을 직�
 - 쇼핑몰 후보 확인 결과가 오면 progress.md '지원 쇼핑몰 목록'에 반영한다
 5. **쇼핑몰 후보 확인 결과 (사용자 직접 확인)** — 한국어 미지원: Urban Outfitters, Abercrombie & Fitch, Hollister(A&F와 같은 회사), END. Clothing, J.Crew, Nordstrom, 유니클로 미국, GU 일본, BEAMS, Amazon 일본. 한국어 지원(제외): UNITED ARROWS. Amazon 일본은 종합몰이라 기본 목록에서 빼고 사용자 추가로 두자고 제안(초안). progress.md '지원 쇼핑몰 목록'에 반영
 6. **해외배송 구분** — 웹 검색으로 한국 직배송 여부를 정리함. 확정은 ASOS(있음)뿐이고 나머지는 결제 화면에서 국가를 한국으로 바꿔 확인 필요. progress.md '지원 쇼핑몰 목록'에 반영
+7. **배송 태그** — 쇼핑몰마다 `배송 가능` / `배송대행 필요` / `그 외` 태그를 붙이기로 함. shop-browser.md와 progress.md에 반영
+8. **배송대행 브로커 아이디어** — 사업화 아이디어로만 기록. 완성본 후속에 '예상 총액 계산 + 배대지 업체 목록 링크'를 넣음 (00-overview.md 제외 목록)
 
 ---
 
@@ -170,9 +172,8 @@ ZOZOTOWN 상품 페이지 구조를 확인하고, 사용자가 쇼핑몰을 직�
    - 계정: **Google 로그인** (추천은 익명 ID였지만 사용자가 Google 로그인을 고름). 앱 안·웹 계정 삭제가 필요해서 [account/google-login.md](features/account/google-login.md)를 만들고 기능 순서 3번에 넣음. 서버 인증 방식(Google ID 토큰 검증 → 자체 세션 토큰)과 이메일 미저장은 초안
    - 안드로이드 테스트: Gradle 기본 위치 (CLAUDE.md 규칙 5번 예외)
    - 코딩 규칙: ktlint, ruff
+4. **프로젝트 뼈대**: 이 PC에 Android Studio·Java·Android SDK가 없어 앱 프로젝트는 보류. 서버 뼈대(FastAPI `/health`), pytest, ruff, jsdom 테스트 환경을 만들고 테스트 통과 확인
 
 ### 다음 세션 AI에게
 - 기능 번호가 하나씩 밀렸다 (로그인이 3번). 00-overview.md 기능 목록 기준
 - 웹 계정 삭제 페이지는 개인정보처리방침과 같은 곳(Cloudflare Pages 제안)에 두면 된다. 아직 결정 아님
-7. **배송 태그** — 쇼핑몰마다 `배송 가능` / `배송대행 필요` / `그 외` 태그를 붙이기로 함. shop-browser.md와 progress.md에 반영
-8. **배송대행 브로커 아이디어** — 사업화 아이디어로만 기록. 완성본 후속에 '예상 총액 계산 + 배대지 업체 목록 링크'를 넣음 (00-overview.md 제외 목록)

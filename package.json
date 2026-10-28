@@ -1,0 +1,11 @@
+{
+  "name": "inject-tests",
+  "private": true,
+  "description": "WebView 주입 스크립트 테스트 (Node + jsdom)",
+  "scripts": {
+    "test:inject": "node --test \"tests/inject/**/*.test.js\""
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

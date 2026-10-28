@@ -15,6 +15,7 @@
 | 2026-10-28 | ZOZOTOWN 상품 페이지 확인 (`docs/site_html/zozotown.html`, 개발자 도구 콘솔에서 `copy(document.documentElement.outerHTML)`로 복사. "웹페이지, 전체" 저장은 실패하며 파일이 지워짐) | **JSON-LD `Product` 있음**, 색상별로 하나씩: 상품명, 이미지, 브랜드, 색, 가격. 소재·세탁·두께·신축성은 `description` 안의 일본어 자유 글(`【Material】表地：...手洗い可`)에 섞여 있어 LLM으로 정리해야 함. 페이지 본문 `素材` 항목에도 소재가 있음 |
 | 2026-10-28 | 사용자가 쇼핑몰을 직접 추가하는 기능을 넣기로 함 | [shop-browser.md](features/shopping/shop-browser.md)에 요구사항 추가 |
 | 2026-10-28 | 브라우저로 저장한 ASOS 상품 페이지 확인 (`docs/site_html/`) | **JSON-LD `Product` 있음**: 상품명, 색, 이미지, 브랜드, 설명(핏 포함, 예: "Regular fit"), 가격·통화(USD). 소재·세탁·모델 키는 `window.asos.pdp.config` 안 `aboutMe`·`careInfo`·`sizeAndFit`에 있음. ZOZOTOWN은 저장이 끝나지 않아 다시 해야 함 (Ctrl+S에서 "웹페이지, HTML만"으로 저장 권장). 저장한 페이지의 부속 파일 폴더(`*_files/`)는 `.gitignore`에 넣고 HTML만 올림 |
+| 2026-10-28 | 서버 뼈대·테스트 환경 생성 | `src/server/`(FastAPI, `/health`), `tests/server/`(pytest), `tests/inject/`(Node 내장 테스트 + jsdom), ruff 설정(`pyproject.toml`). 실행: `python -m venv .venv` → `.venv/Scripts/pip install -r src/server/requirements-dev.txt` → `.venv/Scripts/python -m pytest`, `npm install` → `npm run test:inject`. 안드로이드 프로젝트는 이 PC에 Android Studio가 없어 아직 못 만듦 |
 | 2026-10-21 | 대화 기록 저장, 문서 커밋·푸시 | [conversation-log.md](conversation-log.md). 제출 기획서 PDF는 팀원 이름·학번이 있어 공개 저장소에 올리지 않음 (`.gitignore`) |
 
 ## 결정 사항
@@ -69,7 +70,7 @@
 1. **Play Console 개인 개발자 계정 만들기**, 비공개 테스트 테스터 15명 정도 모으기 시작 (14일 테스트가 일정의 병목)
 2. 미결정 사항 중 OCR·지원 쇼핑몰 정하기
 3. **기술 검증**: 후보 쇼핑몰마다 WebView에서 열림, 로그인·장바구니·결제 화면 진입, JS 주입으로 글자 읽기·바꾸기, JSON-LD Product 유무를 확인하고 결과를 여기에 기록
-4. 안드로이드 프로젝트 생성 (minSdk 26, targetSdk 36, ktlint), FastAPI 서버 뼈대(ruff), 테스트 환경(pytest, jsdom)
+4. **Android Studio 설치** (팀) → 안드로이드 프로젝트 생성 (minSdk 26, targetSdk 36, ktlint). 서버 뼈대·테스트 환경은 완료
 5. 평가 데이터 준비 시작: 의류 사진 100~200장 라벨링, 영어·일본어 상품 페이지·캡처 30~50개
 6. 기능 1번 [wardrobe/photo-register.md](features/wardrobe/photo-register.md)부터 순서대로
 
