@@ -153,3 +153,4 @@ ZOZOTOWN 상품 페이지 구조를 확인하고, 사용자가 쇼핑몰을 직�
 ### 다음 세션 AI에게
 - 쇼핑몰 후보 확인 결과가 오면 progress.md '지원 쇼핑몰 목록'에 반영한다
 5. **쇼핑몰 후보 확인 결과 (사용자 직접 확인)** — 한국어 미지원: Urban Outfitters, Abercrombie & Fitch, Hollister(A&F와 같은 회사), END. Clothing, J.Crew, Nordstrom, 유니클로 미국, GU 일본, BEAMS, Amazon 일본. 한국어 지원(제외): UNITED ARROWS. Amazon 일본은 종합몰이라 기본 목록에서 빼고 사용자 추가로 두자고 제안(초안). progress.md '지원 쇼핑몰 목록'에 반영
+6. **해외배송 구분** — 웹 검색으로 한국 직배송 여부를 정리함. 확정은 ASOS(있음)뿐이고 나머지는 결제 화면에서 국가를 한국으로 바꿔 확인 필요. progress.md '지원 쇼핑몰 목록'에 반영
