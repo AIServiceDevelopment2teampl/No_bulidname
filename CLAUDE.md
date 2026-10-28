@@ -14,7 +14,7 @@
 - AI: CLIP, FAISS, OCR(미결정), Claude API (우선 Claude Haiku 5.5)
 - DB: 서버 SQLite, 앱 Room
 - 테스트: pytest (서버), Node + jsdom (WebView 주입 JS), JUnit·Compose UI 테스트 (앱)
-- 배포: Google Play (비공개 테스트 → 프로덕션), 서버는 AWS Lightsail (서울 리전)
+- 배포: Google Play (비공개 테스트 → 프로덕션), 서버는 Vultr (서울 리전, 선불 크레딧)
 
 ## 문서 안내
 작업 전 관련 문서를 반드시 먼저 읽을 것.

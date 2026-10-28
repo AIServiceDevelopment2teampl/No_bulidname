@@ -48,7 +48,7 @@
 | 번역 | LLM API로 전부 하거나, 페이지 문장은 번역 API로 하고 상품 구조화만 LLM으로 | 미결정 |
 | LLM API | Claude API, 우선 Claude Haiku 5.5 (`claude-haiku-5-5`). 공식 `anthropic` Python SDK. 키는 서버에만 둔다 | 확정 (모델은 AI 점원 품질 보고 바꿀 수 있음) |
 | DB | 서버 SQLite | 확정 |
-| 서버 배포 | AWS Lightsail 서울 리전 (CLIP 실행에 메모리 필요, 4GB 요금제 예정) | 확정 (요금제는 메모리 측정 후) |
+| 서버 배포 | Vultr 서울 리전 (CLIP 실행에 메모리 필요, 4GB 예정). 선불 크레딧으로 결제. 약 11/10~12/13만 켜 둔다 | 확정 (학교 결제 승인 대기, 요금제는 메모리 측정 후) |
 | 앱 배포 | Google Play (비공개 테스트 → 프로덕션) | 확정 |
 | 테스트 | 서버 pytest, 주입 JS는 Node + jsdom, 앱은 JUnit·Compose UI 테스트 | 확정 (초안) |
 
@@ -147,7 +147,7 @@
 | FAISS | 벡터 검색 | |
 | EasyOCR 또는 ML Kit | 캡처·영수증 글자 인식 | 미결정 |
 | Claude API (Anthropic) | 번역, 구조화, 리포트, 점원 | 선불 크레딧, 학교 지원금. 사용료 발생 |
-| AWS Lightsail | AI 서버 | 월 고정 요금, 학교 지원금 |
+| Vultr | AI 서버 | 선불 크레딧(약 $40 신청 예정), 학교 지원금. 해외 업체라 인보이스만 나오고 세금계산서는 없음 |
 | Google Play Console | 앱 배포 | 개인 개발자 계정 등록비 있음 |
 
 ## 보안·개인정보 규칙
