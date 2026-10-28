@@ -46,9 +46,9 @@
 | 유사 검색 | FAISS | 확정 (제출 기획서) |
 | OCR | EasyOCR(서버) 또는 Google ML Kit(기기 안) | 미결정 |
 | 번역 | LLM API로 전부 하거나, 페이지 문장은 번역 API로 하고 상품 구조화만 LLM으로 | 미결정 |
-| LLM API | 제공사·모델 | 미결정 |
+| LLM API | Claude API, 우선 Claude Haiku 5.5 (`claude-haiku-5-5`). 공식 `anthropic` Python SDK. 키는 서버에만 둔다 | 확정 (모델은 AI 점원 품질 보고 바꿀 수 있음) |
 | DB | 서버 SQLite | 확정 |
-| 서버 배포 | 클라우드 호스팅 (CLIP 실행에 메모리 필요) | 업체 미결정 |
+| 서버 배포 | AWS Lightsail 서울 리전 (CLIP 실행에 메모리 필요, 4GB 요금제 예정) | 확정 (요금제는 메모리 측정 후) |
 | 앱 배포 | Google Play (비공개 테스트 → 프로덕션) | 확정 |
 | 테스트 | 서버 pytest, 주입 JS는 Node + jsdom, 앱은 JUnit·Compose UI 테스트 | 확정 (초안) |
 
@@ -146,8 +146,8 @@
 | CLIP 사전학습 모델 | 이미지 임베딩, 종류·색 분류 | 라이선스·출처 표기 |
 | FAISS | 벡터 검색 | |
 | EasyOCR 또는 ML Kit | 캡처·영수증 글자 인식 | 미결정 |
-| LLM API | 번역, 구조화, 리포트, 점원 | 미결정. 사용료 발생 |
-| 클라우드 호스팅 | AI 서버 | 미결정. 사용료 발생 가능 |
+| Claude API (Anthropic) | 번역, 구조화, 리포트, 점원 | 선불 크레딧, 학교 지원금. 사용료 발생 |
+| AWS Lightsail | AI 서버 | 월 고정 요금, 학교 지원금 |
 | Google Play Console | 앱 배포 | 개인 개발자 계정 등록비 있음 |
 
 ## 보안·개인정보 규칙

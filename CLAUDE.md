@@ -11,10 +11,10 @@
 ## 기술 스택
 - 언어: Kotlin (앱), Python (서버)
 - 프레임워크: Jetpack Compose (Android Studio, targetSdk 36 이상), FastAPI, Retrofit
-- AI: CLIP, FAISS, OCR(미결정), LLM API(미결정)
+- AI: CLIP, FAISS, OCR(미결정), Claude API (우선 Claude Haiku 5.5)
 - DB: 서버 SQLite, 앱 Room
 - 테스트: pytest (서버), Node + jsdom (WebView 주입 JS), JUnit·Compose UI 테스트 (앱)
-- 배포: Google Play (비공개 테스트 → 프로덕션), 서버는 클라우드 호스팅(미결정)
+- 배포: Google Play (비공개 테스트 → 프로덕션), 서버는 AWS Lightsail (서울 리전)
 
 ## 문서 안내
 작업 전 관련 문서를 반드시 먼저 읽을 것.
