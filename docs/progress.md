@@ -30,6 +30,10 @@
 | 2026-10-28 | 역할 분담을 하지 않는다. 팀은 기획을 하고, 앱·서버 구현은 모두 AI로 한다 | 구현을 AI가 하므로 담당 구분이 의미 없다. 누가 무엇을 했는지는 작업 로그에만 기록한다 |
 | 2026-10-28 | 서버 호스팅은 **AWS Lightsail** (서울 리전, 4GB 요금제 예정) | 학교 지원금으로 받기로 함. 월 고정 요금이라 예산 관리가 쉽다. 비공개 테스트 때문에 11주차 안에 배포 |
 | 2026-10-28 | 서버 호스팅을 **Vultr** (서울 리전, 선불 크레딧)로 바꾼다. 위 Lightsail 결정을 대신함 | 학교가 AWS는 후불제라 지원할 수 없다고 함. Vultr는 크레딧을 미리 충전해 차감한다. 수업 프로젝트라 서버는 첫 비공개 테스트 직전(약 11/10)부터 15주차 평가(약 12/13)까지만 켜고, 그 전에는 각자 컴퓨터에서 개발한다. 신청액 약 $40(4GB 5주 약 $30 + 여유). 학교 카드 해외 결제와 인보이스 정산 가능 여부 확인 필요. 서버를 지울 때 스토어 앱을 어떻게 할지(비공개 전환 등) 팀에서 정한다 |
+| 2026-10-28 | minSdk **26** (Android 8.0) | 거의 모든 폰을 지원하고 최신 라이브러리를 쓰기에 문제없다 |
+| 2026-10-28 | 계정은 **Google 로그인** | 폰을 바꿔도 옷장이 유지된다. Play 정책상 앱 안과 웹 두 곳에 계정 삭제가 필요해서 기능 문서 [account/google-login.md](features/account/google-login.md)를 추가하고 기능 순서 3번에 넣었다. 이메일·Apple 로그인은 넣지 않는다 |
+| 2026-10-28 | 안드로이드 테스트는 Gradle 기본 위치(`src/android/app/src/test`)에 둔다. 서버·주입 JS 테스트는 `tests/` | Android Studio에서 바로 돌릴 수 있다. CLAUDE.md 규칙 5번에 예외로 적음 |
+| 2026-10-28 | 코딩 규칙: Kotlin은 **ktlint**, Python은 **ruff** | 누가 작성해도 코드 모양이 같아진다. CLAUDE.md 코딩 규칙에 적음 |
 
 ## 제출 기획서와 달라진 점 (Sprint 발표에서 설명할 것)
 | 항목 | 제출 기획서 (10/14) | 현재 | 이유 |
@@ -58,18 +62,14 @@
 | OCR | EasyOCR(서버) / ML Kit(기기) | |
 | CLIP 모델 | 일반 CLIP / 패션 특화 CLIP | 평가로 결정 |
 | 서버 요금제 | Vultr 4GB(예정) / 2GB | CLIP 메모리 사용량을 재고 결정 |
-| 계정 방식 | 기기 단위 익명 ID(초안) / 로그인 | 새 시안 `docs/image/로그인-메인화면 초안.png`에는 이메일·Google·Apple 로그인과 회원가입이 있음. 로그인을 넣으면 Play 정책상 앱 안과 웹에서 계정 삭제 기능도 필요 |
-| minSdk | - | |
 | 지원 쇼핑몰 목록 | 기준: 많이 쓰이는 해외 쇼핑몰 중 **한국어를 지원하지 않는 곳**. 2026-10-28 직접 확인 결과 한국어 미지원 후보: 영어 **ASOS** (https://www.asos.com/women/), **Urban Outfitters** (https://www.urbanoutfitters.com/), **Abercrombie & Fitch** (https://www.abercrombie.com/, Hollister는 같은 회사라 하나만), **END. Clothing** (https://www.endclothing.com/), **J.Crew** (https://www.jcrew.com/), **Nordstrom** (https://www.nordstrom.com/), **유니클로 미국** (https://www.uniqlo.com/us/en/) / 일본어 **ZOZOTOWN** (https://zozo.jp/), **유니클로 일본** (https://www.uniqlo.com/jp/ja/), **GU 일본** (https://www.gu-global.com/jp/ja/), **BEAMS** (https://www.beams.co.jp/). 한국 직배송(웹 검색, 확인 필요): ASOS 있음(공식 배송 페이지), J.Crew 있음 가능성 높음(한국용 `/kr` 스토어), Urban Outfitters·A&F·END.·Nordstrom 불확실, 유니클로 미국·ZOZOTOWN·유니클로 일본·GU 일본 없음(국내 전용, 배송대행지 필요), BEAMS 자료가 엇갈림. 직배송 여부는 쇼핑몰 목록에 표시만 하고 후보에서 빼지는 않는다(초안). Amazon 일본은 한국어 미지원이지만 종합몰이라 기본 목록에서는 빼고 사용자가 직접 추가하게 둔다(초안). 한국어를 지원해서 제외: Amazon(미국), SSENSE, 라쿠텐, UNITED ARROWS, ZARA, H&M | 상품 페이지 구조 확인 완료: ASOS·ZOZOTOWN(JSON-LD 있음), 유니클로 일본(페이지 데이터). 나머지는 앱이 생기면 실제 폰 WebView에서 열림·상품 정보 읽기를 확인하고 기본 목록을 정한다 |
 | 쇼핑몰 목록 표시 | 텍스트 이름(초안) / 로고 | 로고는 Play 지식재산권 정책 위험 |
-| 안드로이드 테스트 위치 | Gradle 관례(`src/android/app/src/test`) / `tests/` | CLAUDE.md 규칙과 다름 |
-| 코딩 규칙 | Kotlin: ktlint 등 / Python: ruff 등 | CLAUDE.md 코딩 규칙 TODO |
 
 ## 다음 할 일 (순서대로)
 1. **Play Console 개인 개발자 계정 만들기**, 비공개 테스트 테스터 15명 정도 모으기 시작 (14일 테스트가 일정의 병목)
 2. 미결정 사항 중 OCR·지원 쇼핑몰 정하기
 3. **기술 검증**: 후보 쇼핑몰마다 WebView에서 열림, 로그인·장바구니·결제 화면 진입, JS 주입으로 글자 읽기·바꾸기, JSON-LD Product 유무를 확인하고 결과를 여기에 기록
-4. 안드로이드 프로젝트 생성 (targetSdk 36), FastAPI 서버 뼈대, 테스트 환경(pytest, jsdom)
+4. 안드로이드 프로젝트 생성 (minSdk 26, targetSdk 36, ktlint), FastAPI 서버 뼈대(ruff), 테스트 환경(pytest, jsdom)
 5. 평가 데이터 준비 시작: 의류 사진 100~200장 라벨링, 영어·일본어 상품 페이지·캡처 30~50개
 6. 기능 1번 [wardrobe/photo-register.md](features/wardrobe/photo-register.md)부터 순서대로
 

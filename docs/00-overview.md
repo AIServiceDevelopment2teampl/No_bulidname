@@ -54,7 +54,7 @@
 | 인앱 브라우저 | 페이지를 그 자리에서 번역한다. 번역 켜기/끄기, 원문 보기, AI 점원 버튼 |
 | AI 점원 패널 | 화면 가장자리의 작은 버튼을 누르면 아래쪽 절반 패널로 열린다(초안). 위쪽에서는 쇼핑 페이지가 계속 보인다 |
 | 내 옷장 | 옷 사진 격자 목록, 종류·색상 필터, 상세·수정·삭제, 등록 버튼(주문내역 캡처 / 영수증 / 사진) |
-| 마이 | 설정, 내 데이터 전체 삭제, 개인정보처리방침 |
+| 마이 | 설정, 내 데이터 전체 삭제, 계정 삭제, 로그아웃, 개인정보처리방침 |
 
 ## 사용자 흐름 (대표 시나리오)
 1. 주문내역 캡처 몇 장으로 옷장에 옷 20벌을 등록한다. 분류가 틀린 것만 고친다.
@@ -73,18 +73,19 @@
 |------|------|------|------|-----------|------|
 | 1 | 옷장 | 옷 사진 등록·자동 분류 | [wardrobe/photo-register.md](features/wardrobe/photo-register.md) | 9~10주 | 구현 전 |
 | 2 | 옷장 | 옷장 조회·수정·삭제 | [wardrobe/browse.md](features/wardrobe/browse.md) | 9~10주 | 구현 전 |
-| 3 | 비교·AI | 유사 의류 검색 | [compare/similar-search.md](features/compare/similar-search.md) | 10주 | 구현 전 |
-| 4 | 번역 | 단위·사이즈 변환 | [translation/unit-conversion.md](features/translation/unit-conversion.md) | 10주 | 구현 전 |
-| 5 | 번역 | 페이지 그 자리 번역 | [translation/page-translation.md](features/translation/page-translation.md) | 10~11주 | 구현 전 |
-| 6 | 번역 | 상품 정보 구조화 | [translation/product-extraction.md](features/translation/product-extraction.md) | 11주 | 구현 전 |
-| 7 | 쇼핑 | 홈·쇼핑몰 목록·인앱 브라우저 | [shopping/shop-browser.md](features/shopping/shop-browser.md) | 11주 | 구현 전 |
-| 8 | 출시 | Google Play 출시 | [release/play-store-release.md](features/release/play-store-release.md) | 계정은 지금, 비공개 테스트는 11주, 출시는 15주 | 구현 전 |
-| 9 | 쇼핑 | 공유하기로 상품 받기 | [shopping/share-intake.md](features/shopping/share-intake.md) | 12주 | 구현 전 |
-| 10 | 비교·AI | 구매 전 비교 리포트 | [compare/purchase-report.md](features/compare/purchase-report.md) | 12주 | 구현 전 |
-| 11 | 비교·AI | AI 점원 | [compare/ai-clerk.md](features/compare/ai-clerk.md) | 13주 | 구현 전 |
-| 12 | 자동 등록 | 주문내역 캡처로 일괄 등록 | [auto-register/order-capture.md](features/auto-register/order-capture.md) | 13주 | 구현 전 |
-| 13 | 자동 등록 | 앱에서 산 옷 자동 등록 | [auto-register/in-app.md](features/auto-register/in-app.md) | 14주 | 구현 전 |
-| 14 | 자동 등록 | 영수증 사진 등록 | [auto-register/receipt.md](features/auto-register/receipt.md) | 14주 (시간 부족하면 후속) | 구현 전 |
+| 3 | 계정 | Google 로그인·계정 삭제 | [account/google-login.md](features/account/google-login.md) | 10~11주 (첫 비공개 테스트 빌드 전) | 구현 전 |
+| 4 | 비교·AI | 유사 의류 검색 | [compare/similar-search.md](features/compare/similar-search.md) | 10주 | 구현 전 |
+| 5 | 번역 | 단위·사이즈 변환 | [translation/unit-conversion.md](features/translation/unit-conversion.md) | 10주 | 구현 전 |
+| 6 | 번역 | 페이지 그 자리 번역 | [translation/page-translation.md](features/translation/page-translation.md) | 10~11주 | 구현 전 |
+| 7 | 번역 | 상품 정보 구조화 | [translation/product-extraction.md](features/translation/product-extraction.md) | 11주 | 구현 전 |
+| 8 | 쇼핑 | 홈·쇼핑몰 목록·인앱 브라우저 | [shopping/shop-browser.md](features/shopping/shop-browser.md) | 11주 | 구현 전 |
+| 9 | 출시 | Google Play 출시 | [release/play-store-release.md](features/release/play-store-release.md) | 계정은 지금, 비공개 테스트는 11주, 출시는 15주 | 구현 전 |
+| 10 | 쇼핑 | 공유하기로 상품 받기 | [shopping/share-intake.md](features/shopping/share-intake.md) | 12주 | 구현 전 |
+| 11 | 비교·AI | 구매 전 비교 리포트 | [compare/purchase-report.md](features/compare/purchase-report.md) | 12주 | 구현 전 |
+| 12 | 비교·AI | AI 점원 | [compare/ai-clerk.md](features/compare/ai-clerk.md) | 13주 | 구현 전 |
+| 13 | 자동 등록 | 주문내역 캡처로 일괄 등록 | [auto-register/order-capture.md](features/auto-register/order-capture.md) | 13주 | 구현 전 |
+| 14 | 자동 등록 | 앱에서 산 옷 자동 등록 | [auto-register/in-app.md](features/auto-register/in-app.md) | 14주 | 구현 전 |
+| 15 | 자동 등록 | 영수증 사진 등록 | [auto-register/receipt.md](features/auto-register/receipt.md) | 14주 (시간 부족하면 후속) | 구현 전 |
 
 **0단계 (지금, 8주차): 기술 검증과 계정 준비.** 위험이 가장 큰 부분을 먼저 확인한다. 자세한 내용은 [progress.md](progress.md)의 '다음 할 일'에 있다.
 
@@ -94,7 +95,7 @@
 | Sprint | 주차 (추정 날짜) | 목표 |
 |--------|------------------|------|
 | 1차 | 8주차 (10/19~10/25) | UI/UX 설계, 안드로이드 프로젝트 구성, 기술 검증, Play Console 계정 |
-| - | 9~11주차 (10/26~11/15) | 기능 1~7. **11주차 안에 첫 빌드를 비공개 테스트에 올리고 테스터 12명 참여 시작** |
+| - | 9~11주차 (10/26~11/15) | 기능 1~8. **11주차 안에 첫 빌드를 비공개 테스트에 올리고 테스터 12명 참여 시작** |
 | 2차 | 12주차 (11/16~11/22) | AI 서버 API 구축·앱 연동, 공유하기, 비교 리포트 |
 | - | 13~14주차 (11/23~12/6) | AI 점원, 자동 등록, 프로덕션 출시 신청 |
 | 3차 | 15주차 (12/7~12/13) | Play 스토어 정식 출시, AI 서버 배포, 사용자 평가 |

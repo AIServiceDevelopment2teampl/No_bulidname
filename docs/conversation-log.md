@@ -154,3 +154,23 @@ ZOZOTOWN 상품 페이지 구조를 확인하고, 사용자가 쇼핑몰을 직�
 - 쇼핑몰 후보 확인 결과가 오면 progress.md '지원 쇼핑몰 목록'에 반영한다
 5. **쇼핑몰 후보 확인 결과 (사용자 직접 확인)** — 한국어 미지원: Urban Outfitters, Abercrombie & Fitch, Hollister(A&F와 같은 회사), END. Clothing, J.Crew, Nordstrom, 유니클로 미국, GU 일본, BEAMS, Amazon 일본. 한국어 지원(제외): UNITED ARROWS. Amazon 일본은 종합몰이라 기본 목록에서 빼고 사용자 추가로 두자고 제안(초안). progress.md '지원 쇼핑몰 목록'에 반영
 6. **해외배송 구분** — 웹 검색으로 한국 직배송 여부를 정리함. 확정은 ASOS(있음)뿐이고 나머지는 결제 화면에서 국가를 한국으로 바꿔 확인 필요. progress.md '지원 쇼핑몰 목록'에 반영
+
+---
+
+## 2026-10-28 세션 5 (Claude Code, VS Code)
+
+### 한 줄 요약
+코딩 전에 필요한 결정 4가지를 정하고, Google 로그인 기능 문서를 추가했다.
+
+### 대화 흐름
+1. **학교 요청서에 Vultr를 어떻게 적을지**: "Vultr 클라우드 서버 선불 크레딧 $40 (서울 리전 4GB 서버, 11/10~12/13 AI 서버 운영용)"으로 안내. 사용자가 학교에 요청함
+2. **이제 할 일**: Play Console 계정 → 코딩 전 결정 4가지 → 프로젝트 뼈대 → 기능 1·2
+3. **결정 4가지**
+   - minSdk 26
+   - 계정: **Google 로그인** (추천은 익명 ID였지만 사용자가 Google 로그인을 고름). 앱 안·웹 계정 삭제가 필요해서 [account/google-login.md](features/account/google-login.md)를 만들고 기능 순서 3번에 넣음. 서버 인증 방식(Google ID 토큰 검증 → 자체 세션 토큰)과 이메일 미저장은 초안
+   - 안드로이드 테스트: Gradle 기본 위치 (CLAUDE.md 규칙 5번 예외)
+   - 코딩 규칙: ktlint, ruff
+
+### 다음 세션 AI에게
+- 기능 번호가 하나씩 밀렸다 (로그인이 3번). 00-overview.md 기능 목록 기준
+- 웹 계정 삭제 페이지는 개인정보처리방침과 같은 곳(Cloudflare Pages 제안)에 두면 된다. 아직 결정 아님

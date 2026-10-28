@@ -32,9 +32,11 @@
 2. 기능 문서의 **완료 조건**을 테스트로 먼저 작성하고, 테스트가 통과해야 완료로 본다.
 3. 문서에 없는 결정이 필요하면 임의로 정하지 말고 질문한다.
 4. 작업이 끝나면 `docs/progress.md`에 한 일과 결정 사항을 업데이트한다.
-5. 소스 코드는 `src/`, 테스트는 `tests/` 아래에 둔다.
+5. 소스 코드는 `src/`, 테스트는 `tests/` 아래에 둔다. 예외: 안드로이드 앱 테스트는 Gradle 기본 위치(`src/android/app/src/test`, `src/android/app/src/androidTest`)에 둔다.
 6. 작업을 시작하기 전에 `git fetch`로 GitHub 변경사항을 확인하고, 있으면 받는다(`git pull`). 받은 변경 내용은 사용자에게 요약한다.
 7. 작업이 끝나면 `docs/progress.md`와 `docs/conversation-log.md`에 기록하고 커밋·푸시한다.
 
 ## 코딩 규칙
-- (TODO: 네이밍, 포맷터, 린터 등)
+- Kotlin: ktlint로 포맷·검사한다.
+- Python: ruff로 포맷·검사한다.
+- 커밋 전에 두 도구를 통과시킨다.

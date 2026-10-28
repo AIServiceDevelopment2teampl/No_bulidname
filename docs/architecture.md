@@ -38,7 +38,7 @@
 |------|------|------|
 | 앱 | Kotlin + Jetpack Compose, Android Studio | 확정 (제출 기획서) |
 | targetSdk | 36 (Android 16) 이상 | 확정 (2026-08-31부터 신규 앱 필수) |
-| minSdk | - | 미결정 |
+| minSdk | 26 (Android 8.0) | 확정 |
 | 앱-서버 통신 | Retrofit, REST(JSON) | 확정 |
 | 앱 로컬 저장 | Room | 확정 |
 | 서버 | Python + FastAPI | 확정 |
@@ -73,14 +73,16 @@
     ├── fixtures/          # 고정 HTML 페이지, 테스트 이미지, 캡처
     └── eval/              # 정확도 평가 스크립트와 라벨 데이터 (통과 조건 아님, 결과를 progress.md에 기록)
 ```
-- 안드로이드 테스트 위치는 확인 필요. Gradle 관례(`src/android/app/src/test`, `androidTest`)를 따르면 CLAUDE.md의 "테스트는 `tests/`" 규칙과 다르다.
+- 안드로이드 테스트는 Gradle 기본 위치(`src/android/app/src/test`, `androidTest`)에 둔다. CLAUDE.md 규칙 5번의 예외다.
 - 단위 테스트에서 LLM·OCR·CLIP 호출은 가짜(mock)로 바꾼다. 실제 모델 성능은 `tests/eval/`에서 따로 잰다.
 
 ## 서버 API (초안)
-모든 요청에 `X-Device-Id` 헤더를 붙인다 (계정 방식이 정해지면 바꾼다).
+계정은 Google 로그인이다 ([account/google-login.md](features/account/google-login.md)). 앱이 Google ID 토큰을 `/v1/auth/google`로 보내면 서버가 검증하고 세션 토큰을 준다. 그 밖의 모든 요청에 `Authorization: Bearer <세션 토큰>`을 붙인다 (초안).
 
 | 메서드 | 경로 | 기능 |
 |--------|------|------|
+| POST | `/v1/auth/google` | Google ID 토큰 검증 → 사용자 생성 또는 조회, 세션 토큰 발급 |
+| DELETE | `/v1/me` | 계정 삭제 (사용자와 모든 데이터) |
 | POST | `/v1/clothes` | 사진 업로드 → 자동 분류 결과와 함께 `미확인` 상태로 생성 |
 | GET | `/v1/clothes?category=&color=` | 옷장 목록·필터 |
 | PATCH | `/v1/clothes/{id}` | 속성 수정·확인 |
@@ -99,7 +101,8 @@
 **users**
 | 필드 | 타입 | 설명 |
 |------|------|------|
-| id | TEXT PK | 기기 단위 익명 ID (초안) |
+| id | TEXT PK | 서버가 만든 사용자 id |
+| google_sub | TEXT UNIQUE | Google 계정 고유 id (ID 토큰의 `sub`). 이메일은 저장하지 않는다 (초안) |
 | created_at | DATETIME | |
 
 **clothes** (내 옷장)

@@ -10,4 +10,5 @@
 | [translation/](translation/) | 번역 | [page-translation.md](translation/page-translation.md) 페이지 그 자리 번역, [unit-conversion.md](translation/unit-conversion.md) 단위·사이즈 변환, [product-extraction.md](translation/product-extraction.md) 상품 정보 구조화 |
 | [shopping/](shopping/) | 쇼핑 진입 | [shop-browser.md](shopping/shop-browser.md) 홈·쇼핑몰 목록·인앱 브라우저, [share-intake.md](shopping/share-intake.md) 공유하기로 상품 받기 |
 | [compare/](compare/) | 비교·AI | [similar-search.md](compare/similar-search.md) 유사 의류 검색, [purchase-report.md](compare/purchase-report.md) 구매 전 비교 리포트, [ai-clerk.md](compare/ai-clerk.md) AI 점원 |
+| [account/](account/) | 계정 | [google-login.md](account/google-login.md) Google 로그인·계정 삭제 |
 | [release/](release/) | 출시 | [play-store-release.md](release/play-store-release.md) Google Play 출시 |
