@@ -35,6 +35,7 @@
 5. 소스 코드는 `src/`, 테스트는 `tests/` 아래에 둔다. 예외: 안드로이드 앱 테스트는 Gradle 기본 위치(`src/android/app/src/test`, `src/android/app/src/androidTest`)에 둔다.
 6. 작업을 시작하기 전에 `git fetch`로 GitHub 변경사항을 확인하고, 있으면 받는다(`git pull`). 받은 변경 내용은 사용자에게 요약한다.
 7. 작업이 끝나면 `docs/progress.md`와 `docs/conversation-log.md`에 기록하고 커밋·푸시한다.
+8. 각자의 작업물은 먼저 `sandbox/<GitHub 아이디>/`(`moneyhipo`, `mmminsung02`)에서 만들고, 검수한 뒤 `src/`·`tests/`로 옮긴다. `sandbox/` 코드는 완성본으로 보지 않는다. 자세한 규칙은 [sandbox/README.md](sandbox/README.md)
 
 ## 코딩 규칙
 - Kotlin: ktlint로 포맷·검사한다.
