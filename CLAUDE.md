@@ -23,6 +23,7 @@
 - `docs/features/<종류>/*.md` — 기능별 요구사항 + 완료 조건 (종류 목록: `docs/features/README.md`)
 - `docs/progress.md` — 진행 상황, 결정 사항, 미결정 사항, 다음 할 일
 - `docs/conversation-log.md` — 세션별 대화 기록 (이어서 작업할 때 맥락 확인용)
+- `docs/sp2-plan.md` — SP2 과제 제출용 MVP·완성본 구현 계획 (10/28 제출)
 
 원본 자료 `아이디어_상세.md`, `추가 idea.txt`, 제출 기획서 PDF는 수정하지 않는다.
 
