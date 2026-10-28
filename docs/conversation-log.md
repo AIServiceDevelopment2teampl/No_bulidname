@@ -136,3 +136,19 @@ SP2 MVP 범위와 비용 항목을 정리하고, Claude API·AWS Lightsail을 �
 ### 다음 세션 AI에게
 - 학교에 확인할 것: 학교 카드로 해외 결제 가능 여부, 세금계산서 없이 인보이스로 정산 가능 여부. 안 되면 국내 VPS로 바꾼다
 - 개인정보처리방침 페이지는 Cloudflare Pages에 올리자고 제안함 (아직 결정 아님)
+
+---
+
+## 2026-10-28 세션 4 (Claude Code, VS Code, moneyhipo)
+
+### 한 줄 요약
+ZOZOTOWN 상품 페이지 구조를 확인하고, 사용자가 쇼핑몰을 직접 추가하는 기능을 shop-browser.md에 넣었다.
+
+### 대화 흐름
+1. **ZOZOTOWN 페이지 받기** — "웹페이지, 전체" 저장은 145/150에서 멈추고 파일이 지워짐(부속 파일 요청이 봇 차단에 막힌 것으로 추정). 개발자 도구 콘솔에서 `copy(document.documentElement.outerHTML)`로 복사해 `docs/site_html/zozotown.html`에 붙여 넣음
+2. **결과** — JSON-LD `Product`가 색상별로 있음. 소재·세탁은 `description` 일본어 자유 글 안에 있어 LLM 정리가 필요
+3. **다른 쇼핑몰 후보** — 한국어 미지원 의류 쇼핑몰 후보 링크를 제안함. 한국어 지원 여부는 사용자가 직접 확인하기로 함
+4. **내 쇼핑몰 추가 기능** — 사용자가 이름·주소로 추가, Room에 저장, 상품 정보는 공통 순서(JSON-LD → og → LLM)로 읽음
+
+### 다음 세션 AI에게
+- 쇼핑몰 후보 확인 결과가 오면 progress.md '지원 쇼핑몰 목록'에 반영한다

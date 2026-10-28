@@ -12,6 +12,8 @@
 | 2026-10-21 | 개발용 기획 문서 작성 | 아이디어_상세.md, 추가 idea.txt, 제출 기획서, UI 시안을 합쳐 정리. 원본은 수정하지 않음 |
 | 2026-10-21 | 기능 문서를 종류별 하위 폴더로 분리 | wardrobe, auto-register, translation, shopping, compare, release |
 | 2026-10-28 | 쇼핑몰 상품 페이지 확인 (curl, 모바일 UA) | ASOS·ZOZOTOWN: 403 봇 차단(ZOZOTOWN은 Akamai). 유니클로 일본: 받아짐. JSON-LD는 없지만 페이지 데이터(`window.__PRELOADED_STATE__`)에 소재(`composition`)·세탁(`washingInformation`)·핏 정보가 있고 `og:title`·`og:image`도 있음. 서버가 쇼핑몰 페이지를 직접 가져오는 방식은 막히므로 WebView 주입 스크립트로 읽는 설계가 맞다 |
+| 2026-10-28 | ZOZOTOWN 상품 페이지 확인 (`docs/site_html/zozotown.html`, 개발자 도구 콘솔에서 `copy(document.documentElement.outerHTML)`로 복사. "웹페이지, 전체" 저장은 실패하며 파일이 지워짐) | **JSON-LD `Product` 있음**, 색상별로 하나씩: 상품명, 이미지, 브랜드, 색, 가격. 소재·세탁·두께·신축성은 `description` 안의 일본어 자유 글(`【Material】表地：...手洗い可`)에 섞여 있어 LLM으로 정리해야 함. 페이지 본문 `素材` 항목에도 소재가 있음 |
+| 2026-10-28 | 사용자가 쇼핑몰을 직접 추가하는 기능을 넣기로 함 | [shop-browser.md](features/shopping/shop-browser.md)에 요구사항 추가 |
 | 2026-10-28 | 브라우저로 저장한 ASOS 상품 페이지 확인 (`docs/site_html/`) | **JSON-LD `Product` 있음**: 상품명, 색, 이미지, 브랜드, 설명(핏 포함, 예: "Regular fit"), 가격·통화(USD). 소재·세탁·모델 키는 `window.asos.pdp.config` 안 `aboutMe`·`careInfo`·`sizeAndFit`에 있음. ZOZOTOWN은 저장이 끝나지 않아 다시 해야 함 (Ctrl+S에서 "웹페이지, HTML만"으로 저장 권장). 저장한 페이지의 부속 파일 폴더(`*_files/`)는 `.gitignore`에 넣고 HTML만 올림 |
 | 2026-10-21 | 대화 기록 저장, 문서 커밋·푸시 | [conversation-log.md](conversation-log.md). 제출 기획서 PDF는 팀원 이름·학번이 있어 공개 저장소에 올리지 않음 (`.gitignore`) |
 
