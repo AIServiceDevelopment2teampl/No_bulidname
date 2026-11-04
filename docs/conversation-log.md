@@ -235,4 +235,5 @@ Android Studio를 설치하고 안드로이드 프로젝트 뼈대를 `sandbox/m
 - 목업을 다시 찍을 때: `chrome.exe --headless=new --blink-settings=preferredColorScheme=1 --screenshot=<출력.png> --window-size=1150,3300 file:///.../index.html` (1 = 라이트, 0 = 다크. 이 값을 안 주면 PC 설정을 따라가서 다크로 찍힐 수 있다)
 - 목업 색은 `:root`(라이트)와 `[data-theme="dark"]`의 변수로만 쓴다. 새 화면에 색 코드를 직접 넣지 말 것
 - 가상 피팅 서비스, 하루 횟수, 본인 사진 사용은 미결정이다 (progress.md)
+- README.md에 "AI에게 요청"(서로의 AI에게 남기는 규칙·할 일)을 만들고 CLAUDE.md 0-1번에서 읽게 했다. 팀원 AI가 대화 기록을 파일 끝에 덧붙여 남의 세션 칸에 들어가는 일이 두 번 있어서다. 요청을 처리하면 README 표에서 `[x]`로 바꾼다
 
