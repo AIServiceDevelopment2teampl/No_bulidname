@@ -461,10 +461,10 @@
       </li>
     </ul>
     <ul class="tree">
-      <li data-go="closet-select"><span class="n">내 옷장</span> <span class="d">격자 목록, 종류·색 필터</span><span class="tag has">고르기 화면만</span>
+      <li data-go="closet"><span class="n">내 옷장</span> <span class="d">격자 목록, 종류·색 필터, 미확인·사진 필요 표시</span><span class="tag has">시안 있음</span>
         <ul>
-          <li><span class="n">옷 상세 → 수정 / 삭제</span><span class="tag none">시안 없음</span></li>
-          <li><span class="n">등록</span> <span class="d">주문내역 캡처 / 영수증 / 사진</span><span class="tag none">시안 없음</span></li>
+          <li data-go="cloth-detail"><span class="n">옷 상세 → 수정 / 삭제</span><span class="tag has">시안 있음</span></li>
+          <li data-go="register-pick"><span class="n">등록 방법 고르기</span> <span class="d">주문내역 캡처 / 영수증 / 사진</span><span class="tag has">시안 있음</span><ul><li data-go="import-review"><span class="n">주문내역 캡처 · 영수증 → 후보 확인</span><span class="tag has">시안 있음</span></li><li data-go="register-photo"><span class="n">사진으로 등록 → 분류 결과</span><span class="tag has">시안 있음</span></li></ul></li>
           <li data-go="closet-select"><span class="n">여러 벌 고르기</span><span class="tag has">시안 있음</span>
             <ul><li data-go="fitting"><span class="n">미리 입어보기</span> <span class="d">고른 내 옷끼리</span><span class="tag chal">도전 목표</span></li></ul>
           </li>
@@ -479,7 +479,7 @@
         </ul>
       </li>
       <li><span class="n">하단 탭</span> <span class="d">홈 / 내 옷장 / 쇼핑(→ 쇼핑몰 목록) / 마이</span></li>
-      <li><span class="n">앱 밖: 다른 쇼핑 앱 → 공유 → 결과</span> <span class="d">상품 정보 + TOP 3 + 리포트</span><span class="tag none">시안 없음</span></li>
+      <li data-go="share-result"><span class="n">앱 밖: 다른 쇼핑 앱 → 공유 → 결과</span> <span class="d">상품 정보 + TOP 3 + 리포트</span><span class="tag has">시안 있음</span></li>
     </ul>
   </div>
 </section>
@@ -571,7 +571,7 @@
       <div class="appbar"><h1>옷장 AI</h1><div class="acts"><svg class="i"><use href="#search"/></svg><div class="avatar" data-go="my"><svg class="i"><use href="#user"/></svg></div></div></div>
       <div class="scroll">
         <div data-tpl="t-hero"></div>
-        <div class="closet-card" data-go="closet-select">
+        <div class="closet-card" data-go="closet">
           <div class="icon-circle" style="margin:0 auto"><svg class="i"><use href="#hanger"/></svg></div>
           <h2>내 옷장</h2>
           <p>사진으로 옷을 등록하고,<br>나만의 디지털 옷장을 만들어보세요.</p>
@@ -592,7 +592,7 @@
         <div class="headline">내 옷장과 해외 쇼핑을<br>한곳에</div>
         <div class="subline">번역하고, 비교하고, 현명하게 쇼핑하세요</div>
         <div class="grid2">
-          <div class="fcard" data-go="closet-select">
+          <div class="fcard" data-go="closet">
             <div class="pic"><div class="collage"><div class="cloth">👚</div><div class="cloth">🧥</div><div class="cloth">👔</div><div class="cloth">👖</div><div class="cloth">👜</div><div class="cloth">🧥</div></div></div>
             <div class="icon-sq"><svg class="i"><use href="#hanger"/></svg></div>
             <h4>내 옷장 <svg class="i"><use href="#arrow"/></svg></h4>
@@ -673,7 +673,7 @@
           <div class="sec" style="margin-left:0">이 상품과 어울리는 내 옷</div>
           <div class="pickgrid" style="grid-template-columns:repeat(4,1fr);gap:6px">
             <div class="pick sel"><div class="cloth" style="font-size:24px">👖</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>청바지</small></div>
-            <div class="pick sel"><div class="cloth" style="font-size:24px"><span style="filter:brightness(.4)">👕</span></div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>검은 니트</small></div>
+            <div class="pick sel"><div class="cloth" style="font-size:24px"><span style="filter:grayscale(1) brightness(.35)">👕</span></div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>검은 니트</small></div>
             <div class="pick"><div class="cloth" style="font-size:24px">👔</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>셔츠</small></div>
             <div class="pick"><div class="cloth" style="font-size:24px">👟</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>운동화</small></div>
           </div>
@@ -688,7 +688,7 @@
   <section class="item"><h3>내 옷장 · 여러 벌 고르기</h3>
     <div class="phone" id="closet-select">
       <div data-tpl="t-status"></div>
-      <div class="appbar"><h1 class="sm">입혀볼 옷 고르기</h1><span class="link" style="font-size:13px" data-go="home-base">취소</span></div>
+      <div class="appbar"><h1 class="sm">입혀볼 옷 고르기</h1><span class="link" style="font-size:13px" data-go="closet">취소</span></div>
       <div class="scroll" style="padding-bottom:96px">
         <div style="font-size:11.5px;color:var(--sub);margin:0 2px 8px">아우터·상의·하의에서 한 벌씩, 최대 3벌까지 고를 수 있어요.</div>
         <div class="chips big" style="margin:0 0 12px"><span class="on">전체</span><span>아우터</span><span>상의</span><span>하의</span></div>
@@ -698,7 +698,7 @@
           <div class="pick"><div class="cloth">👚</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>핑크 블라우스</small></div>
           <div class="pick sel"><div class="cloth">👕</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>줄무늬 티</small></div>
           <div class="pick"><div class="cloth">👔</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>파란 셔츠</small></div>
-          <div class="pick"><div class="cloth"><span style="filter:brightness(.4)">👕</span></div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>검은 니트</small></div>
+          <div class="pick"><div class="cloth"><span style="filter:grayscale(1) brightness(.35)">👕</span></div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>검은 니트</small></div>
           <div class="pick sel"><div class="cloth">👖</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>청바지</small></div>
           <div class="pick"><div class="cloth"><span style="filter:grayscale(1)">👖</span></div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>회색 슬랙스</small></div>
           <div class="pick"><div class="cloth">🩳</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>반바지</small></div>
@@ -726,7 +726,7 @@
         <div class="sec">입힌 옷</div>
         <div class="worn">
           <div class="row"><div class="cloth"><span style="filter:sepia(.5)">🧥</span></div><div>울 블렌드 코트<small>ASOS · $129.00</small></div><span class="src shop">쇼핑 중</span></div>
-          <div class="row"><div class="cloth"><span style="filter:brightness(.4)">👕</span></div><div>검은 니트<small>내 옷장</small></div><span class="src mine">내 옷</span></div>
+          <div class="row"><div class="cloth"><span style="filter:grayscale(1) brightness(.35)">👕</span></div><div>검은 니트<small>내 옷장</small></div><span class="src mine">내 옷</span></div>
           <div class="row"><div class="cloth">👖</div><div>청바지<small>내 옷장</small></div><span class="src mine">내 옷</span></div>
         </div>
         <div class="note" style="margin-top:12px">실제 핏·색과 다를 수 있어요. 결과 이미지는 서버에 남기지 않고 <b>이 폰에만</b> 저장돼요. 옷 사진은 이미지를 만들 때만 가상 피팅 서비스로 보내요.</div>
@@ -851,6 +851,151 @@
       </div>
     </div>
   </section>
+
+  <!-- 14. 내 옷장 -->
+  <section class="item"><h3>내 옷장</h3>
+    <div class="phone" id="closet">
+      <div data-tpl="t-status"></div>
+      <div class="appbar"><h1>내 옷장 <span style="font-size:13px;color:var(--sub);font-weight:600">23벌</span></h1><span class="link" style="font-size:13px" data-go="closet-select">여러 벌 고르기</span></div>
+      <div class="scroll" style="padding-bottom:140px">
+        <div class="chips big" style="margin:0 0 10px"><span class="on">전체</span><span>아우터</span><span>상의</span><span>하의</span><span>기타</span></div>
+        <div class="colors" title="색으로 거르기"><i style="background:#1C1C22"></i><i style="background:#F4F4F0"></i><i style="background:#9A9AA2"></i><i style="background:#26345A"></i><i style="background:#3F6FD1"></i><i style="background:#D8C4A3"></i><i style="background:#7A5233"></i><i style="background:#6E7445"></i><i style="background:#E7849E"></i><i style="background:#C9373D"></i></div>
+        <div class="note" style="margin-bottom:12px">확인이 필요한 옷 2벌 · 사진이 필요한 옷 1벌 <span class="link">확인하기</span></div>
+        <div class="pickgrid">
+          <div class="gitem" data-go="cloth-detail"><div class="cloth"><span style="filter:sepia(.5)">🧥</span></div><small>카멜 코트</small></div>
+          <div class="gitem" data-go="cloth-detail"><div class="cloth"><span style="filter:brightness(.4)">🧥</span></div><small>검은 패딩</small></div>
+          <div class="gitem" data-go="cloth-detail"><span class="bdg b-warn">미확인</span><div class="cloth"><span style="filter:grayscale(1) brightness(.35)">👕</span></div><small>상의 · 블랙</small></div>
+          <div class="gitem" data-go="cloth-detail"><div class="cloth">👕</div><small>줄무늬 티</small></div>
+          <div class="gitem" data-go="cloth-detail"><div class="cloth">👔</div><small>파란 셔츠</small></div>
+          <div class="gitem" data-go="cloth-detail"><span class="bdg b-warn">사진 필요</span><div class="cloth nophoto"><svg class="i"><use href="#camera"/></svg></div><small>울 니트 베스트</small></div>
+          <div class="gitem" data-go="cloth-detail"><div class="cloth">👖</div><small>청바지</small></div>
+          <div class="gitem" data-go="cloth-detail"><span class="bdg b-warn">미확인</span><div class="cloth"><span style="filter:grayscale(1)">👖</span></div><small>하의 · 그레이</small></div>
+          <div class="gitem" data-go="cloth-detail"><div class="cloth">👚</div><small>핑크 블라우스</small></div>
+        </div>
+      </div>
+      <div class="fab-reg" data-go="register-pick"><svg class="i" style="width:20px;height:20px"><use href="#plus"/></svg>옷 등록</div>
+      <nav class="nav" data-nav="closet"></nav>
+    </div>
+  </section>
+
+  <!-- 15. 옷 상세·수정 -->
+  <section class="item"><h3>옷 상세·수정</h3>
+    <div class="phone" id="cloth-detail">
+      <div data-tpl="t-status"></div>
+      <div class="appbar"><div class="back" data-go="closet"><svg class="i"><use href="#back"/></svg></div><h1 class="sm">옷 상세</h1><span class="bdg b-warn">미확인</span></div>
+      <div class="scroll" style="padding-bottom:90px">
+        <div class="cloth" style="height:190px;aspect-ratio:auto;font-size:96px"><span style="filter:grayscale(1) brightness(.35)">👕</span></div>
+        <div style="font-size:11px;color:var(--sub);margin:8px 2px 0;line-height:1.5">주문내역 캡처로 등록 · 2026-10-12<br>자동 분류 결과예요. 맞는지 확인하고 저장해 주세요.</div>
+        <div class="form">
+          <div class="lab">종류</div>
+          <div class="chips big"><span>아우터</span><span class="on">상의</span><span>하의</span><span>기타</span></div>
+          <div class="lab">색 · 블랙</div>
+          <div class="colors" style="margin:0"><i class="on" style="background:#1C1C22"></i><i style="background:#F4F4F0"></i><i style="background:#9A9AA2"></i><i style="background:#26345A"></i><i style="background:#3F6FD1"></i><i style="background:#D8C4A3"></i><i style="background:#7A5233"></i><i style="background:#E7849E"></i></div>
+          <div class="lab">이름</div>
+          <label class="field"><input value="라운드넥 울 니트"></label>
+          <div class="lab">브랜드 · 사이즈</div>
+          <div class="row2"><label class="field" style="flex:1"><input value="UNIQLO"></label><label class="field" style="width:84px"><input value="M"></label></div>
+          <div class="lab">소재</div>
+          <label class="field"><input placeholder="모르면 비워 두세요"></label>
+        </div>
+      </div>
+      <div class="actionbar"><button class="btn danger" style="width:90px">삭제</button><button class="btn primary" data-go="closet">확인하고 저장</button></div>
+    </div>
+  </section>
+
+  <!-- 16. 등록 방법 고르기 -->
+  <section class="item"><h3>등록 방법 고르기</h3>
+    <div class="phone" id="register-pick">
+      <div data-tpl="t-status"></div>
+      <div class="appbar"><h1>내 옷장 <span style="font-size:13px;color:var(--sub);font-weight:600">23벌</span></h1></div>
+      <div class="scroll">
+        <div class="pickgrid">
+          <div class="gitem"><div class="cloth"><span style="filter:sepia(.5)">🧥</span></div></div>
+          <div class="gitem"><div class="cloth"><span style="filter:brightness(.4)">🧥</span></div></div>
+          <div class="gitem"><div class="cloth">👕</div></div>
+          <div class="gitem"><div class="cloth">👔</div></div>
+          <div class="gitem"><div class="cloth">👖</div></div>
+          <div class="gitem"><div class="cloth">👚</div></div>
+        </div>
+      </div>
+      <div class="dim" data-go="closet"></div>
+      <div class="bsheet">
+        <div class="handle"></div>
+        <b style="font-size:17px">옷 등록하기</b>
+        <div style="font-size:12px;color:var(--sub);margin:4px 0 14px">한 벌씩 찍는 것보다 주문내역 캡처가 훨씬 빨라요.</div>
+        <div class="stack">
+          <div class="optrow" data-go="import-review"><div class="icon-sq"><svg class="i"><use href="#image"/></svg></div><div class="grow"><b>주문내역 캡처</b> <span class="bdg b-p">추천</span><small>쇼핑 앱·사이트의 주문내역 화면을 캡처해 올리면 여러 벌을 한 번에 등록해요</small></div><svg class="i"><use href="#chev"/></svg></div>
+          <div class="optrow" data-go="import-review"><div class="icon-sq"><svg class="i"><use href="#receipt"/></svg></div><div class="grow"><b>영수증 사진</b><small>매장에서 산 옷. 영수증엔 사진이 없어서 옷 사진은 나중에 붙여요</small></div><svg class="i"><use href="#chev"/></svg></div>
+          <div class="optrow" data-go="register-photo"><div class="icon-sq"><svg class="i"><use href="#camera"/></svg></div><div class="grow"><b>사진으로 등록</b><small>옷 한 벌씩 찍은 사진을 골라요. 여러 장을 한 번에 고를 수 있어요</small></div><svg class="i"><use href="#chev"/></svg></div>
+        </div>
+        <div style="font-size:11px;color:var(--sub);margin:12px 2px 0">이 앱에서 산 옷은 결제가 끝나면 자동으로 물어봐요.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 17. 사진으로 등록 (결과) — 문구는 mmminsung02 앱(RegisterPhotoScreen.kt)과 같다 -->
+  <section class="item"><h3>사진으로 등록 (결과)</h3>
+    <div class="phone" id="register-photo">
+      <div data-tpl="t-status"></div>
+      <div class="appbar"><div class="back" data-go="register-pick"><svg class="i"><use href="#back"/></svg></div><h1 class="sm">사진으로 옷 등록</h1></div>
+      <div class="scroll" style="padding-bottom:90px">
+        <div style="font-size:12px;color:var(--sub);margin:0 2px">분류하는 중 (5/6)</div>
+        <div class="bar"><i style="width:80%"></i></div>
+        <div class="cand"><div class="cloth"><span style="filter:grayscale(1) brightness(.35)">👕</span></div><div class="grow"><b>상의 · 블랙</b><small>자동 분류 결과</small></div><span class="bdg b-warn">미확인</span></div>
+        <div class="cand"><div class="cloth">👖</div><div class="grow"><b>하의 · 네이비</b><small>자동 분류 결과</small></div><span class="bdg b-warn">미확인</span></div>
+        <div class="cand" style="align-items:flex-start"><div class="cloth">🧣</div><div class="grow"><b>종류를 골라 주세요</b><small>색: 블루</small><div class="chips"><span>상의</span><span>하의</span><span>아우터</span><span class="on">기타</span></div></div></div>
+        <div class="cand"><div class="cloth">👚</div><div class="grow"><b>이미 등록된 사진이에요</b><small>옷장에 있는 옷이라 새로 저장하지 않았어요</small></div></div>
+        <div class="cand"><div class="cloth"><span style="filter:sepia(.5)">🧥</span></div><div class="grow"><b style="color:var(--red)">서버에 연결하지 못했어요</b></div><button class="btn outline small" style="width:auto;padding:0 12px">다시 시도</button></div>
+        <div class="cand off"><div class="cloth">👔</div><div class="grow"><b>기다리는 중</b></div></div>
+      </div>
+      <div class="actionbar"><button class="btn outline">더 등록하기</button><button class="btn primary" data-go="closet">완료</button></div>
+    </div>
+  </section>
+
+  <!-- 18. 자동 등록 후보 확인 (주문내역 캡처 · 영수증 공통) -->
+  <section class="item"><h3>자동 등록 후보 확인</h3>
+    <div class="phone" id="import-review">
+      <div data-tpl="t-status"></div>
+      <div class="appbar"><div class="back" data-go="register-pick"><svg class="i"><use href="#back"/></svg></div><h1 class="sm">등록할 옷 고르기</h1></div>
+      <div class="scroll" style="padding-bottom:90px">
+        <div class="note">주문내역 캡처 2장에서 상품 5개를 찾았어요. 틀린 건 눌러서 고쳐 주세요.</div>
+        <div class="cand"><span class="cbx on"><svg class="i"><use href="#check"/></svg></span><div class="cloth">👔</div><div class="grow">오버핏 코튼 셔츠<small>화이트 · L · ₩39,900 · 10/12</small></div><span class="bdg b-p">상의</span></div>
+        <div class="cand"><span class="cbx on"><svg class="i"><use href="#check"/></svg></span><div class="cloth">👖</div><div class="grow">와이드 데님 팬츠<small>인디고 · 30 · ₩59,000 · 10/12</small></div><span class="bdg b-p">하의</span></div>
+        <div class="cand"><span class="cbx on"><svg class="i"><use href="#check"/></svg></span><div class="cloth nophoto"><svg class="i"><use href="#camera"/></svg></div><div class="grow">울 니트 베스트 <span class="bdg b-warn">사진 필요</span><small>그레이 · M · ₩45,000 · 9/30</small></div><span class="bdg b-p">상의</span></div>
+        <div class="cand off"><span class="cbx"><svg class="i"><use href="#check"/></svg></span><div class="cloth">🧴</div><div class="grow">핸드크림 50ml<small>₩12,000 · 9/30</small></div><span class="bdg b-gray">의류 아님</span></div>
+        <div class="cand off"><span class="cbx"><svg class="i"><use href="#check"/></svg></span><div class="cloth"><span style="filter:sepia(.5)">🧥</span></div><div class="grow">카멜 코트<small>이미 등록된 옷이에요</small></div></div>
+        <div style="font-size:11px;color:var(--sub);margin:12px 2px 0">주문자 이름·주소·연락처는 읽지도 저장하지도 않아요.</div>
+      </div>
+      <div class="actionbar"><div class="cnt"><b>3</b>개 선택</div><button class="btn primary" data-go="closet">옷장에 저장</button></div>
+    </div>
+  </section>
+
+  <!-- 19. 공유로 받은 상품 (다른 앱 → 공유 → 스크린샷 분석) -->
+  <section class="item"><h3>공유로 받은 상품</h3>
+    <div class="phone" id="share-result">
+      <div data-tpl="t-status"></div>
+      <div class="appbar"><div class="back" data-go="home-base"><svg class="i"><use href="#back"/></svg></div><h1 class="sm">공유로 받은 상품</h1></div>
+      <div class="scroll" style="padding-bottom:20px">
+        <div style="font-size:11px;color:var(--sub);margin:0 2px 8px;display:flex;gap:5px;align-items:center"><svg class="i" style="width:14px;height:14px"><use href="#share"/></svg>다른 쇼핑 앱에서 공유한 스크린샷 1장</div>
+        <div class="mini" style="display:flex;gap:10px">
+          <div class="cloth" style="width:80px;font-size:40px;flex:none;align-self:flex-start">👖</div>
+          <dl class="kv" style="margin:0;flex:1;grid-template-columns:38px 1fr"><dt>상품명</dt><dd>스트레이트 데님 팬츠</dd><dt>색</dt><dd>미드 블루</dd><dt>소재</dt><dd>면 98%, 폴리우레탄 2% <span class="bdg b-warn">불확실</span></dd><dt>핏</dt><dd>스트레이트</dd><dt>사이즈</dt><dd>W28–34 (71–86cm)</dd><dt>세탁</dt><dd style="color:var(--muted)">정보 없음</dd></dl>
+        </div>
+        <div class="sec" style="margin-left:0">내 옷장에서 비슷한 옷</div>
+        <div class="top3">
+          <div><div class="cloth">👖</div><div class="level">매우 비슷</div></div>
+          <div><div class="cloth"><span style="filter:grayscale(1)">👖</span></div><div class="level">비슷</div></div>
+          <div><div class="cloth"><span style="opacity:.45">🩳</span></div><div class="level" style="background:var(--surface2);color:var(--sub)">조금 다름</div></div>
+        </div>
+        <div class="mini rep" style="margin-top:12px">
+          <h5 style="margin-top:0">비슷한 점</h5><ul><li>둘 다 파란 계열 스트레이트 청바지예요</li></ul>
+          <h5>다른 점</h5><ul><li>새 상품은 신축성 소재(폴리우레탄 2%), 기존 옷은 면 100%예요</li></ul>
+          <h5>확인 안 된 점</h5><ul><li>새 상품의 세탁 방법이 스크린샷에 없어요</li><li>기존 옷의 기장 정보가 없어요</li></ul>
+        </div>
+        <div style="font-size:11px;color:var(--sub);margin:10px 2px 0">구매는 직접 판단해 주세요. 비교는 사진과 적힌 정보로만 했어요.</div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <script>
@@ -862,7 +1007,7 @@
   // 하단 탭 (쇼핑 탭은 쇼핑몰 목록으로 바로 간다)
   const TABS = [
     { key: 'home', label: '홈', icon: 'home', go: 'home-base' },
-    { key: 'closet', label: '내 옷장', icon: 'hanger', go: 'closet-select' },
+    { key: 'closet', label: '내 옷장', icon: 'hanger', go: 'closet' },
     { key: 'shop', label: '쇼핑', icon: 'bag', go: 'shop-list' },
     { key: 'my', label: '마이', icon: 'user', go: 'my' },
   ];
