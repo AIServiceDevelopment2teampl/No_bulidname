@@ -86,6 +86,29 @@ object ClothLabels {
             "multi" to "멀티(패턴)",
         )
 
+    // 필터 칩 순서 (시안: 전체 / 아우터 / 상의 / 하의 / 기타)
+    val categoryOrder = listOf("outer", "top", "bottom", "other")
+
+    // 색 동그라미. 앞의 10개는 docs/app-sitemap/index.html 시안 값, 나머지 5개는 시안에 없어 새로 정함
+    val swatches =
+        mapOf(
+            "black" to 0xFF1C1C22,
+            "white" to 0xFFF4F4F0,
+            "gray" to 0xFF9A9AA2,
+            "navy" to 0xFF26345A,
+            "blue" to 0xFF3F6FD1,
+            "beige" to 0xFFD8C4A3,
+            "brown" to 0xFF7A5233,
+            "khaki" to 0xFF6E7445,
+            "pink" to 0xFFE7849E,
+            "red" to 0xFFC9373D,
+            "green" to 0xFF3E8E5A,
+            "purple" to 0xFF7B5BB5,
+            "yellow" to 0xFFE8C547,
+            "orange" to 0xFFE98A3B,
+            "multi" to 0xFFB0A8C8,
+        )
+
     fun category(code: String) = categories[code] ?: code
 
     fun color(code: String) = colors[code] ?: code

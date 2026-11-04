@@ -1,6 +1,9 @@
 package com.team12.closet
 
 import com.team12.closet.FakeClothesRepository.Companion.photo
+import com.team12.closet.data.ApiResult
+import com.team12.closet.data.ClothFilter
+import com.team12.closet.data.ClothUpdate
 import com.team12.closet.data.NetworkClothesRepository
 import com.team12.closet.data.UploadOutcome
 import kotlinx.coroutines.test.runTest
@@ -8,6 +11,7 @@ import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -113,4 +117,100 @@ class NetworkClothesRepositoryTest {
 
             assertEquals(UploadOutcome.Failed("서버에 연결하지 못했어요"), outcome)
         }
+
+    // 기능 2: 옷장 조회·수정·삭제
+
+    @Test
+    fun listSendsFilterAndParsesItems() =
+        runTest {
+            respond(
+                200,
+                """{"items":[{"id":3,"image_url":"/v1/clothes/3/image","category":"top","color":"black",""" +
+                    """"name":null,"brand":"UNIQLO","material":null,"size":"M","source":"photo","confirmed":false,""" +
+                    """"needs_category":false,"needs_photo":false,"created_at":"2026-11-04 10:00:00"}],"total":1}""",
+            )
+
+            val result = repository.listClothes(ClothFilter(category = "top", color = "black"))
+
+            val page = (result as ApiResult.Ok).value
+            assertEquals(1, page.total)
+            assertEquals("UNIQLO", page.items[0].brand)
+            assertNull(page.items[0].name)
+            val request = server.takeRequest()
+            assertEquals("/v1/clothes", request.url.encodedPath)
+            assertEquals("top", request.url.queryParameter("category"))
+            assertEquals("black", request.url.queryParameter("color"))
+        }
+
+    @Test
+    fun listWithoutFilterSendsNoQuery() =
+        runTest {
+            respond(200, """{"items":[],"total":0}""")
+
+            repository.listClothes(ClothFilter())
+
+            assertNull(server.takeRequest().url.query)
+        }
+
+    @Test
+    fun updateSendsOnlyGivenFieldsAndParsesCloth() =
+        runTest {
+            respond(
+                200,
+                """{"id":3,"category":"outer","color":"navy","name":"코트","source":"photo","confirmed":true}""",
+            )
+
+            val result = repository.updateCloth(3, ClothUpdate(category = "outer", name = ""))
+
+            assertEquals("outer", (result as ApiResult.Ok).value.category)
+            val request = server.takeRequest()
+            assertEquals("PATCH", request.method)
+            assertEquals("/v1/clothes/3", request.url.encodedPath)
+            assertEquals("""{"category":"outer","name":""}""", request.body!!.utf8())
+        }
+
+    @Test
+    fun updateWithInvalidValueReturnsServerMessage() =
+        runTest {
+            respond(400, """{"detail":"알 수 없는 종류예요: shoes"}""")
+
+            val result = repository.updateCloth(3, ClothUpdate(category = "shoes"))
+
+            assertEquals(ApiResult.Error("알 수 없는 종류예요: shoes"), result)
+        }
+
+    @Test
+    fun deleteOfMissingClothReturnsNotFound() =
+        runTest {
+            respond(404, """{"detail":"옷을 찾을 수 없어요"}""")
+
+            assertEquals(ApiResult.Error("옷을 찾을 수 없어요"), repository.deleteCloth(9))
+        }
+
+    @Test
+    fun deleteAndDeleteAllUseDeleteMethod() =
+        runTest {
+            server.enqueue(MockResponse.Builder().code(204).build())
+            server.enqueue(MockResponse.Builder().code(204).build())
+
+            assertEquals(ApiResult.Ok(Unit), repository.deleteCloth(3))
+            assertEquals(ApiResult.Ok(Unit), repository.deleteAllMyData())
+
+            server.takeRequest().let {
+                assertEquals("DELETE", it.method)
+                assertEquals("/v1/clothes/3", it.url.encodedPath)
+            }
+            server.takeRequest().let {
+                assertEquals("DELETE", it.method)
+                assertEquals("/v1/me/data", it.url.encodedPath)
+            }
+        }
+
+    @Test
+    fun imageUrlIsJoinedWithServerAddress() {
+        val url = repository.imageUrl("/v1/clothes/3/image")
+
+        assertEquals(server.url("/v1/clothes/3/image").toString(), url)
+        assertNull(repository.imageUrl(null))
+    }
 }
