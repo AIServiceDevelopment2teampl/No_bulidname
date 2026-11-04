@@ -19,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -27,9 +28,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.team12.closet.data.ClothLabels
 import com.team12.closet.data.PickedPhoto
+import com.team12.closet.data.RegisteredCloth
 import com.team12.closet.data.UploadOutcome
 
 /** 실제 앱: 시스템 사진 선택기로 여러 장을 고른다 */
@@ -72,7 +75,23 @@ fun RegisterPhotoScreen(
     onDone: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
+    RegisterPhotoContent(
+        state = state,
+        onPickPhotos = onPickPhotos,
+        onRetry = viewModel::retry,
+        onReset = viewModel::reset,
+        onDone = onDone,
+    )
+}
 
+@Composable
+private fun RegisterPhotoContent(
+    state: RegisterUiState,
+    onPickPhotos: () -> Unit,
+    onRetry: (PickedPhoto) -> Unit,
+    onReset: () -> Unit,
+    onDone: () -> Unit,
+) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -98,10 +117,10 @@ fun RegisterPhotoScreen(
                     modifier = Modifier.weight(1f).testTag("result_list"),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    items(s.items) { item -> ResultCard(item, onRetry = { viewModel.retry(item.photo) }) }
+                    items(s.items) { item -> ResultCard(item, onRetry = { onRetry(item.photo) }) }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = viewModel::reset) { Text("더 등록하기") }
+                    OutlinedButton(onClick = onReset) { Text("더 등록하기") }
                     Button(onClick = onDone, modifier = Modifier.testTag("done")) { Text("완료") }
                 }
             }
@@ -144,3 +163,44 @@ private fun ResultCard(
         }
     }
 }
+
+// Android Studio 미리보기 전용 (가짜 데이터)
+
+private fun previewPhoto(name: String) = PickedPhoto(name, "image/jpeg", byteArrayOf())
+
+private fun previewRegistered(
+    category: String,
+    color: String,
+    needsCategory: Boolean = false,
+    duplicate: Boolean = false,
+) = UploadOutcome.Registered(RegisteredCloth(1, category, color, false, needsCategory), duplicate)
+
+@Composable
+private fun PreviewFrame(state: RegisterUiState) {
+    MaterialTheme {
+        Surface { RegisterPhotoContent(state, {}, {}, {}, {}) }
+    }
+}
+
+@Preview(name = "1. 사진 선택 전", showBackground = true, heightDp = 400)
+@Composable
+private fun IdlePreview() = PreviewFrame(RegisterUiState.Idle)
+
+@Preview(name = "2. 업로드 중", showBackground = true, heightDp = 400)
+@Composable
+private fun UploadingPreview() = PreviewFrame(RegisterUiState.Uploading(done = 1, total = 3))
+
+@Preview(name = "3. 결과", showBackground = true, heightDp = 800)
+@Composable
+private fun DonePreview() =
+    PreviewFrame(
+        RegisterUiState.Done(
+            listOf(
+                UploadItem(previewPhoto("shirt.jpg"), previewRegistered("top", "black")),
+                UploadItem(previewPhoto("cap.jpg"), previewRegistered("other", "gray", needsCategory = true)),
+                UploadItem(previewPhoto("jeans.jpg"), previewRegistered("bottom", "blue", duplicate = true)),
+                UploadItem(previewPhoto("memo.txt"), UploadOutcome.Rejected("이미지를 읽을 수 없어요")),
+                UploadItem(previewPhoto("coat.jpg"), UploadOutcome.Failed("서버에 연결하지 못했어요")),
+            ),
+        ),
+    )
