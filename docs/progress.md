@@ -16,6 +16,7 @@
 | 2026-10-28 | 사용자가 쇼핑몰을 직접 추가하는 기능을 넣기로 함 | [shop-browser.md](features/shopping/shop-browser.md)에 요구사항 추가 |
 | 2026-10-28 | 브라우저로 저장한 ASOS 상품 페이지 확인 (`docs/site_html/`) | **JSON-LD `Product` 있음**: 상품명, 색, 이미지, 브랜드, 설명(핏 포함, 예: "Regular fit"), 가격·통화(USD). 소재·세탁·모델 키는 `window.asos.pdp.config` 안 `aboutMe`·`careInfo`·`sizeAndFit`에 있음. ZOZOTOWN은 저장이 끝나지 않아 다시 해야 함 (Ctrl+S에서 "웹페이지, HTML만"으로 저장 권장). 저장한 페이지의 부속 파일 폴더(`*_files/`)는 `.gitignore`에 넣고 HTML만 올림 |
 | 2026-10-28 | 서버 뼈대·테스트 환경 생성 | `src/server/`(FastAPI, `/health`), `tests/server/`(pytest), `tests/inject/`(Node 내장 테스트 + jsdom), ruff 설정(`pyproject.toml`). 실행: `python -m venv .venv` → `.venv/Scripts/pip install -r src/server/requirements-dev.txt` → `.venv/Scripts/python -m pytest`, `npm install` → `npm run test:inject`. 안드로이드 프로젝트는 이 PC에 Android Studio가 없어 아직 못 만듦 |
+| 2026-11-04 | 안드로이드 프로젝트 뼈대 생성 (`sandbox/mmminsung02/android/`, 검수 전) | AGP 9.5.0, Gradle 9.8.2, Kotlin 2.4.21, Compose BOM 2026.09.00, compileSdk 37, targetSdk 36, minSdk 26, ktlint. 하단 탭 4개(홈/내 옷장/번역/마이) 빈 화면. Robolectric 테스트 3개(탭 표시, 탭 전환, targetSdk 36 이상) 통과, 디버그 APK 빌드 성공. 실제 폰 실행은 미확인. 실행: `cd sandbox/mmminsung02/android` → `./gradlew ktlintCheck testDebugUnitTest assembleDebug` (JAVA_HOME은 Android Studio의 `jbr`). JDK 25에서 Robolectric을 돌리려고 테스트 JVM에 `--add-opens java.io`, `--add-exports jdk.internal.access`를 넣음. applicationId는 임시 `com.team12.closet` |
 | 2026-10-21 | 대화 기록 저장, 문서 커밋·푸시 | [conversation-log.md](conversation-log.md). 제출 기획서 PDF는 팀원 이름·학번이 있어 공개 저장소에 올리지 않음 (`.gitignore`) |
 
 ## 결정 사항
@@ -58,7 +59,7 @@
 ## 미결정 사항
 | 항목 | 후보 | 비고 |
 |------|------|------|
-| 서비스 이름 | ClosetLens, 옷장 AI | 스토어 등록 전까지 |
+| 서비스 이름 | ClosetLens, 옷장 AI | 스토어 등록 전까지. applicationId(앱 고유 ID, 지금은 임시 `com.team12.closet`)도 같이 정한다 |
 | 홈 화면 시안 | 베이스(2카드), 초안(4카드) | `docs/image/` |
 | 번역 방식 | LLM 전부 / 번역 API + LLM(구조화만) | 비용·속도 비교 후 |
 | OCR | EasyOCR(서버) / ML Kit(기기) | |
@@ -71,7 +72,7 @@
 1. **Play Console 개인 개발자 계정 만들기**, 비공개 테스트 테스터 15명 정도 모으기 시작 (14일 테스트가 일정의 병목)
 2. 미결정 사항 중 OCR·지원 쇼핑몰 정하기
 3. **기술 검증**: 후보 쇼핑몰마다 WebView에서 열림, 로그인·장바구니·결제 화면 진입, JS 주입으로 글자 읽기·바꾸기, JSON-LD Product 유무를 확인하고 결과를 여기에 기록
-4. **Android Studio 설치** (팀) → 안드로이드 프로젝트 생성 (minSdk 26, targetSdk 36, ktlint). 서버 뼈대·테스트 환경은 완료
+4. 안드로이드 프로젝트 뼈대 검수 후 `src/android/`로 옮기기 (sandbox에서 생성 완료). **applicationId 정하기** (Play에 올리면 바꿀 수 없음, 서비스 이름과 함께 첫 비공개 테스트 전까지)
 5. 평가 데이터 준비 시작: 의류 사진 100~200장 라벨링, 영어·일본어 상품 페이지·캡처 30~50개
 6. 기능 1번 [wardrobe/photo-register.md](features/wardrobe/photo-register.md)부터 순서대로
 

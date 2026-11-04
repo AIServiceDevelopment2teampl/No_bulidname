@@ -192,3 +192,21 @@ ZOZOTOWN 상품 페이지 구조를 확인하고, 사용자가 쇼핑몰을 직�
 ### 다음 세션 AI에게
 - 업로드 오류가 동시 푸시 충돌이었다면 sandbox로는 해결되지 않는다. 푸시 전에 항상 `git pull --rebase`
 3. **SP2 과제 (10/28 제출)** — 과제 항목: MVP 구현 계획, 완성본 구현 계획, 팀 GitHub 주소(오늘 커밋). 교수님이 저장소 공개를 확인해야 해서 비공개 전환은 하지 않기로 함. `docs/sp2-plan.md` 작성 (SP2 MVP = 기능 1~5, 7, 8 + 비공개 테스트 시작, 페이지 전체 번역은 도전 목표)
+
+---
+
+## 2026-11-04 세션 (Claude Code, VS Code, mmminsung02)
+
+### 한 줄 요약
+Android Studio를 설치하고 안드로이드 프로젝트 뼈대를 `sandbox/mmminsung02/android/`에 만들었다. 빌드와 테스트 통과.
+
+### 대화 흐름
+1. **Android Studio 설치**: 이 PC는 RAM 7.7GB, 디스크가 빠듯해서 가상 폰(에뮬레이터) 없이 설치하라고 안내. 테스트는 안드로이드 폰이 있는 팀원에게 APK를 보내는 방식(추천) 또는 팀원 PC에서 실행. 사용자가 디스크를 25GB까지 비움. 에뮬레이터(1.1GB)는 해제가 안 되고 설치돼 있음
+2. **프로젝트 뼈대**: 최신 안정 버전 확인 후 생성 (AGP 9.5.0, Gradle 9.8.2, Kotlin 2.4.21, Compose BOM 2026.09.00). 하단 탭 4개 빈 화면, Robolectric 테스트 3개
+3. **빌드 중 고친 것**: ktlint가 Compose 함수 이름(대문자)을 오류로 봐서 `.editorconfig`에 Composable 예외 추가 / Robolectric이 JDK 25에서 실패해서 테스트 JVM 인자 추가 / `createComposeRule`을 v2로 바꿈 (기존 것은 deprecated)
+
+### 다음 세션 AI에게
+- applicationId는 임시값이다. Play 업로드 전에 꼭 정한다
+- 실제 폰 실행은 아직 안 했다. 디버그 APK: `sandbox/mmminsung02/android/app/build/outputs/apk/debug/app-debug.apk`
+- 이 PC는 RAM 7.7GB라 Gradle 힙을 2GB로 잡았다 (`gradle.properties`)
+
