@@ -14,8 +14,9 @@ android {
         applicationId = "com.team12.closet"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        // 시험용 APK 버전은 -PversionCode=2 -PversionName=0.1.1 처럼 넘긴다 (README 'AI에게 요청')
+        versionCode = providers.gradleProperty("versionCode").map { it.toInt() }.getOrElse(1)
+        versionName = providers.gradleProperty("versionName").getOrElse("0.1.0")
 
         // 서버 주소. 바꾸려면 gradle.properties나 -PserverBaseUrl=... 로 넘긴다
         val serverBaseUrl = providers.gradleProperty("serverBaseUrl").getOrElse("http://10.0.2.2:8000/")
