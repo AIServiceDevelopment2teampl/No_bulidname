@@ -34,6 +34,7 @@ import com.team12.closet.data.ClothLabels
 import com.team12.closet.data.PickedPhoto
 import com.team12.closet.data.RegisteredCloth
 import com.team12.closet.data.UploadOutcome
+import com.team12.closet.ui.theme.ClosetTheme
 
 /** 실제 앱: 시스템 사진 선택기로 여러 장을 고른다 */
 @Composable
@@ -177,7 +178,7 @@ private fun previewRegistered(
 
 @Composable
 private fun PreviewFrame(state: RegisterUiState) {
-    MaterialTheme {
+    ClosetTheme(darkTheme = false) {
         Surface { RegisterPhotoContent(state, {}, {}, {}, {}) }
     }
 }

@@ -1,18 +1,28 @@
 package com.team12.closet
 
 import android.content.Context
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
 import com.team12.closet.ui.ClosetApp
 import com.team12.closet.ui.MainTab
+import com.team12.closet.ui.theme.AppTheme
+import com.team12.closet.ui.theme.DarkColors
+import com.team12.closet.ui.theme.InMemoryThemeStore
+import com.team12.closet.ui.theme.LightColors
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 class ClosetAppTest {
@@ -21,7 +31,7 @@ class ClosetAppTest {
 
     @Test
     fun startsOnHomeAndShowsFourTabs() {
-        composeRule.setContent { ClosetApp(FakeClothesRepository()) }
+        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore()) }
 
         MainTab.entries.forEach { composeRule.onNodeWithTag("tab_${it.name}").assertIsDisplayed() }
         composeRule.onNodeWithTag("screen_HOME").assertIsDisplayed()
@@ -29,7 +39,7 @@ class ClosetAppTest {
 
     @Test
     fun tappingTabSwitchesScreen() {
-        composeRule.setContent { ClosetApp(FakeClothesRepository()) }
+        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore()) }
 
         composeRule.onNodeWithTag("tab_CLOSET").performClick()
 
@@ -38,7 +48,7 @@ class ClosetAppTest {
 
     @Test
     fun closetTabOpensPhotoRegisterScreen() {
-        composeRule.setContent { ClosetApp(FakeClothesRepository()) }
+        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore()) }
         composeRule.onNodeWithTag("tab_CLOSET").performClick()
 
         composeRule.onNodeWithTag("open_register_photo").performClick()
@@ -52,5 +62,46 @@ class ClosetAppTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
 
         assertTrue(context.applicationInfo.targetSdkVersion >= 36)
+    }
+
+    // README 'AI에게 요청': 하단 탭은 홈 / 내 옷장 / 쇼핑 / 마이
+    @Test
+    fun tabLabelsMatchSitemap() {
+        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore()) }
+
+        listOf("홈", "내 옷장", "쇼핑", "마이").forEach { composeRule.onNodeWithText(it).assertIsDisplayed() }
+        composeRule.onNodeWithText("번역").assertDoesNotExist()
+    }
+
+    // 색 값은 docs/app-sitemap/index.html 시안과 같다
+    @Test
+    fun themeColorsMatchMockup() {
+        assertEquals(Color(0xFF5B5CEB), LightColors.primary)
+        assertEquals(Color(0xFFF5F5FA), LightColors.background)
+        assertEquals(Color(0xFF8E8FFF), DarkColors.primary)
+        assertEquals(Color(0xFF0C0D18), DarkColors.background)
+    }
+
+    @Test
+    @Config(qualifiers = "night")
+    fun withoutChoiceThemeFollowsDevice() {
+        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore()) }
+
+        composeRule.onNodeWithTag("tab_MY").performClick()
+
+        composeRule.onNodeWithTag("theme_DARK").assertIsSelected()
+    }
+
+    @Test
+    fun choosingThemeInMyTabIsSavedAndApplied() {
+        val store = InMemoryThemeStore(AppTheme.LIGHT)
+        composeRule.setContent { ClosetApp(FakeClothesRepository(), store) }
+        composeRule.onNodeWithTag("tab_MY").performClick()
+
+        composeRule.onNodeWithTag("theme_DARK").performClick()
+
+        assertEquals(AppTheme.DARK, store.load())
+        composeRule.onNodeWithTag("theme_DARK").assertIsSelected()
+        composeRule.onNodeWithTag("theme_LIGHT").assertIsNotSelected()
     }
 }
