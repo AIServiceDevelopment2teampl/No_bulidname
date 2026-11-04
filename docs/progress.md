@@ -17,6 +17,7 @@
 | 2026-10-28 | 브라우저로 저장한 ASOS 상품 페이지 확인 (`docs/site_html/`) | **JSON-LD `Product` 있음**: 상품명, 색, 이미지, 브랜드, 설명(핏 포함, 예: "Regular fit"), 가격·통화(USD). 소재·세탁·모델 키는 `window.asos.pdp.config` 안 `aboutMe`·`careInfo`·`sizeAndFit`에 있음. ZOZOTOWN은 저장이 끝나지 않아 다시 해야 함 (Ctrl+S에서 "웹페이지, HTML만"으로 저장 권장). 저장한 페이지의 부속 파일 폴더(`*_files/`)는 `.gitignore`에 넣고 HTML만 올림 |
 | 2026-10-28 | 서버 뼈대·테스트 환경 생성 | `src/server/`(FastAPI, `/health`), `tests/server/`(pytest), `tests/inject/`(Node 내장 테스트 + jsdom), ruff 설정(`pyproject.toml`). 실행: `python -m venv .venv` → `.venv/Scripts/pip install -r src/server/requirements-dev.txt` → `.venv/Scripts/python -m pytest`, `npm install` → `npm run test:inject`. 안드로이드 프로젝트는 이 PC에 Android Studio가 없어 아직 못 만듦 |
 | 2026-11-04 | 안드로이드 프로젝트 뼈대 생성 (`sandbox/mmminsung02/android/`, 검수 전) | AGP 9.4.0 (설치된 Android Studio 2026.2.1이 지원하는 최신. 9.5.0은 동기화 실패), Gradle 9.8.2, Kotlin 2.4.21, Compose BOM 2026.09.00, compileSdk 37, targetSdk 36, minSdk 26, ktlint. 하단 탭 4개(홈/내 옷장/번역/마이) 빈 화면. Robolectric 테스트 3개(탭 표시, 탭 전환, targetSdk 36 이상) 통과, 디버그 APK 빌드 성공. 실제 폰 실행은 미확인. 실행: `cd sandbox/mmminsung02/android` → `./gradlew ktlintCheck testDebugUnitTest assembleDebug` (JAVA_HOME은 Android Studio의 `jbr`). JDK 25에서 Robolectric을 돌리려고 테스트 JVM에 `--add-opens java.io`, `--add-exports jdk.internal.access`를 넣음. applicationId는 임시 `com.team12.closet` |
+| 2026-11-04 | 화면 시안 PNG 3장을 HTML 목업으로 옮김 (`sandbox/moneyhipo/mockup/index.html`, 검수 전) | 화면 6개: 로그인(Google), 로그아웃 확인, 비로그인 홈, 로그인 후 메인(프로필 메뉴), 홈 베이스, 홈 초안. 버튼을 누르면 이어지는 화면으로 이동. 옷 사진·로봇 그림은 이모지·도형으로 대신함. 색은 `:root`에 모아 둠(주 색 `#5B5CEB`), 앱 테마를 만들 때 쓴다. 시안과 문서가 어긋난 4곳은 아래 결정 사항대로 고침 |
 | 2026-10-21 | 대화 기록 저장, 문서 커밋·푸시 | [conversation-log.md](conversation-log.md). 제출 기획서 PDF는 팀원 이름·학번이 있어 공개 저장소에 올리지 않음 (`.gitignore`) |
 
 ## 결정 사항
@@ -37,6 +38,10 @@
 | 2026-10-28 | 계정은 **Google 로그인** | 폰을 바꿔도 옷장이 유지된다. Play 정책상 앱 안과 웹 두 곳에 계정 삭제가 필요해서 기능 문서 [account/google-login.md](features/account/google-login.md)를 추가하고 기능 순서 3번에 넣었다. 이메일·Apple 로그인은 넣지 않는다 |
 | 2026-10-28 | 안드로이드 테스트는 Gradle 기본 위치(`src/android/app/src/test`)에 둔다. 서버·주입 JS 테스트는 `tests/` | Android Studio에서 바로 돌릴 수 있다. CLAUDE.md 규칙 5번에 예외로 적음 |
 | 2026-10-28 | 코딩 규칙: Kotlin은 **ktlint**, Python은 **ruff** | 누가 작성해도 코드 모양이 같아진다. CLAUDE.md 코딩 규칙에 적음 |
+| 2026-11-04 | 로그인은 **Google 로그인만** 쓴다. 시안에 있던 이메일·비밀번호 로그인, 회원가입, 회원가입 완료, Apple 로그인 화면은 만들지 않는다 | 10/28 결정을 유지했다. 비밀번호 저장·재설정이 필요 없고, 처음 쓰는 사람도 버튼 하나로 바로 가입된다 |
+| 2026-11-04 | 쇼핑몰은 로고 대신 **이름 글자**로 보여 준다. 시안의 ZARA·H&M·amazon·asos 로고는 지원 후보(ASOS, ZOZOTOWN, UNIQLO, GU) 이름으로 바꿈 | 로고는 Play 지식재산권 정책 위험이 있다. ZARA·H&M·Amazon 미국은 한국어를 지원해서 후보에서 뺀 곳이다 |
+| 2026-11-04 | 유사도는 숫자(%) 대신 **`매우 비슷` / `비슷`** 같은 단계로 보여 준다 | 숫자는 '중복 구매 확률'처럼 읽힐 수 있다. 단계 기준 점수는 Recall@3 평가 때 정한다. [similar-search.md](features/compare/similar-search.md)에 적음 |
+| 2026-11-04 | 하단 탭 3번째 이름을 **쇼핑**으로 한다 (탭: 홈 / 내 옷장 / 쇼핑 / 마이) | 누르면 쇼핑몰 목록이 바로 열려서 이름과 맞는다. 베이스 시안의 "화면 번역"은 이미 뺀 오버레이 번역 기능을 떠올리게 하고, "번역"은 글을 넣어 번역하는 화면처럼 오해할 수 있다 |
 
 ## 제출 기획서와 달라진 점 (Sprint 발표에서 설명할 것)
 | 항목 | 제출 기획서 (10/14) | 현재 | 이유 |
@@ -66,13 +71,12 @@
 | CLIP 모델 | 일반 CLIP / 패션 특화 CLIP | 평가로 결정 |
 | 서버 요금제 | Vultr 4GB(예정) / 2GB | CLIP 메모리 사용량을 재고 결정 |
 | 지원 쇼핑몰 목록 | 기준: 많이 쓰이는 해외 쇼핑몰 중 **한국어를 지원하지 않는 곳**. 2026-10-28 직접 확인 결과 한국어 미지원 후보: 영어 **ASOS** (https://www.asos.com/women/), **Urban Outfitters** (https://www.urbanoutfitters.com/), **Abercrombie & Fitch** (https://www.abercrombie.com/, Hollister는 같은 회사라 하나만), **END. Clothing** (https://www.endclothing.com/), **J.Crew** (https://www.jcrew.com/), **Nordstrom** (https://www.nordstrom.com/), **유니클로 미국** (https://www.uniqlo.com/us/en/) / 일본어 **ZOZOTOWN** (https://zozo.jp/), **유니클로 일본** (https://www.uniqlo.com/jp/ja/), **GU 일본** (https://www.gu-global.com/jp/ja/), **BEAMS** (https://www.beams.co.jp/). 한국 직배송(웹 검색, 확인 필요): ASOS 있음(공식 배송 페이지), J.Crew 있음 가능성 높음(한국용 `/kr` 스토어), Urban Outfitters·A&F·END.·Nordstrom 불확실, 유니클로 미국·ZOZOTOWN·유니클로 일본·GU 일본 없음(국내 전용, 배송대행지 필요), BEAMS 자료가 엇갈림. **배송 태그로 표시하고 후보에서 빼지는 않는다** (2026-10-28 결정, [shop-browser.md](features/shopping/shop-browser.md)): `배송 가능` ASOS / `배송대행 필요` 유니클로 미국·ZOZOTOWN·유니클로 일본·GU 일본 / `그 외`(확인 전) J.Crew·Urban Outfitters·A&F·Nordstrom·END.·BEAMS. `그 외`는 결제 화면에서 배송 국가를 한국으로 바꿔 확인하면 옮긴다. Amazon 일본은 한국어 미지원이지만 종합몰이라 기본 목록에서는 빼고 사용자가 직접 추가하게 둔다(초안). 한국어를 지원해서 제외: Amazon(미국), SSENSE, 라쿠텐, UNITED ARROWS, ZARA, H&M | 상품 페이지 구조 확인 완료: ASOS·ZOZOTOWN(JSON-LD 있음), 유니클로 일본(페이지 데이터). 나머지는 앱이 생기면 실제 폰 WebView에서 열림·상품 정보 읽기를 확인하고 기본 목록을 정한다 |
-| 쇼핑몰 목록 표시 | 텍스트 이름(초안) / 로고 | 로고는 Play 지식재산권 정책 위험 |
 
 ## 다음 할 일 (순서대로)
 1. **Play Console 개인 개발자 계정 만들기**, 비공개 테스트 테스터 15명 정도 모으기 시작 (14일 테스트가 일정의 병목)
 2. 미결정 사항 중 OCR·지원 쇼핑몰 정하기
 3. **기술 검증**: 후보 쇼핑몰마다 WebView에서 열림, 로그인·장바구니·결제 화면 진입, JS 주입으로 글자 읽기·바꾸기, JSON-LD Product 유무를 확인하고 결과를 여기에 기록
-4. 안드로이드 프로젝트 뼈대 검수 후 `src/android/`로 옮기기 (sandbox에서 생성 완료). **applicationId 정하기** (Play에 올리면 바꿀 수 없음, 서비스 이름과 함께 첫 비공개 테스트 전까지)
+4. 안드로이드 프로젝트 뼈대 검수 후 `src/android/`로 옮기기 (sandbox에서 생성 완료). 옮기기 전에 3번째 탭 이름을 `번역`에서 `쇼핑`으로 바꾼다 (`ClosetApp.kt`의 `SHOPPING("번역", ...)`, 테스트에 탭 이름이 있으면 같이). **applicationId 정하기** (Play에 올리면 바꿀 수 없음, 서비스 이름과 함께 첫 비공개 테스트 전까지)
 5. 평가 데이터 준비 시작: 의류 사진 100~200장 라벨링, 영어·일본어 상품 페이지·캡처 30~50개
 6. 기능 1번 [wardrobe/photo-register.md](features/wardrobe/photo-register.md)부터 순서대로
 

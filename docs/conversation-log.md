@@ -211,3 +211,20 @@ Android Studio를 설치하고 안드로이드 프로젝트 뼈대를 `sandbox/m
 - 이 PC는 RAM 7.7GB라 Gradle 힙을 2GB로 잡았다 (`gradle.properties`)
 
 - AGP 버전은 Android Studio가 지원하는 최신까지만 쓴다. 지원 버전은 `%LOCALAPPDATA%\Google\AndroidStudio*\log\idea.log`의 "Latest supported version"에서 확인할 수 있다
+
+---
+
+## 2026-11-04 세션 2 (Claude Code, VS Code, moneyhipo)
+
+### 한 줄 요약
+`docs/image/`의 화면 시안 PNG 3장을 HTML 목업으로 옮기고(`sandbox/moneyhipo/mockup/index.html`), 시안과 기획 문서가 어긋나는 4곳을 정했다.
+
+### 대화 흐름
+1. **지금 앱의 사용자 흐름**: 안드로이드 뼈대에는 하단 탭 4개와 "준비 중" 글자만 있어 흐름이 없다. 기획 문서 기준으로 앞으로 만들 흐름(로그인 → 홈 → 쇼핑몰 목록 → 인앱 브라우저 → AI 점원 패널 / 내 옷장 → 등록)을 정리했다. 시안이 더 필요한 화면은 9개(쇼핑몰 목록, 인앱 브라우저, AI 점원 패널, 내 옷장 목록, 옷 상세, 등록 방법 고르기, 자동 등록 후보 확인, 공유 결과, 마이)
+2. **PNG 시안을 HTML로**: 화면 사이 이동을 버튼으로 연결했다. 헤드리스 Chrome으로 찍어 PNG와 비교했다
+3. **시안과 문서가 어긋난 곳 결정**: Google 로그인만(이메일 가입·Apple 화면 삭제) / 쇼핑몰은 로고 대신 이름 글자, 예시는 지원 후보로 / 유사도는 % 대신 `매우 비슷`·`비슷` / 하단 탭 3번째 이름은 `쇼핑`. 문서 반영: progress.md 결정 사항, 00-overview.md·architecture.md·shop-browser.md 탭 이름, similar-search.md 유사도 표시
+
+### 다음 세션 AI에게
+- 홈 시안(베이스 / 초안)은 아직 미결정이다. 목업에는 둘 다 있다
+- 안드로이드 앱 코드의 탭 이름은 아직 `번역`이다 (`sandbox/mmminsung02/.../ClosetApp.kt`, 다른 팀원 sandbox라 고치지 않음). progress.md 다음 할 일 4번에 적어 둠
+- 목업을 다시 찍을 때: `chrome.exe --headless=new --screenshot=<출력.png> --window-size=1150,1700 file:///.../index.html`

@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>옷장 AI 화면 시안</title>
+<!-- docs/image/ 의 PNG 시안 3장을 코드로 옮긴 것. 버튼을 누르면 이어지는 화면으로 이동한다 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root {
+    --p: #5B5CEB;        /* 주 색 (버튼, 강조) */
+    --p-soft: #F1F1FE;   /* 연한 배경 */
+    --p-soft2: #E4E5FD;  /* 아이콘 원 */
+    --bg: #F5F5FA;
+    --card: #FFFFFF;
+    --line: #E7E7F0;
+    --text: #17182C;
+    --sub: #6B6D85;
+    --muted: #A4A6B8;
+    --red: #E5484D;
+    --shadow: 0 6px 24px rgba(80, 80, 170, .10);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: Pretendard, "Malgun Gothic", system-ui, sans-serif; }
+  .page-title { padding: 28px 32px 0; font-size: 20px; font-weight: 800; }
+  .page-title small { display: block; font-size: 13px; font-weight: 400; color: var(--sub); margin-top: 6px; }
+  .board { display: flex; flex-wrap: wrap; gap: 40px 28px; padding: 24px 32px 48px; align-items: flex-start; }
+  .item h3 { font-size: 15px; margin: 0 0 10px; }
+  .i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8;
+    stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+  /* 폰 틀 */
+  .phone { width: 340px; height: 720px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 28px; position: relative; overflow: hidden; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; transition: outline-color .3s; outline: 3px solid transparent; }
+  .phone.flash { outline-color: var(--p); }
+  .status { height: 38px; flex: none; display: flex; justify-content: space-between; align-items: center;
+    padding: 0 24px; font-size: 12px; font-weight: 600; }
+  .status .sig { display: flex; gap: 4px; align-items: center; }
+  .status .sig b { display: block; background: var(--text); border-radius: 2px; }
+  .body { padding: 6px 24px 24px; flex: 1; display: flex; flex-direction: column; }
+  .back { width: 28px; height: 28px; display: grid; place-items: center; margin: 0 0 14px -6px; cursor: pointer; color: var(--text); }
+  .h-title { font-size: 22px; font-weight: 800; margin: 0 0 6px; }
+  .h-desc { font-size: 13px; color: var(--sub); margin: 0 0 22px; line-height: 1.5; }
+
+  /* 버튼·입력 */
+  .btn { height: 44px; border-radius: 12px; font: 600 14px/1 inherit; font-family: inherit; border: 0;
+    width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn.primary { background: var(--p); color: #fff; }
+  .btn.outline { background: #fff; border: 1.5px solid var(--p); color: var(--p); }
+  .btn.social { background: #fff; border: 1px solid var(--line); color: var(--text); font-weight: 500; }
+  .btn.small { height: 34px; font-size: 13px; border-radius: 10px; }
+  .stack { display: flex; flex-direction: column; gap: 10px; }
+  .field { height: 44px; border: 1px solid var(--line); border-radius: 10px; display: flex; align-items: center;
+    gap: 8px; padding: 0 12px; color: var(--muted); }
+  .field .i { width: 18px; height: 18px; }
+  .field input { border: 0; outline: 0; flex: 1; font: 13px inherit; font-family: inherit; color: var(--text); background: transparent; min-width: 0; }
+  .field input::placeholder { color: var(--muted); }
+  .row-opt { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--sub); margin-top: 12px; }
+  .radio { width: 15px; height: 15px; border: 1.5px solid var(--p); border-radius: 50%; display: inline-block; vertical-align: -3px; margin-right: 6px; }
+  .divider { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; margin: 18px 0; }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .foot { font-size: 12px; color: var(--sub); text-align: center; margin-top: 22px; }
+  .link { color: var(--p); font-weight: 600; cursor: pointer; }
+  [data-go] { cursor: pointer; }
+
+  /* 공통 조각 */
+  .icon-circle { width: 76px; height: 76px; border-radius: 50%; background: var(--p-soft2); display: grid; place-items: center; color: var(--p); }
+  .icon-circle .i { width: 40px; height: 40px; stroke-width: 2; }
+  .icon-sq { width: 44px; height: 44px; border-radius: 12px; background: var(--p-soft2); display: grid; place-items: center; color: var(--p); }
+  .cloth { background: #F2F2F6; border-radius: 10px; display: grid; place-items: center; font-size: 30px; aspect-ratio: 1; }
+  .appbar { display: flex; align-items: center; justify-content: space-between; padding: 4px 20px 12px; border-bottom: 1px solid var(--line); flex: none; }
+  .appbar h1 { font-size: 22px; font-weight: 800; margin: 0; }
+  .appbar .acts { display: flex; gap: 12px; align-items: center; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--p-soft2); display: grid; place-items: center; cursor: pointer; }
+  .scroll { flex: 1; overflow-y: auto; padding: 14px 14px 80px; scrollbar-width: none; }
+  .scroll::-webkit-scrollbar { display: none; }
+  .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; border-top: 1px solid var(--line); background: #fff; display: flex; }
+  .nav a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: var(--sub); position: relative; }
+  .nav a.on { color: var(--p); font-weight: 600; }
+  .nav a.on::after { content: ""; position: absolute; bottom: 5px; width: 40px; height: 3px; border-radius: 2px; background: var(--p); }
+
+  /* 로봇 (AI 점원) */
+  .robot { width: 62px; height: 56px; background: #fff; border-radius: 22px; box-shadow: 0 4px 14px rgba(90, 92, 235, .25);
+    display: grid; place-items: center; position: relative; }
+  .robot::before, .robot::after { content: ""; position: absolute; top: 20px; width: 8px; height: 14px; border-radius: 4px; background: #C9CAFB; }
+  .robot::before { left: -5px; } .robot::after { right: -5px; }
+  .robot .face { width: 46px; height: 34px; border-radius: 14px; background: #1E2350; position: relative; }
+  .robot .face::before, .robot .face::after { content: ""; position: absolute; top: 10px; width: 9px; height: 5px;
+    border: 2.5px solid #7DE3FF; border-bottom: 0; border-radius: 9px 9px 0 0; }
+  .robot .face::before { left: 9px; } .robot .face::after { right: 9px; }
+  .robot .face i { position: absolute; left: 17px; top: 20px; width: 12px; height: 5px; border: 2.5px solid #7DE3FF; border-top: 0; border-radius: 0 0 9px 9px; }
+  .bubble { background: #fff; border-radius: 14px; padding: 8px 12px; font-size: 11px; line-height: 1.45; box-shadow: var(--shadow); font-weight: 500; }
+
+  /* 상품·번역 카드 (일러스트) */
+  .mini { background: #fff; border-radius: 14px; box-shadow: var(--shadow); padding: 10px; }
+  .shopname { font-weight: 700; font-size: 13px; color: var(--sub); }
+  .chip-tr { display: inline-flex; align-items: center; gap: 4px; background: var(--p-soft2); color: var(--p); border-radius: 999px; padding: 3px 10px 3px 4px; font-size: 12px; font-weight: 600; }
+  .chip-tr .dot { width: 18px; height: 18px; border-radius: 50%; background: var(--p); color: #fff; display: grid; place-items: center; }
+  .chip-tr .dot .i { width: 12px; height: 12px; stroke-width: 2.2; }
+  .kv { display: grid; grid-template-columns: 44px 1fr; gap: 5px 8px; font-size: 11px; margin-top: 8px; }
+  .kv dt { color: var(--sub); font-weight: 600; } .kv dd { margin: 0; }
+  .pct { font-size: 9px; white-space: nowrap; letter-spacing: -.3px; background: var(--p-soft2); color: var(--p); border-radius: 999px; padding: 1px 3px; font-weight: 700; text-align: center; margin-top: 4px; }
+
+  /* 홈 (베이스) */
+  .hero { background: linear-gradient(160deg, #F7F7FF, #ECECFD); border-radius: 18px; padding: 18px 16px; position: relative; height: 236px; overflow: hidden; border: 1px solid var(--line); }
+  .hero .lead { font-size: 12px; color: var(--p); line-height: 1.5; font-weight: 500; }
+  .hero h2 { font-size: 28px; font-weight: 900; margin: 8px 0 10px; letter-spacing: -.5px; }
+  .hero p { font-size: 12px; color: var(--sub); line-height: 1.55; margin: 0; width: 120px; }
+  .hero .go { position: absolute; left: 16px; bottom: 18px; width: 44px; height: 44px; border-radius: 50%; background: var(--p-soft2); color: var(--p); display: grid; place-items: center; }
+  .hero .art { position: absolute; right: -6px; top: 22px; width: 300px; height: 330px; transform: scale(.52); transform-origin: top right; }
+  .hero .art > * { position: absolute; }
+  .closet-card { margin-top: 14px; border: 1px solid var(--line); border-radius: 18px; padding: 22px 14px 0; text-align: center; overflow: hidden; position: relative; background: #fff; }
+  .closet-card h2 { font-size: 24px; font-weight: 900; margin: 14px 0 6px; }
+  .closet-card p { font-size: 12px; color: var(--sub); line-height: 1.6; margin: 0 0 14px; }
+  .closet-card .strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 0 -4px; }
+  .closet-card .strip .cloth { border-radius: 10px 10px 0 0; aspect-ratio: 1.15; font-size: 34px; }
+  .fab { position: absolute; right: 14px; top: 140px; width: 44px; height: 44px; border-radius: 50%; background: #fff; box-shadow: var(--shadow); color: var(--p); display: grid; place-items: center; }
+
+  /* 홈 (초안) */
+  .headline { font-size: 23px; font-weight: 900; line-height: 1.3; margin: 6px 4px 6px; letter-spacing: -.5px; }
+  .subline { font-size: 13px; color: var(--sub); margin: 0 4px 16px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .fcard { border: 1px solid var(--line); border-radius: 14px; padding: 8px 8px 12px; background: #fff; }
+  .fcard .pic { height: 110px; border-radius: 10px; background: #F6F6FA; overflow: hidden; position: relative; }
+  .fcard .icon-sq { width: 30px; height: 30px; border-radius: 9px; margin: 10px 0 6px; }
+  .fcard .icon-sq .i { width: 17px; height: 17px; }
+  .fcard h4 { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 800; margin: 0 0 4px; }
+  .fcard h4 .i { width: 15px; height: 15px; }
+  .fcard p { font-size: 10px; color: var(--sub); line-height: 1.5; margin: 0; }
+  .collage { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; height: 100%; }
+  .collage .cloth { aspect-ratio: auto; font-size: 22px; border-radius: 6px; background: #fff; }
+  .chips { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 6px; }
+  .chips span { font-size: 8.5px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 6px; color: var(--sub); }
+  .chips span.on { background: var(--p-soft2); color: var(--p); border-color: transparent; font-weight: 700; }
+
+  /* 드롭다운 (로그인 후 메인) */
+  .menu { position: absolute; right: 12px; top: 84px; width: 200px; background: #fff; border-radius: 14px; box-shadow: 0 10px 32px rgba(40, 40, 90, .18); padding: 12px; z-index: 5; }
+  .menu .who { display: flex; gap: 10px; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 6px; }
+  .menu .who .pic { width: 34px; height: 34px; border-radius: 50%; background: #DADBE6; }
+  .menu .who b { font-size: 13px; display: block; } .menu .who small { font-size: 11px; color: var(--sub); }
+  .menu a { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 2px; }
+  .menu a .i { width: 17px; height: 17px; }
+  .menu a.danger { color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- 아이콘 모음 -->
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="hanger" viewBox="0 0 24 24"><path d="M10 6.5a2 2 0 1 1 3 1.7c-.6.4-1 .9-1 1.6V11"/><path d="M12 11 3.2 17.3c-.7.5-.4 1.7.5 1.7h16.6c.9 0 1.2-1.2.5-1.7L12 11"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c.8-3.6 3.8-5.5 7.5-5.5s6.7 1.9 7.5 5.5"/></symbol>
+  <symbol id="home" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="translate" viewBox="0 0 24 24"><path d="M3 5h10M8 3v2M5 5c.8 3 3 5.5 6 7M11 5c-.8 3.2-3 6-6.5 8"/><path d="m12 21 4.5-10 4.5 10M13.8 17h5.4"/></symbol>
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="back" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></symbol>
+  <symbol id="mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="cart" viewBox="0 0 24 24"><path d="M3 4h2.5l2.2 10.5h10.6L20.5 7H6.4"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></symbol>
+  <symbol id="scale" viewBox="0 0 24 24"><path d="M12 4v16M8 20h8M5 7h14"/><path d="m5 7-3 6a3 3 0 0 0 6 0zM19 7l-3 6a3 3 0 0 0 6 0z"/></symbol>
+  <symbol id="bag" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></symbol>
+  <symbol id="gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></symbol>
+  <symbol id="power" viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M7 6.3a7 7 0 1 0 10 0"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="spark" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 2c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7z"/></symbol>
+  <symbol id="google" viewBox="0 0 48 48"><path stroke="none" fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path stroke="none" fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path stroke="none" fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path stroke="none" fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></symbol>
+  <symbol id="apple" viewBox="0 0 24 24"><path stroke="none" fill="currentColor" d="M16.4 12.6c0-2.4 2-3.5 2-3.6-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9-.7 0-1.8-.9-3-.8-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.6s-2.5-1-2.5-3.7zM14.1 5.6c.6-.8 1.1-1.8 1-2.9-.9 0-2.1.6-2.7 1.4-.6.7-1.1 1.8-1 2.8 1 .1 2.1-.5 2.7-1.3z"/></symbol>
+</svg>
+
+<!-- 반복해서 쓰는 조각 -->
+<template id="t-status">
+  <div class="status"><span>9:41</span><span class="sig"><b style="width:3px;height:5px"></b><b style="width:3px;height:7px"></b><b style="width:3px;height:9px"></b><b style="width:18px;height:9px;margin-left:4px"></b></span></div>
+</template>
+
+<template id="t-hero">
+  <div class="hero" data-go="home-base">
+    <div class="lead"><svg class="i" style="width:14px;height:14px;color:var(--p);vertical-align:-2px"><use href="#spark"/></svg> 번역하고, 비교하고,<br>&nbsp;&nbsp;&nbsp;&nbsp;더 스마트한 쇼핑을!</div>
+    <h2>쇼핑하기</h2>
+    <p>해외 상품 번역부터<br>AI 구매 비교까지,<br>한 번에!</p>
+    <div class="go"><svg class="i"><use href="#arrow"/></svg></div>
+    <div class="art">
+      <div class="mini" style="left:0;top:0;width:180px;height:160px">
+        <div class="shopname">ASOS</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <div class="cloth" style="width:90px;font-size:44px">🧥</div>
+          <div style="font-size:12px;font-weight:700">$79.90<div style="color:var(--p);margin-top:30px"><svg class="i"><use href="#cart"/></svg></div></div>
+        </div>
+      </div>
+      <div class="mini" style="left:150px;top:60px;width:150px">
+        <div style="font-size:12px;font-weight:700;color:var(--p)">유사 의류 비교</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:6px">
+          <div><div class="cloth" style="font-size:20px">🧥</div><div class="pct">매우 비슷</div></div>
+          <div><div class="cloth" style="font-size:20px">🧥</div><div class="pct">비슷</div></div>
+          <div><div class="cloth" style="font-size:20px">🧥</div><div class="pct">비슷</div></div>
+        </div>
+      </div>
+      <div class="mini" style="left:8px;top:150px;width:200px">
+        <span class="chip-tr"><span class="dot"><svg class="i"><use href="#translate"/></svg></span>번역하기</span>
+        <dl class="kv"><dt>상품명</dt><dd>코튼 블렌드 자켓</dd><dt>소재</dt><dd>면 60%, 폴리에스터 40%</dd><dt>핏</dt><dd>레귤러 핏</dd><dt>사이즈</dt><dd>S / M / L</dd><dt>세탁</dt><dd>드라이클리닝 권장</dd></dl>
+      </div>
+      <div class="bubble" style="left:178px;top:190px;width:122px">이 제품은<br>이런 옷과 비슷해요!</div>
+      <div class="robot" style="left:220px;top:250px"><div class="face"><i></i></div></div>
+    </div>
+  </div>
+</template>
+
+<template id="t-nav-base">
+  <nav class="nav">
+    <a class="on"><svg class="i"><use href="#home"/></svg>홈</a>
+    <a><svg class="i"><use href="#hanger"/></svg>내 옷장</a>
+    <a><svg class="i"><use href="#bag"/></svg>쇼핑</a>
+    <a><svg class="i"><use href="#user"/></svg>마이</a>
+  </nav>
+</template>
+
+<div class="page-title">옷장 AI 화면 시안 (코드판)
+  <small>docs/image/의 PNG 3장을 HTML로 옮김. 문서 결정에 맞춰 Google 로그인만 남기고, 쇼핑몰은 로고 대신 이름 글자로, 유사도는 % 대신 말로 표시함. 버튼·링크를 누르면 이어지는 화면으로 이동한다. 옷 사진은 이모지로 대신함</small>
+</div>
+
+<div class="board">
+
+  <!-- 1. 로그인 화면 -->
+  <section class="item"><h3>로그인 화면</h3>
+    <div class="phone" id="login-start">
+      <div data-tpl="t-status"></div>
+      <div class="body" style="position:relative">
+        <div style="position:absolute;left:-40px;top:20px;width:420px;height:330px;border-radius:50%;background:radial-gradient(closest-side,#EEEEFD,transparent)"></div>
+        <div style="position:absolute;left:-14px;top:40px;font-size:64px;opacity:.55">🧥</div>
+        <div style="position:absolute;left:10px;top:200px;font-size:44px;opacity:.5">👟</div>
+        <div style="position:absolute;right:-10px;top:150px;font-size:50px;opacity:.45">👜</div>
+        <div style="position:relative;display:flex;flex-direction:column;align-items:center;margin-top:70px">
+          <div class="icon-circle"><svg class="i"><use href="#hanger"/></svg></div>
+          <div style="font-size:26px;font-weight:900;margin-top:14px">옷장 AI</div>
+          <div style="font-size:12px;color:var(--sub);text-align:center;line-height:1.5;margin-top:6px">해외 쇼핑도, 내 옷장도<br>AI와 함께</div>
+        </div>
+        <div class="stack" style="margin-top:auto;position:relative">
+          <button class="btn social" style="height:48px;font-weight:600" data-go="home-in"><svg class="i" style="width:20px;height:20px"><use href="#google"/></svg>Google로 계속하기</button>
+        </div>
+        <div class="foot" style="margin-bottom:60px;line-height:1.6">처음이면 Google 계정으로 바로 가입돼요.<br>계속하면 <span class="link">이용약관</span>과 <span class="link">개인정보처리방침</span>에 동의하게 돼요.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. 로그아웃 확인 화면 -->
+  <section class="item"><h3>로그아웃 확인 화면</h3>
+    <div class="phone" id="logout-confirm">
+      <div data-tpl="t-status"></div>
+      <div class="body">
+        <div class="back" data-go="home-in"><svg class="i"><use href="#back"/></svg></div>
+        <div class="h-title" style="margin-top:20px">로그아웃</div>
+        <div style="font-size:14px;margin:8px 0 10px">정말 로그아웃하시겠습니까?</div>
+        <div class="h-desc">지금 로그아웃하면 일부 기능을 이용할 수 없습니다.</div>
+        <div class="stack">
+          <button class="btn primary" data-go="home-out">로그아웃</button>
+          <button class="btn outline" data-go="home-in">취소</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 로그아웃 완료 (비로그인 상태) -->
+  <section class="item"><h3>로그아웃 완료 (비로그인 상태)</h3>
+    <div class="phone" id="home-out">
+      <div data-tpl="t-status"></div>
+      <div class="appbar" style="border:0"><h1>옷장 AI</h1><svg class="i"><use href="#search"/></svg></div>
+      <div class="scroll" style="padding-top:4px">
+        <div style="background:var(--p-soft);border-radius:16px;padding:20px 16px;text-align:center">
+          <div class="icon-circle" style="width:50px;height:50px;margin:0 auto"><svg class="i" style="width:28px;height:28px"><use href="#hanger"/></svg></div>
+          <div style="color:var(--p);font-weight:700;font-size:15px;margin-top:10px">로그인이 필요해요</div>
+          <div style="font-size:11px;color:var(--sub);margin:4px 0 12px">더 많은 기능을 이용하려면 로그인해주세요.</div>
+          <button class="btn primary small" style="width:180px;margin:0 auto" data-go="login-start">로그인하기</button>
+        </div>
+        <div style="font-size:15px;font-weight:700;margin:22px 4px 10px">주요 기능</div>
+        <div style="display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:14px;padding:14px">
+          <div class="icon-sq" style="background:var(--p-soft)"><svg class="i"><use href="#cart"/></svg></div>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px">쇼핑하기</div><div style="font-size:11px;color:var(--sub);margin-top:2px">해외 상품 번역 + AI 구매 비교</div></div>
+          <svg class="i" style="width:16px;height:16px;color:var(--sub)"><use href="#chev"/></svg>
+        </div>
+      </div>
+      <div data-tpl="t-nav-base"></div>
+    </div>
+  </section>
+
+  <!-- 4. 로그인 후 메인 화면 (프로필 메뉴 열림) -->
+  <section class="item"><h3>로그인 후 메인 화면</h3>
+    <div class="phone" id="home-in">
+      <div data-tpl="t-status"></div>
+      <div class="appbar" style="border:0"><h1>옷장 AI</h1><div class="acts"><svg class="i"><use href="#search"/></svg><div class="avatar" style="width:30px;height:30px"><svg class="i" style="width:18px;height:18px"><use href="#user"/></svg></div></div></div>
+      <div class="scroll" style="padding-top:4px"><div data-tpl="t-hero"></div></div>
+      <div class="menu">
+        <div class="who"><div class="pic"></div><div><b>홍길동</b><small>user@example.com</small></div></div>
+        <a><svg class="i"><use href="#user"/></svg>내 정보 수정</a>
+        <a><svg class="i"><use href="#gear"/></svg>설정</a>
+        <a class="danger" data-go="logout-confirm"><svg class="i"><use href="#power"/></svg>로그아웃</a>
+      </div>
+      <div data-tpl="t-nav-base"></div>
+    </div>
+  </section>
+
+  <!-- 5. 메인 화면 (베이스) -->
+  <section class="item"><h3>메인 화면 (베이스)</h3>
+    <div class="phone" id="home-base">
+      <div data-tpl="t-status"></div>
+      <div class="appbar"><h1>옷장 AI</h1><div class="acts"><svg class="i"><use href="#search"/></svg><div class="avatar"><svg class="i"><use href="#user"/></svg></div></div></div>
+      <div class="scroll">
+        <div data-tpl="t-hero"></div>
+        <div class="closet-card">
+          <div class="icon-circle" style="margin:0 auto"><svg class="i"><use href="#hanger"/></svg></div>
+          <h2>내 옷장</h2>
+          <p>사진으로 옷을 등록하고,<br>나만의 디지털 옷장을 만들어보세요.</p>
+          <div class="fab"><svg class="i"><use href="#plus"/></svg></div>
+          <div class="strip"><div class="cloth">👚</div><div class="cloth">🧥</div><div class="cloth">👕</div><div class="cloth" style="filter:brightness(.35)">🧥</div></div>
+        </div>
+      </div>
+      <div data-tpl="t-nav-base"></div>
+    </div>
+  </section>
+
+  <!-- 6. 메인 화면 (초안) -->
+  <section class="item"><h3>메인 화면 (초안)</h3>
+    <div class="phone" id="home-draft">
+      <div data-tpl="t-status"></div>
+      <div class="appbar"><h1>옷장 AI</h1><div class="acts"><svg class="i"><use href="#search"/></svg><div class="avatar"><svg class="i"><use href="#user"/></svg></div></div></div>
+      <div class="scroll">
+        <div class="headline">내 옷장과 해외 쇼핑을<br>한곳에</div>
+        <div class="subline">번역하고, 비교하고, 현명하게 쇼핑하세요</div>
+        <div class="grid2">
+          <div class="fcard">
+            <div class="pic"><div class="collage"><div class="cloth">👚</div><div class="cloth">🧥</div><div class="cloth">👔</div><div class="cloth">👖</div><div class="cloth">👜</div><div class="cloth">🧥</div></div></div>
+            <div class="icon-sq"><svg class="i"><use href="#hanger"/></svg></div>
+            <h4>내 옷장 <svg class="i"><use href="#arrow"/></svg></h4>
+            <p>사진으로 옷을 등록하고<br>나만의 디지털 옷장을 만들어보세요.</p>
+          </div>
+          <div class="fcard">
+            <div class="pic">
+              <div style="position:absolute;left:6px;top:6px;font-weight:700;font-size:9px;color:var(--sub)">ASOS</div>
+              <div class="cloth" style="position:absolute;left:6px;top:20px;width:50px;font-size:30px;background:#fff">🧥</div>
+              <div style="position:absolute;left:62px;top:22px;font-size:7px;line-height:1.5">Wool Blend Coat<br><b>$129.00</b></div>
+              <div class="mini" style="position:absolute;left:44px;top:46px;width:94px;padding:5px 6px;border-radius:8px">
+                <div style="font-size:7px;color:var(--p);font-weight:700">文A 한국어 번역</div>
+                <div style="font-size:8px;font-weight:800;margin-top:2px">울 블렌드 코트</div>
+                <dl class="kv" style="grid-template-columns:22px 1fr;gap:1px 4px;font-size:6px;margin-top:3px"><dt>소재</dt><dd>울 60%, 폴리에스터 40%</dd><dt>핏</dt><dd>레귤러 핏</dd><dt>사이즈</dt><dd>S / M / L</dd><dt>세탁</dt><dd>드라이클리닝 권장</dd></dl>
+              </div>
+            </div>
+            <div class="icon-sq"><svg class="i"><use href="#translate"/></svg></div>
+            <h4>해외 상품 번역 <svg class="i"><use href="#arrow"/></svg></h4>
+            <p>외국어 상품 정보를 한국어로 번역하고<br>핵심 정보를 구조화해보세요.</p>
+          </div>
+          <div class="fcard">
+            <div class="pic" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:#fff">
+              <div style="background:#F6F6FA;border-radius:8px;text-align:center"><div style="font-size:34px;margin-top:12px">🧥</div><div style="font-size:6.5px;color:var(--sub);margin-top:16px">비슷한 스타일의 다른 상품</div></div>
+              <div style="background:#F6F6FA;border-radius:8px;text-align:center"><div style="font-size:34px;margin-top:12px;filter:hue-rotate(60deg)">🧥</div><div style="font-size:6.5px;color:var(--sub);margin-top:16px">보유 중인 유사 아이템</div></div>
+              <div style="position:absolute;left:50%;top:38px;transform:translateX(-50%);width:24px;height:24px;border-radius:50%;background:#B9BAF8;color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center">VS</div>
+            </div>
+            <div class="icon-sq"><svg class="i"><use href="#scale"/></svg></div>
+            <h4>AI 구매 비교 <svg class="i"><use href="#arrow"/></svg></h4>
+            <p>보유한 옷과 유사한 해외 상품을 찾아<br>비교 리포트를 제공해드려요.</p>
+          </div>
+          <div class="fcard">
+            <div class="pic" style="background:#fff;padding:4px">
+              <div style="display:flex;justify-content:space-between;font-size:8.5px;font-weight:700;color:var(--sub);padding:2px 2px 4px"><span>ASOS</span><span>ZOZOTOWN</span><span>UNIQLO</span><span>GU</span></div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px"><div class="cloth" style="font-size:22px">👚</div><div class="cloth" style="font-size:22px">🧥</div><div class="cloth" style="font-size:22px">👟</div></div>
+              <div class="chips"><span class="on">전체</span><span>상의</span><span>하의</span><span>아우터</span><span>신발</span></div>
+            </div>
+            <div class="icon-sq"><svg class="i"><use href="#bag"/></svg></div>
+            <h4>쇼핑몰 둘러보기 <svg class="i"><use href="#arrow"/></svg></h4>
+            <p>해외 인기 쇼핑몰의 최신 상품을<br>쉽게 둘러보세요.</p>
+          </div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a class="on"><svg class="i"><use href="#home"/></svg>홈</a>
+        <a><svg class="i"><use href="#hanger"/></svg>내 옷장</a>
+        <a><svg class="i"><use href="#bag"/></svg>쇼핑</a>
+        <a><svg class="i"><use href="#user"/></svg>마이</a>
+      </nav>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // 템플릿 조각 채우기
+  document.querySelectorAll('[data-tpl]').forEach(el => {
+    el.replaceWith(document.getElementById(el.dataset.tpl).content.cloneNode(true));
+  });
+  // 버튼을 누르면 이어지는 화면으로 이동하고 테두리를 잠깐 강조한다
+  document.addEventListener('click', e => {
+    const go = e.target.closest('[data-go]');
+    if (!go) return;
+    const target = document.getElementById(go.dataset.go);
+    if (!target) return;
+    target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    target.classList.add('flash');
+    setTimeout(() => target.classList.remove('flash'), 900);
+  });
+</script>
+</body>
+</html>
