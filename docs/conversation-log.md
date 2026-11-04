@@ -202,7 +202,7 @@ Android Studio를 설치하고 안드로이드 프로젝트 뼈대를 `sandbox/m
 
 ### 대화 흐름
 1. **Android Studio 설치**: 이 PC는 RAM 7.7GB, 디스크가 빠듯해서 가상 폰(에뮬레이터) 없이 설치하라고 안내. 테스트는 안드로이드 폰이 있는 팀원에게 APK를 보내는 방식(추천) 또는 팀원 PC에서 실행. 사용자가 디스크를 25GB까지 비움. 에뮬레이터(1.1GB)는 해제가 안 되고 설치돼 있음
-2. **프로젝트 뼈대**: 최신 안정 버전 확인 후 생성 (AGP 9.5.0, Gradle 9.8.2, Kotlin 2.4.21, Compose BOM 2026.09.00). 하단 탭 4개 빈 화면, Robolectric 테스트 3개
+2. **프로젝트 뼈대**: 최신 안정 버전 확인 후 생성 (AGP 9.5.0으로 만들었다가 Android Studio가 9.4.0까지만 지원해서 9.4.0으로 낮춤, Gradle 9.8.2, Kotlin 2.4.21, Compose BOM 2026.09.00). 하단 탭 4개 빈 화면, Robolectric 테스트 3개
 3. **빌드 중 고친 것**: ktlint가 Compose 함수 이름(대문자)을 오류로 봐서 `.editorconfig`에 Composable 예외 추가 / Robolectric이 JDK 25에서 실패해서 테스트 JVM 인자 추가 / `createComposeRule`을 v2로 바꿈 (기존 것은 deprecated)
 
 ### 다음 세션 AI에게
@@ -210,3 +210,4 @@ Android Studio를 설치하고 안드로이드 프로젝트 뼈대를 `sandbox/m
 - 실제 폰 실행은 아직 안 했다. 디버그 APK: `sandbox/mmminsung02/android/app/build/outputs/apk/debug/app-debug.apk`
 - 이 PC는 RAM 7.7GB라 Gradle 힙을 2GB로 잡았다 (`gradle.properties`)
 
+- AGP 버전은 Android Studio가 지원하는 최신까지만 쓴다. 지원 버전은 `%LOCALAPPDATA%\Google\AndroidStudio*\log\idea.log`의 "Latest supported version"에서 확인할 수 있다
