@@ -74,8 +74,8 @@
 
 | 순서 | 종류 | 기능 | 문서 | 목표 주차 | 상태 |
 |------|------|------|------|-----------|------|
-| 1 | 옷장 | 옷 사진 등록·자동 분류 | [wardrobe/photo-register.md](features/wardrobe/photo-register.md) | 9~10주 | 구현 전 |
-| 2 | 옷장 | 옷장 조회·수정·삭제 | [wardrobe/browse.md](features/wardrobe/browse.md) | 9~10주 | 구현 전 |
+| 1 | 옷장 | 옷 사진 등록·자동 분류 | [wardrobe/photo-register.md](features/wardrobe/photo-register.md) | 9~10주 | 구현했지만 미검증 (sandbox/mmminsung02, 자동 테스트만 통과, 실제 폰 미확인) |
+| 2 | 옷장 | 옷장 조회·수정·삭제 | [wardrobe/browse.md](features/wardrobe/browse.md) | 9~10주 | 구현했지만 미검증 (sandbox/mmminsung02, 자동 테스트만 통과, 실제 폰 미확인) |
 | 3 | 계정 | Google 로그인·계정 삭제 | [account/google-login.md](features/account/google-login.md) | 10~11주 (첫 비공개 테스트 빌드 전) | 구현 전 |
 | 4 | 비교·AI | 유사 의류 검색 | [compare/similar-search.md](features/compare/similar-search.md) | 10주 | 구현 전 |
 | 5 | 번역 | 단위·사이즈 변환 | [translation/unit-conversion.md](features/translation/unit-conversion.md) | 10주 | 구현 전 |
