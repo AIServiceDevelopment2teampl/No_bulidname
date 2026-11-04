@@ -21,6 +21,10 @@ android {
         // 서버 주소. 바꾸려면 gradle.properties나 -PserverBaseUrl=... 로 넘긴다
         val serverBaseUrl = providers.gradleProperty("serverBaseUrl").getOrElse("http://10.0.2.2:8000/")
         buildConfigField("String", "SERVER_BASE_URL", "\"$serverBaseUrl\"")
+
+        // Google Cloud의 'Web' OAuth 클라이언트 ID (서버 GOOGLE_CLIENT_ID와 같은 값). 비어 있으면 로그인 버튼이 안내만 한다
+        val googleWebClientId = providers.gradleProperty("googleWebClientId").getOrElse("")
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
     }
 
     buildFeatures {
@@ -55,6 +59,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services)
+    implementation(libs.googleid)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 

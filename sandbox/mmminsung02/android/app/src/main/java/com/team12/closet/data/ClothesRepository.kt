@@ -3,11 +3,8 @@ package com.team12.closet.data
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -18,7 +15,6 @@ import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 interface ClothesRepository {
     suspend fun uploadPhoto(photo: PickedPhoto): UploadOutcome
@@ -157,22 +153,5 @@ class NetworkClothesRepository(
                 ignoreUnknownKeys = true
                 explicitNulls = false
             }
-
-        fun create(baseUrl: String): NetworkClothesRepository {
-            val client =
-                OkHttpClient
-                    .Builder()
-                    // 서버가 처음 켜질 때 CLIP을 올리느라 느릴 수 있다
-                    .readTimeout(60, TimeUnit.SECONDS)
-                    .build()
-            val retrofit =
-                Retrofit
-                    .Builder()
-                    .baseUrl(baseUrl)
-                    .client(client)
-                    .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-                    .build()
-            return NetworkClothesRepository(retrofit.create(ClothesApi::class.java), baseUrl)
-        }
     }
 }
