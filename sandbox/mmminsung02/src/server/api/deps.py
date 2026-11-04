@@ -1,20 +1,29 @@
 import sqlite3
 
-from fastapi import Request
+from fastapi import HTTPException, Request
 
-DEV_USER_ID = "dev-user"
+from server.auth import find_session_user
 
 
 def get_conn(request: Request) -> sqlite3.Connection:
     return request.app.state.conn
 
 
-def ensure_user(conn: sqlite3.Connection, user_id: str) -> None:
-    with conn:
-        conn.execute("INSERT OR IGNORE INTO users (id) VALUES (?)", (user_id,))
+def get_session_token(request: Request) -> str:
+    scheme, _, token = request.headers.get("Authorization", "").partition(" ")
+    if scheme.lower() != "bearer" or not token:
+        raise HTTPException(
+            status_code=401, detail="로그인이 필요해요", headers={"WWW-Authenticate": "Bearer"}
+        )
+    return token
 
 
 def get_current_user_id(request: Request) -> str:
-    # TODO(기능 3 google-login): 세션 토큰으로 사용자를 찾는다. 그 전까지는 개발용 사용자 하나
-    ensure_user(request.app.state.conn, DEV_USER_ID)
-    return DEV_USER_ID
+    user_id = find_session_user(request.app.state.conn, get_session_token(request))
+    if user_id is None:
+        raise HTTPException(
+            status_code=401,
+            detail="로그인이 만료됐어요. 다시 로그인해 주세요",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user_id

@@ -3,3 +3,5 @@ uvicorn==0.54.0
 python-multipart==0.0.33
 pillow==13.0.0
 numpy==2.5.4
+google-auth==2.62.1
+requests==2.34.2

@@ -170,33 +170,35 @@ def test_deleted_photo_can_be_registered_again(client):
 
 
 def test_delete_all_my_data_leaves_nothing(client, analyzer, settings, as_user):
-    as_user("me")
+    me = as_user("me")
     add_cloth(client, analyzer, seed=1)
     add_cloth(client, analyzer, seed=2)
     with sqlite3.connect(settings.db_path) as db:
         db.execute(
-            "INSERT INTO products (user_id, source, fields, lang) VALUES ('me', 'page', '{}', 'en')"
+            "INSERT INTO products (user_id, source, fields, lang) VALUES (?, 'page', '{}', 'en')",
+            (me,),
         )
         product_id = db.execute("SELECT id FROM products").fetchone()[0]
         db.execute(
             "INSERT INTO reports (product_id, similar, body) VALUES (?, '[]', '{}')", (product_id,)
         )
         db.execute(
-            "INSERT INTO clerk_messages (user_id, role, content) VALUES ('me', 'user', 'hi')"
+            "INSERT INTO clerk_messages (user_id, role, content) VALUES (?, 'user', 'hi')", (me,)
         )
         db.execute(
             "INSERT INTO imports (user_id, type, status, candidates)"
-            " VALUES ('me', 'receipt', 'pending', '[]')"
+            " VALUES (?, 'receipt', 'pending', '[]')",
+            (me,),
         )
 
     response = client.delete("/v1/me/data")
 
     assert response.status_code == 204
     for table in ("clothes", "products", "clerk_messages", "imports"):
-        assert count(settings, f"SELECT COUNT(*) FROM {table} WHERE user_id = 'me'") == 0
+        assert count(settings, f"SELECT COUNT(*) FROM {table} WHERE user_id = ?", me) == 0
     assert count(settings, "SELECT COUNT(*) FROM reports") == 0
     assert count(settings, "SELECT COUNT(*) FROM clothes_embeddings") == 0
-    assert not (settings.image_dir / "me").exists()
+    assert not (settings.image_dir / me).exists()
 
 
 def test_delete_all_keeps_other_users_data(client, analyzer, settings, as_user):

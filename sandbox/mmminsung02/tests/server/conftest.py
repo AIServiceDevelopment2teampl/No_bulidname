@@ -2,11 +2,11 @@ import io
 
 import numpy as np
 import pytest
-from fastapi import Request
 from fastapi.testclient import TestClient
 from PIL import Image
 
 from server.ai.analyzer import Analysis
+from server.auth import InvalidGoogleToken
 from server.config import Settings
 from server.main import create_app
 
@@ -47,31 +47,48 @@ def settings(tmp_path):
     return Settings(data_dir=tmp_path, max_upload_bytes=1024 * 1024)
 
 
+class FakeGoogleVerifier:
+    """Google ID 토큰 확인을 대신한다. 'valid:<sub>'만 통과, 나머지는 실패 경우를 흉내 낸다"""
+
+    def verify(self, token: str) -> str:
+        if token.startswith("valid:"):
+            return token.removeprefix("valid:")
+        if token == "expired":
+            raise InvalidGoogleToken("만료된 토큰")
+        if token == "wrong-aud":
+            raise InvalidGoogleToken("다른 앱용 토큰")
+        raise InvalidGoogleToken("위조된 토큰")
+
+
 @pytest.fixture
 def app(settings, analyzer):
-    return create_app(settings=settings, analyzer=analyzer)
+    return create_app(settings=settings, analyzer=analyzer, google_verifier=FakeGoogleVerifier())
+
+
+def login(client, google_sub: str) -> dict:
+    response = client.post("/v1/auth/google", json={"id_token": f"valid:{google_sub}"})
+    assert response.status_code == 200, response.text
+    return response.json()
 
 
 @pytest.fixture
 def client(app):
+    """기본 사용자로 로그인한 클라이언트"""
     with TestClient(app) as c:
+        c.headers["Authorization"] = f"Bearer {login(c, 'default-user')['session_token']}"
         yield c
 
 
 @pytest.fixture
-def as_user(app):
-    """요청하는 사용자를 바꾼다. 로그인(기능 3) 전이라 의존성을 바꿔 끼운다"""
-    from server.api.deps import ensure_user, get_current_user_id
+def as_user(client):
+    """다른 Google 계정으로 로그인해 이후 요청을 그 사용자로 보낸다. 서버 사용자 id를 돌려준다"""
 
-    def switch(user_id: str):
-        def current_user(request: Request) -> str:
-            ensure_user(request.app.state.conn, user_id)
-            return user_id
+    def switch(google_sub: str) -> str:
+        body = login(client, google_sub)
+        client.headers["Authorization"] = f"Bearer {body['session_token']}"
+        return body["user_id"]
 
-        app.dependency_overrides[get_current_user_id] = current_user
-
-    yield switch
-    app.dependency_overrides.clear()
+    return switch
 
 
 def upload(client, data: bytes | None = None, name="shirt.png", mime="image/png"):
