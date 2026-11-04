@@ -214,8 +214,10 @@ Android Studio를 설치하고 안드로이드 프로젝트 뼈대를 `sandbox/m
 10. **기능 2 옷장 조회·수정·삭제**: 서버 테스트 28개, 앱 테스트 39개 통과. Robolectric 기본 화면이 작아 상세 화면 아래 칩 클릭이 빗나가서 테스트 화면을 `w411dp-h891dp`로 맞춤. 오프라인 Room 캐시와 등록 방법 시트는 남김
 11. **README 요청: 경험 저장소 규칙 확인** (`general/`·`mobile/`만, 읽기만). diff 다시 읽기로 기능 2 버그(전체 삭제 뒤 옛 목록) 찾아 고침. 기능 1·2 상태를 `구현했지만 미검증`으로. 긴 작업 진행 창 규칙은 사용자에게 물어봄
 12. **진행 창**: 사용자가 '창 띄우기'를 고름. `sandbox/mmminsung02/tools/run-gradle.ps1`로 Gradle을 돌리면 진행 창이 뜬다. 앞으로 몇 분 걸리는 빌드·테스트는 이걸로 돌린다
+13. **기능 3 Google 로그인**: Google 로그인용 ID(OAuth 클라이언트 ID)가 아직 없어서, ID 없이 만들 수 있는 부분부터 하기로 함(사용자 선택). 서버 완료(테스트 72개 통과). 시안과 문서가 달라 물어봄 → **로그인해야만 쓰기**. 앱은 로그인 화면·마이 화면·세션 저장·인증 헤더까지 쓰다가 사용자가 자리를 비워 **중간에 멈춤(컴파일 안 됨)**. 이어서 할 일은 progress.md '다음 할 일' 0번
 
 ### 다음 세션 AI에게
+- **앱이 지금 컴파일되지 않는다** (기능 3 작업 중간). progress.md '다음 할 일' 0번부터 이어서 한다
 - 앱 빌드·테스트는 `sandbox/mmminsung02/tools/run-gradle.ps1`로 돌린다 (사용자가 진행 창을 원함)
 - applicationId는 임시값이다. Play 업로드 전에 꼭 정한다
 - 실제 폰 실행은 아직 안 했다. 디버그 APK: `sandbox/mmminsung02/android/app/build/outputs/apk/debug/app-debug.apk`
