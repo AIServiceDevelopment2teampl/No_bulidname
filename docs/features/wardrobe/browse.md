@@ -3,7 +3,9 @@
 ## 설명
 등록된 옷을 사진 격자로 보여 주고 종류·색으로 거른다. 옷을 눌러 상세를 보고 속성을 고치거나 지운다. 마이 탭에서 내 데이터 전체를 지울 수 있다.
 
-## 입력
+도전 목표: 여러 벌을 골라 `마네킹에 입혀보기`로 넘기는 고르기 모드 → [compare/virtual-fitting.md](../compare/virtual-fitting.md)
+
+
 - 목록: 필터(category, color), 페이지
 - 수정: category, color, name, brand, material, size 중 바꿀 값
 - 삭제: 옷 id, 또는 전체 삭제 요청

@@ -20,6 +20,7 @@
 | 2026-11-04 | 화면 시안 PNG 3장을 HTML 목업으로 옮김 (`sandbox/moneyhipo/mockup/index.html`, 검수 전) | 화면 6개: 로그인(Google), 로그아웃 확인, 비로그인 홈, 로그인 후 메인(프로필 메뉴), 홈 베이스, 홈 초안. 버튼을 누르면 이어지는 화면으로 이동. 옷 사진·로봇 그림은 이모지·도형으로 대신함. 색은 `:root`에 모아 둠(주 색 `#5B5CEB`), 앱 테마를 만들 때 쓴다. 시안과 문서가 어긋난 4곳은 아래 결정 사항대로 고침 |
 | 2026-11-04 | 기능 1 옷 사진 등록·자동 분류 **서버** (`sandbox/mmminsung02/`, 검수 전) | `POST /v1/clothes`. 완료 조건 [서버] 5개 + 예외 상황 5개 테스트 통과(가짜 분석기). 실제 CLIP(`openai/clip-vit-base-patch32`, 제로샷) 동작 테스트 2개 통과(`pytest -m slow`, 단색 이미지로 값 범위·차원만 확인, 정확도는 미측정). 실행: `cd sandbox/mmminsung02` → `../../.venv/Scripts/python -m pytest`. 구현 때 정한 값: 업로드 상한 10MB, 분류 신뢰도 0.5 미만이면 `other`, 요청 하나에 사진 1장, 색은 영어 코드로 저장(`server/domain.py`), 로그인 전까지 개발용 사용자 `dev-user`. transformers 5부터 `get_*_features`가 출력 객체를 돌려줘서 `.pooler_output`을 씀 |
 | 2026-11-04 | CLIP 메모리·속도 측정 (이 PC, CPU) | 모델을 올린 Python 프로세스 약 500MB, 모델 로드 11초, 사진 1장 분석 약 180ms. 서버 전체로도 1GB 안쪽으로 예상되어 **Vultr 2GB 요금제로도 될 가능성이 높다** (FAISS·동시 요청을 붙인 뒤 다시 잰다) |
+| 2026-11-04 | 목업에 라이트/다크 테마, 사이트맵, 화면 4개 추가 | 화면: AI 점원 패널, 내 옷장 여러 벌 고르기, 미리 입어보기, 마이(테마 선택). 색을 모두 테마 변수로 바꿈(다크 주 색 `#8E8FFF`). 헤드리스 Chrome으로 두 테마 다 찍어 확인. 미리 입어보기 기능 문서 [compare/virtual-fitting.md](features/compare/virtual-fitting.md) 추가 |
 | 2026-10-21 | 대화 기록 저장, 문서 커밋·푸시 | [conversation-log.md](conversation-log.md). 제출 기획서 PDF는 팀원 이름·학번이 있어 공개 저장소에 올리지 않음 (`.gitignore`) |
 
 ## 결정 사항
@@ -44,6 +45,8 @@
 | 2026-11-04 | 쇼핑몰은 로고 대신 **이름 글자**로 보여 준다. 시안의 ZARA·H&M·amazon·asos 로고는 지원 후보(ASOS, ZOZOTOWN, UNIQLO, GU) 이름으로 바꿈 | 로고는 Play 지식재산권 정책 위험이 있다. ZARA·H&M·Amazon 미국은 한국어를 지원해서 후보에서 뺀 곳이다 |
 | 2026-11-04 | 유사도는 숫자(%) 대신 **`매우 비슷` / `비슷`** 같은 단계로 보여 준다 | 숫자는 '중복 구매 확률'처럼 읽힐 수 있다. 단계 기준 점수는 Recall@3 평가 때 정한다. [similar-search.md](features/compare/similar-search.md)에 적음 |
 | 2026-11-04 | 하단 탭 3번째 이름을 **쇼핑**으로 한다 (탭: 홈 / 내 옷장 / 쇼핑 / 마이) | 누르면 쇼핑몰 목록이 바로 열려서 이름과 맞는다. 베이스 시안의 "화면 번역"은 이미 뺀 오버레이 번역 기능을 떠올리게 하고, "번역"은 글을 넣어 번역하는 화면처럼 오해할 수 있다 |
+| 2026-11-04 | 화면 테마는 **라이트 / 다크** 두 가지. 처음에는 기기 설정을 따르고, 마이에서 바꾼다 | 사용자 요청 |
+| 2026-11-04 | **미리 입어보기(AI 가상 피팅)**를 **도전 목표**로 넣는다. 여는 곳은 AI 점원 패널(이 상품 + 내 옷)과 내 옷장(여러 벌 고르기) 두 곳. 기본 마네킹(체형 3종, 초안)에 입히고, 결과·코디는 폰에만 저장하며 서버는 중계만 한다 | 구매 판단("사면 내 옷이랑 어울릴까")을 눈으로 확인하게 한다. 2D 겹치기(폰에서 처리, 무료)도 있었지만 실제로 입은 모습에 가까운 AI 방식을 골랐다. 서버에 GPU가 없어 외부 서비스를 쓴다. 장당 과금이라 MVP가 아닌 도전 목표로 둔다. [virtual-fitting.md](features/compare/virtual-fitting.md) |
 
 ## 제출 기획서와 달라진 점 (Sprint 발표에서 설명할 것)
 | 항목 | 제출 기획서 (10/14) | 현재 | 이유 |
@@ -72,6 +75,9 @@
 | OCR | EasyOCR(서버) / ML Kit(기기) | |
 | CLIP 모델 | 일반 CLIP / 패션 특화 CLIP | 평가로 결정 |
 | 서버 요금제 | Vultr 4GB(예정) / 2GB | CLIP 단독 측정 약 500MB (2026-11-04). 서버를 다 붙인 뒤 다시 재고 결정 |
+| 가상 피팅 서비스 (도전 목표) | FASHN (장당 약 $0.075), Google Vertex AI Virtual Try-On (재판매처 기준 장당 약 $0.063), 그 밖의 API | 2026-11-04 웹 검색 결과이고 비교 사이트·재판매처 가격이라 공식 가격을 확인해야 한다. 학교 지원금으로 낼 수 있는지, 업체의 이미지 보관 정책, 여러 벌을 한 번에 입힐 수 있는지 함께 본다 |
+| 미리 입어보기 하루 횟수 | 시안은 5회 | 서비스와 예산을 정한 뒤 |
+| 마네킹에 본인 사진 쓰기 | 안 씀(초안) / 넣기 | 넣으면 몸 사진이 외부 서비스로 가서 개인정보 부담이 커진다 |
 | 지원 쇼핑몰 목록 | 기준: 많이 쓰이는 해외 쇼핑몰 중 **한국어를 지원하지 않는 곳**. 2026-10-28 직접 확인 결과 한국어 미지원 후보: 영어 **ASOS** (https://www.asos.com/women/), **Urban Outfitters** (https://www.urbanoutfitters.com/), **Abercrombie & Fitch** (https://www.abercrombie.com/, Hollister는 같은 회사라 하나만), **END. Clothing** (https://www.endclothing.com/), **J.Crew** (https://www.jcrew.com/), **Nordstrom** (https://www.nordstrom.com/), **유니클로 미국** (https://www.uniqlo.com/us/en/) / 일본어 **ZOZOTOWN** (https://zozo.jp/), **유니클로 일본** (https://www.uniqlo.com/jp/ja/), **GU 일본** (https://www.gu-global.com/jp/ja/), **BEAMS** (https://www.beams.co.jp/). 한국 직배송(웹 검색, 확인 필요): ASOS 있음(공식 배송 페이지), J.Crew 있음 가능성 높음(한국용 `/kr` 스토어), Urban Outfitters·A&F·END.·Nordstrom 불확실, 유니클로 미국·ZOZOTOWN·유니클로 일본·GU 일본 없음(국내 전용, 배송대행지 필요), BEAMS 자료가 엇갈림. **배송 태그로 표시하고 후보에서 빼지는 않는다** (2026-10-28 결정, [shop-browser.md](features/shopping/shop-browser.md)): `배송 가능` ASOS / `배송대행 필요` 유니클로 미국·ZOZOTOWN·유니클로 일본·GU 일본 / `그 외`(확인 전) J.Crew·Urban Outfitters·A&F·Nordstrom·END.·BEAMS. `그 외`는 결제 화면에서 배송 국가를 한국으로 바꿔 확인하면 옮긴다. Amazon 일본은 한국어 미지원이지만 종합몰이라 기본 목록에서는 빼고 사용자가 직접 추가하게 둔다(초안). 한국어를 지원해서 제외: Amazon(미국), SSENSE, 라쿠텐, UNITED ARROWS, ZARA, H&M | 상품 페이지 구조 확인 완료: ASOS·ZOZOTOWN(JSON-LD 있음), 유니클로 일본(페이지 데이터). 나머지는 앱이 생기면 실제 폰 WebView에서 열림·상품 정보 읽기를 확인하고 기본 목록을 정한다 |
 
 ## 다음 할 일 (순서대로)

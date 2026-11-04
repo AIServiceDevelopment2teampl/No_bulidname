@@ -4,31 +4,84 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>옷장 AI 화면 시안</title>
-<!-- docs/image/ 의 PNG 시안 3장을 코드로 옮긴 것. 버튼을 누르면 이어지는 화면으로 이동한다 -->
+<!-- docs/image/ 의 PNG 시안 3장을 코드로 옮기고 화면을 더한 것. 버튼을 누르면 이어지는 화면으로 이동한다.
+     색은 모두 아래 테마 변수로만 쓴다. 라이트/다크 두 가지이고, 처음에는 기기 설정을 따른다 -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
+  /* ── 테마: 라이트 ── */
   :root {
     --p: #5B5CEB;        /* 주 색 (버튼, 강조) */
+    --on-p: #FFFFFF;     /* 주 색 위 글자 */
     --p-soft: #F1F1FE;   /* 연한 배경 */
     --p-soft2: #E4E5FD;  /* 아이콘 원 */
-    --bg: #F5F5FA;
-    --card: #FFFFFF;
+    --accent-l: #B9BAF8; /* 연한 강조 (반짝이, VS 원) */
+    --bg: #F5F5FA;       /* 페이지 배경 */
+    --card: #FFFFFF;     /* 화면·카드 배경 */
+    --surface2: #F2F2F6; /* 옷 사진 칸 */
     --line: #E7E7F0;
     --text: #17182C;
     --sub: #6B6D85;
     --muted: #A4A6B8;
     --red: #E5484D;
+    --ph: #DADBE6;       /* 프로필 사진 자리 */
+    --hero-a: #F7F7FF; --hero-b: #ECECFD; --glow: #EEEEFD;
+    --mq: #E6E0D8;       /* 마네킹 몸 */
     --shadow: 0 6px 24px rgba(80, 80, 170, .10);
+    --shadow-up: 0 -8px 28px rgba(40, 40, 90, .14);
+    color-scheme: light;
   }
+  /* ── 테마: 다크 ── */
+  :root[data-theme="dark"] {
+    --p: #8E8FFF; --on-p: #10112A; --p-soft: #1E1F3D; --p-soft2: #2A2C5C; --accent-l: #4D4FB0;
+    --bg: #0C0D18; --card: #161727; --surface2: #222338; --line: #2C2E46;
+    --text: #ECECF5; --sub: #A3A5BD; --muted: #6E7090; --red: #FF6B70; --ph: #3A3B55;
+    --hero-a: #1B1C36; --hero-b: #242550; --glow: #22234A; --mq: #5C5A68;
+    --shadow: 0 6px 24px rgba(0, 0, 0, .40); --shadow-up: 0 -8px 28px rgba(0, 0, 0, .45);
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --p: #8E8FFF; --on-p: #10112A; --p-soft: #1E1F3D; --p-soft2: #2A2C5C; --accent-l: #4D4FB0;
+      --bg: #0C0D18; --card: #161727; --surface2: #222338; --line: #2C2E46;
+      --text: #ECECF5; --sub: #A3A5BD; --muted: #6E7090; --red: #FF6B70; --ph: #3A3B55;
+      --hero-a: #1B1C36; --hero-b: #242550; --glow: #22234A; --mq: #5C5A68;
+      --shadow: 0 6px 24px rgba(0, 0, 0, .40); --shadow-up: 0 -8px 28px rgba(0, 0, 0, .45);
+      color-scheme: dark;
+    }
+  }
+
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--text);
-    font-family: Pretendard, "Malgun Gothic", system-ui, sans-serif; }
-  .page-title { padding: 28px 32px 0; font-size: 20px; font-weight: 800; }
-  .page-title small { display: block; font-size: 13px; font-weight: 400; color: var(--sub); margin-top: 6px; }
+    font-family: Pretendard, "Malgun Gothic", system-ui, sans-serif; transition: background .2s; }
+  .page-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 28px 32px 0; flex-wrap: wrap; }
+  .page-title { font-size: 20px; font-weight: 800; }
+  .page-title small { display: block; font-size: 13px; font-weight: 400; color: var(--sub); margin-top: 6px; max-width: 760px; line-height: 1.5; }
+  .seg { display: inline-flex; background: var(--surface2); border-radius: 10px; padding: 3px; gap: 2px; }
+  .seg button { border: 0; background: transparent; color: var(--sub); font: 600 12px/1 inherit; font-family: inherit; padding: 8px 14px; border-radius: 8px; cursor: pointer; }
+  .seg button.on { background: var(--card); color: var(--text); box-shadow: var(--shadow); }
   .board { display: flex; flex-wrap: wrap; gap: 40px 28px; padding: 24px 32px 48px; align-items: flex-start; }
   .item h3 { font-size: 15px; margin: 0 0 10px; }
+  .item h3 .tag { vertical-align: 2px; }
   .i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8;
     stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+  /* 사이트맵 */
+  .sitemap { margin: 24px 32px 0; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px 24px; }
+  .sitemap h2 { font-size: 16px; margin: 0 0 4px; }
+  .sitemap > p { font-size: 12px; color: var(--sub); margin: 0 0 14px; }
+  .sm-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 8px 32px; }
+  .tree, .tree ul { list-style: none; margin: 0; padding: 0; }
+  .tree ul { margin-left: 10px; padding-left: 14px; border-left: 1.5px solid var(--line); }
+  .tree li { position: relative; padding: 4px 0; font-size: 13px; line-height: 1.45; }
+  .tree ul > li::before { content: ""; position: absolute; left: -14px; top: 14px; width: 10px; border-top: 1.5px solid var(--line); }
+  .tree .n { font-weight: 700; }
+  .tree .d { color: var(--sub); font-size: 12px; }
+  .tree [data-go] .n { color: var(--p); text-decoration: underline; text-underline-offset: 3px; }
+  .tag { display: inline-block; font-size: 10.5px; font-weight: 700; border-radius: 999px; padding: 1px 7px; margin-left: 4px; white-space: nowrap; }
+  .tag.has { background: var(--p-soft2); color: var(--p); }
+  .tag.none { border: 1px solid var(--line); color: var(--muted); font-weight: 600; }
+  .tag.chal { background: #FFE9C7; color: #8A5300; }
+  :root[data-theme="dark"] .tag.chal { background: #4A3410; color: #FFCB7A; }
 
   /* 폰 틀 */
   .phone { width: 340px; height: 720px; background: var(--card); border: 1px solid var(--line);
@@ -47,20 +100,16 @@
   /* 버튼·입력 */
   .btn { height: 44px; border-radius: 12px; font: 600 14px/1 inherit; font-family: inherit; border: 0;
     width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .btn.primary { background: var(--p); color: #fff; }
-  .btn.outline { background: #fff; border: 1.5px solid var(--p); color: var(--p); }
-  .btn.social { background: #fff; border: 1px solid var(--line); color: var(--text); font-weight: 500; }
+  .btn.primary { background: var(--p); color: var(--on-p); }
+  .btn.outline { background: var(--card); border: 1.5px solid var(--p); color: var(--p); }
+  .btn.social { background: var(--card); border: 1px solid var(--line); color: var(--text); font-weight: 500; }
   .btn.small { height: 34px; font-size: 13px; border-radius: 10px; }
   .stack { display: flex; flex-direction: column; gap: 10px; }
   .field { height: 44px; border: 1px solid var(--line); border-radius: 10px; display: flex; align-items: center;
-    gap: 8px; padding: 0 12px; color: var(--muted); }
+    gap: 8px; padding: 0 12px; color: var(--muted); background: var(--card); }
   .field .i { width: 18px; height: 18px; }
   .field input { border: 0; outline: 0; flex: 1; font: 13px inherit; font-family: inherit; color: var(--text); background: transparent; min-width: 0; }
   .field input::placeholder { color: var(--muted); }
-  .row-opt { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--sub); margin-top: 12px; }
-  .radio { width: 15px; height: 15px; border: 1.5px solid var(--p); border-radius: 50%; display: inline-block; vertical-align: -3px; margin-right: 6px; }
-  .divider { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; margin: 18px 0; }
-  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
   .foot { font-size: 12px; color: var(--sub); text-align: center; margin-top: 22px; }
   .link { color: var(--p); font-weight: 600; cursor: pointer; }
   [data-go] { cursor: pointer; }
@@ -69,80 +118,142 @@
   .icon-circle { width: 76px; height: 76px; border-radius: 50%; background: var(--p-soft2); display: grid; place-items: center; color: var(--p); }
   .icon-circle .i { width: 40px; height: 40px; stroke-width: 2; }
   .icon-sq { width: 44px; height: 44px; border-radius: 12px; background: var(--p-soft2); display: grid; place-items: center; color: var(--p); }
-  .cloth { background: #F2F2F6; border-radius: 10px; display: grid; place-items: center; font-size: 30px; aspect-ratio: 1; }
-  .appbar { display: flex; align-items: center; justify-content: space-between; padding: 4px 20px 12px; border-bottom: 1px solid var(--line); flex: none; }
+  .cloth { background: var(--surface2); border-radius: 10px; display: grid; place-items: center; font-size: 30px; aspect-ratio: 1; }
+  .appbar { display: flex; align-items: center; justify-content: space-between; padding: 4px 20px 12px; border-bottom: 1px solid var(--line); flex: none; gap: 10px; }
   .appbar h1 { font-size: 22px; font-weight: 800; margin: 0; }
+  .appbar h1.sm { font-size: 18px; flex: 1; }
   .appbar .acts { display: flex; gap: 12px; align-items: center; }
-  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--p-soft2); display: grid; place-items: center; cursor: pointer; }
+  .appbar .back { margin: 0 0 0 -8px; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--p-soft2); display: grid; place-items: center; cursor: pointer; color: var(--text); }
   .scroll { flex: 1; overflow-y: auto; padding: 14px 14px 80px; scrollbar-width: none; }
   .scroll::-webkit-scrollbar { display: none; }
-  .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; border-top: 1px solid var(--line); background: #fff; display: flex; }
+  .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; border-top: 1px solid var(--line); background: var(--card); display: flex; z-index: 4; }
   .nav a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: var(--sub); position: relative; }
   .nav a.on { color: var(--p); font-weight: 600; }
   .nav a.on::after { content: ""; position: absolute; bottom: 5px; width: 40px; height: 3px; border-radius: 2px; background: var(--p); }
+  .chips { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 6px; }
+  .chips span { font-size: 8.5px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 6px; color: var(--sub); }
+  .chips span.on { background: var(--p-soft2); color: var(--p); border-color: transparent; font-weight: 700; }
+  .chips.big span { font-size: 12px; padding: 5px 11px; }
+  .sec { font-size: 12px; font-weight: 700; color: var(--sub); margin: 16px 4px 8px; }
+  .level { font-size: 9.5px; white-space: nowrap; background: var(--p-soft2); color: var(--p); border-radius: 999px; padding: 2px 6px; font-weight: 700; text-align: center; }
+  .note { font-size: 11px; color: var(--sub); line-height: 1.55; background: var(--surface2); border-radius: 10px; padding: 9px 11px; }
 
   /* 로봇 (AI 점원) */
-  .robot { width: 62px; height: 56px; background: #fff; border-radius: 22px; box-shadow: 0 4px 14px rgba(90, 92, 235, .25);
+  .robot { width: 62px; height: 56px; background: var(--card); border-radius: 22px; box-shadow: 0 4px 14px rgba(90, 92, 235, .25);
     display: grid; place-items: center; position: relative; }
-  .robot::before, .robot::after { content: ""; position: absolute; top: 20px; width: 8px; height: 14px; border-radius: 4px; background: #C9CAFB; }
+  .robot::before, .robot::after { content: ""; position: absolute; top: 20px; width: 8px; height: 14px; border-radius: 4px; background: var(--accent-l); }
   .robot::before { left: -5px; } .robot::after { right: -5px; }
   .robot .face { width: 46px; height: 34px; border-radius: 14px; background: #1E2350; position: relative; }
   .robot .face::before, .robot .face::after { content: ""; position: absolute; top: 10px; width: 9px; height: 5px;
     border: 2.5px solid #7DE3FF; border-bottom: 0; border-radius: 9px 9px 0 0; }
   .robot .face::before { left: 9px; } .robot .face::after { right: 9px; }
   .robot .face i { position: absolute; left: 17px; top: 20px; width: 12px; height: 5px; border: 2.5px solid #7DE3FF; border-top: 0; border-radius: 0 0 9px 9px; }
-  .bubble { background: #fff; border-radius: 14px; padding: 8px 12px; font-size: 11px; line-height: 1.45; box-shadow: var(--shadow); font-weight: 500; }
+  .robot.mini-bot { transform: scale(.55); transform-origin: left center; margin-right: -26px; }
+  .bubble { background: var(--card); border-radius: 14px; padding: 8px 12px; font-size: 11px; line-height: 1.45; box-shadow: var(--shadow); font-weight: 500; }
 
   /* 상품·번역 카드 (일러스트) */
-  .mini { background: #fff; border-radius: 14px; box-shadow: var(--shadow); padding: 10px; }
+  .mini { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 10px; }
   .shopname { font-weight: 700; font-size: 13px; color: var(--sub); }
   .chip-tr { display: inline-flex; align-items: center; gap: 4px; background: var(--p-soft2); color: var(--p); border-radius: 999px; padding: 3px 10px 3px 4px; font-size: 12px; font-weight: 600; }
-  .chip-tr .dot { width: 18px; height: 18px; border-radius: 50%; background: var(--p); color: #fff; display: grid; place-items: center; }
+  .chip-tr .dot { width: 18px; height: 18px; border-radius: 50%; background: var(--p); color: var(--on-p); display: grid; place-items: center; }
   .chip-tr .dot .i { width: 12px; height: 12px; stroke-width: 2.2; }
   .kv { display: grid; grid-template-columns: 44px 1fr; gap: 5px 8px; font-size: 11px; margin-top: 8px; }
   .kv dt { color: var(--sub); font-weight: 600; } .kv dd { margin: 0; }
   .pct { font-size: 9px; white-space: nowrap; letter-spacing: -.3px; background: var(--p-soft2); color: var(--p); border-radius: 999px; padding: 1px 3px; font-weight: 700; text-align: center; margin-top: 4px; }
 
   /* 홈 (베이스) */
-  .hero { background: linear-gradient(160deg, #F7F7FF, #ECECFD); border-radius: 18px; padding: 18px 16px; position: relative; height: 236px; overflow: hidden; border: 1px solid var(--line); }
+  .hero { background: linear-gradient(160deg, var(--hero-a), var(--hero-b)); border-radius: 18px; padding: 18px 16px; position: relative; height: 236px; overflow: hidden; border: 1px solid var(--line); }
   .hero .lead { font-size: 12px; color: var(--p); line-height: 1.5; font-weight: 500; }
   .hero h2 { font-size: 28px; font-weight: 900; margin: 8px 0 10px; letter-spacing: -.5px; }
   .hero p { font-size: 12px; color: var(--sub); line-height: 1.55; margin: 0; width: 120px; }
   .hero .go { position: absolute; left: 16px; bottom: 18px; width: 44px; height: 44px; border-radius: 50%; background: var(--p-soft2); color: var(--p); display: grid; place-items: center; }
   .hero .art { position: absolute; right: -6px; top: 22px; width: 300px; height: 330px; transform: scale(.52); transform-origin: top right; }
   .hero .art > * { position: absolute; }
-  .closet-card { margin-top: 14px; border: 1px solid var(--line); border-radius: 18px; padding: 22px 14px 0; text-align: center; overflow: hidden; position: relative; background: #fff; }
+  .closet-card { margin-top: 14px; border: 1px solid var(--line); border-radius: 18px; padding: 22px 14px 0; text-align: center; overflow: hidden; position: relative; background: var(--card); }
   .closet-card h2 { font-size: 24px; font-weight: 900; margin: 14px 0 6px; }
   .closet-card p { font-size: 12px; color: var(--sub); line-height: 1.6; margin: 0 0 14px; }
   .closet-card .strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 0 -4px; }
   .closet-card .strip .cloth { border-radius: 10px 10px 0 0; aspect-ratio: 1.15; font-size: 34px; }
-  .fab { position: absolute; right: 14px; top: 140px; width: 44px; height: 44px; border-radius: 50%; background: #fff; box-shadow: var(--shadow); color: var(--p); display: grid; place-items: center; }
+  .fab { position: absolute; right: 14px; top: 140px; width: 44px; height: 44px; border-radius: 50%; background: var(--card); box-shadow: var(--shadow); color: var(--p); display: grid; place-items: center; }
 
   /* 홈 (초안) */
   .headline { font-size: 23px; font-weight: 900; line-height: 1.3; margin: 6px 4px 6px; letter-spacing: -.5px; }
   .subline { font-size: 13px; color: var(--sub); margin: 0 4px 16px; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .fcard { border: 1px solid var(--line); border-radius: 14px; padding: 8px 8px 12px; background: #fff; }
-  .fcard .pic { height: 110px; border-radius: 10px; background: #F6F6FA; overflow: hidden; position: relative; }
+  .fcard { border: 1px solid var(--line); border-radius: 14px; padding: 8px 8px 12px; background: var(--card); }
+  .fcard .pic { height: 110px; border-radius: 10px; background: var(--surface2); overflow: hidden; position: relative; }
   .fcard .icon-sq { width: 30px; height: 30px; border-radius: 9px; margin: 10px 0 6px; }
   .fcard .icon-sq .i { width: 17px; height: 17px; }
   .fcard h4 { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 800; margin: 0 0 4px; }
   .fcard h4 .i { width: 15px; height: 15px; }
   .fcard p { font-size: 10px; color: var(--sub); line-height: 1.5; margin: 0; }
   .collage { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; height: 100%; }
-  .collage .cloth { aspect-ratio: auto; font-size: 22px; border-radius: 6px; background: #fff; }
-  .chips { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 6px; }
-  .chips span { font-size: 8.5px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 6px; color: var(--sub); }
-  .chips span.on { background: var(--p-soft2); color: var(--p); border-color: transparent; font-weight: 700; }
+  .collage .cloth { aspect-ratio: auto; font-size: 22px; border-radius: 6px; background: var(--card); }
 
   /* 드롭다운 (로그인 후 메인) */
-  .menu { position: absolute; right: 12px; top: 84px; width: 200px; background: #fff; border-radius: 14px; box-shadow: 0 10px 32px rgba(40, 40, 90, .18); padding: 12px; z-index: 5; }
+  .menu { position: absolute; right: 12px; top: 84px; width: 200px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 10px 32px rgba(0, 0, 0, .22); padding: 12px; z-index: 5; }
   .menu .who { display: flex; gap: 10px; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 6px; }
-  .menu .who .pic { width: 34px; height: 34px; border-radius: 50%; background: #DADBE6; }
+  .menu .who .pic { width: 34px; height: 34px; border-radius: 50%; background: var(--ph); }
   .menu .who b { font-size: 13px; display: block; } .menu .who small { font-size: 11px; color: var(--sub); }
   .menu a { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 2px; }
   .menu a .i { width: 17px; height: 17px; }
   .menu a.danger { color: var(--red); }
+
+  /* 내 옷장 (고르기) */
+  .pickgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .pick { position: relative; cursor: pointer; }
+  .pick .cloth { border: 2px solid transparent; font-size: 34px; }
+  .pick small { display: block; font-size: 10.5px; color: var(--sub); margin-top: 4px; text-align: center; }
+  .pick .ck { position: absolute; right: 5px; top: 5px; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--muted); background: var(--card); display: grid; place-items: center; color: var(--on-p); }
+  .pick .ck .i { width: 13px; height: 13px; stroke-width: 3; opacity: 0; }
+  .pick.sel .cloth { border-color: var(--p); }
+  .pick.sel .ck { background: var(--p); border-color: var(--p); }
+  .pick.sel .ck .i { opacity: 1; }
+  .actionbar { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px 18px; background: var(--card); border-top: 1px solid var(--line); display: flex; gap: 10px; align-items: center; z-index: 4; }
+  .actionbar .cnt { font-size: 12px; color: var(--sub); white-space: nowrap; }
+  .actionbar .cnt b { color: var(--p); font-size: 15px; }
+
+  /* AI 점원 패널 */
+  .webbar { display: flex; align-items: center; gap: 8px; padding: 0 14px 8px; flex: none; }
+  .url { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 32px; border-radius: 9px; background: var(--surface2); font-size: 12px; color: var(--sub); display: flex; align-items: center; padding: 0 10px; gap: 6px; }
+  .url .i { width: 14px; height: 14px; }
+  .webpage { padding: 4px 16px; display: flex; gap: 12px; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; height: 468px; background: var(--card); border-radius: 22px 22px 0 0; box-shadow: var(--shadow-up); border-top: 1px solid var(--line); display: flex; flex-direction: column; z-index: 3; }
+  .sheet .handle { width: 40px; height: 4px; border-radius: 2px; background: var(--line); margin: 8px auto 4px; flex: none; }
+  .sheet .in { flex: 1; overflow-y: auto; padding: 4px 16px 12px; scrollbar-width: none; }
+  .sheet .in::-webkit-scrollbar { display: none; }
+  .top3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .top3 .cloth { font-size: 28px; margin-bottom: 5px; }
+  .ask { flex: none; padding: 8px 16px 14px; border-top: 1px solid var(--line); }
+  .ask .field { height: 40px; border-radius: 999px; }
+
+  /* 미리 입어보기 */
+  .fit-stage { position: relative; height: 318px; border-radius: 18px; background: radial-gradient(circle at 50% 35%, var(--glow), var(--surface2)); overflow: hidden; }
+  .fit-stage svg { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); height: 300px; }
+  .fit-stage .badge { position: absolute; left: 10px; top: 10px; font-size: 10.5px; font-weight: 700; color: var(--p); background: var(--card); border-radius: 999px; padding: 4px 9px; display: flex; gap: 4px; align-items: center; box-shadow: var(--shadow); }
+  .fit-stage .badge .i { width: 12px; height: 12px; }
+  .worn { display: flex; flex-direction: column; gap: 6px; }
+  .worn .row { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 12px; padding: 6px 10px 6px 6px; font-size: 12px; }
+  .worn .cloth { width: 38px; flex: none; font-size: 20px; border-radius: 8px; }
+  .worn .row > div:not(.cloth) { flex: 1; } .worn .row small { display: block; color: var(--sub); font-size: 10.5px; margin-top: 1px; }
+  .src { font-size: 10px; font-weight: 700; border-radius: 6px; padding: 2px 6px; white-space: nowrap; }
+  .src.shop { background: #FFE9C7; color: #8A5300; }
+  :root[data-theme="dark"] .src.shop { background: #4A3410; color: #FFCB7A; }
+  .src.mine { background: var(--p-soft2); color: var(--p); }
+  .row2 { display: flex; gap: 8px; }
+
+  /* 마이 */
+  .prof { display: flex; gap: 12px; align-items: center; border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+  .prof .pic { width: 46px; height: 46px; border-radius: 50%; background: var(--ph); }
+  .prof b { display: block; font-size: 15px; } .prof small { font-size: 11.5px; color: var(--sub); }
+  .list { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .list .li { display: flex; align-items: center; gap: 10px; padding: 13px 14px; font-size: 13.5px; border-top: 1px solid var(--line); }
+  .list .li:first-child { border-top: 0; }
+  .list .li .grow { flex: 1; } .list .li small { display: block; font-size: 11px; color: var(--sub); margin-top: 2px; }
+  .list .li .i { width: 18px; height: 18px; color: var(--sub); }
+  .list .li.danger, .list .li.danger .i { color: var(--red); }
+  .list .seg button { padding: 7px 11px; }
 </style>
 </head>
 <body>
@@ -157,9 +268,6 @@
   <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
   <symbol id="chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
   <symbol id="back" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></symbol>
-  <symbol id="mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/></symbol>
-  <symbol id="lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
-  <symbol id="eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
   <symbol id="cart" viewBox="0 0 24 24"><path d="M3 4h2.5l2.2 10.5h10.6L20.5 7H6.4"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></symbol>
   <symbol id="scale" viewBox="0 0 24 24"><path d="M12 4v16M8 20h8M5 7h14"/><path d="m5 7-3 6a3 3 0 0 0 6 0zM19 7l-3 6a3 3 0 0 0 6 0z"/></symbol>
@@ -167,9 +275,16 @@
   <symbol id="gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></symbol>
   <symbol id="power" viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M7 6.3a7 7 0 1 0 10 0"/></symbol>
   <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
+  <symbol id="phone" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></symbol>
+  <symbol id="trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+  <symbol id="doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></symbol>
+  <symbol id="refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></symbol>
+  <symbol id="send" viewBox="0 0 24 24"><path d="M4 12 20 4l-6 16-3-7z"/></symbol>
   <symbol id="spark" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 2c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7z"/></symbol>
   <symbol id="google" viewBox="0 0 48 48"><path stroke="none" fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path stroke="none" fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path stroke="none" fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path stroke="none" fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></symbol>
-  <symbol id="apple" viewBox="0 0 24 24"><path stroke="none" fill="currentColor" d="M16.4 12.6c0-2.4 2-3.5 2-3.6-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9-.7 0-1.8-.9-3-.8-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.6s-2.5-1-2.5-3.7zM14.1 5.6c.6-.8 1.1-1.8 1-2.9-.9 0-2.1.6-2.7 1.4-.6.7-1.1 1.8-1 2.8 1 .1 2.1-.5 2.7-1.3z"/></symbol>
 </svg>
 
 <!-- 반복해서 쓰는 조각 -->
@@ -209,18 +324,85 @@
   </div>
 </template>
 
-<template id="t-nav-base">
-  <nav class="nav">
-    <a class="on"><svg class="i"><use href="#home"/></svg>홈</a>
-    <a><svg class="i"><use href="#hanger"/></svg>내 옷장</a>
-    <a><svg class="i"><use href="#bag"/></svg>쇼핑</a>
-    <a><svg class="i"><use href="#user"/></svg>마이</a>
-  </nav>
+<!-- 마네킹 그림 (실제 앱에서는 가상 피팅 서비스가 만든 이미지가 이 자리에 들어간다) -->
+<template id="t-mannequin">
+  <svg viewBox="0 0 200 340" aria-label="마네킹에 코트·니트·청바지를 입힌 예시">
+    <g fill="var(--mq)">
+      <ellipse cx="100" cy="34" rx="17" ry="21"/>
+      <rect x="92" y="50" width="16" height="16" rx="5"/>
+      <path d="M60 80 48 168l8 3 15-74z"/><path d="M140 80l12 88-8 3-15-74z"/>
+      <ellipse cx="51" cy="174" rx="6" ry="8"/><ellipse cx="149" cy="174" rx="6" ry="8"/>
+    </g>
+    <path fill="#41608C" d="M70 168h60l-3 132h-21l-6-98-6 98H73z"/>
+    <path fill="none" stroke="#2F4769" stroke-width="1.5" d="M100 172v28M76 182h14M110 182h14"/>
+    <path fill="#2E2F38" d="M70 64q30 10 60 0l10 16-6 96H66l-6-96z"/>
+    <path fill="none" stroke="#4A4B57" stroke-width="2" d="M68 168h64M68 172h64"/>
+    <path fill="#B88A5A" d="M66 62 58 80 42 176l13 3 11-58-2 112h29l5-138-15-33z"/>
+    <path fill="#B88A5A" d="M134 62l8 18 16 96-13 3-11-58 2 112h-29l-5-138 15-33z"/>
+    <path fill="none" stroke="#8F6640" stroke-width="1.6" d="M84 62l9 30-8 6M116 62l-9 30 8 6M66 150h18M116 150h18"/>
+    <rect x="97" y="300" width="6" height="24" fill="var(--muted)"/>
+    <ellipse cx="100" cy="327" rx="34" ry="6" fill="var(--muted)"/>
+  </svg>
 </template>
 
-<div class="page-title">옷장 AI 화면 시안 (코드판)
-  <small>docs/image/의 PNG 3장을 HTML로 옮김. 문서 결정에 맞춰 Google 로그인만 남기고, 쇼핑몰은 로고 대신 이름 글자로, 유사도는 % 대신 말로 표시함. 버튼·링크를 누르면 이어지는 화면으로 이동한다. 옷 사진은 이모지로 대신함</small>
+<div class="page-head">
+  <div class="page-title">옷장 AI 화면 시안 (코드판)
+    <small>docs/image/의 PNG 3장을 HTML로 옮기고 화면을 더함. 버튼·링크·사이트맵의 밑줄 친 이름을 누르면 그 화면으로 이동한다. 옷 사진은 이모지, 가상 피팅 결과는 그림으로 대신함. 테마는 라이트/다크 두 가지이고 처음에는 기기 설정을 따른다</small>
+  </div>
+  <div class="seg" role="group" aria-label="테마"><button data-theme-btn="light">라이트</button><button data-theme-btn="dark">다크</button></div>
 </div>
+
+<!-- 사이트맵 -->
+<section class="sitemap">
+  <h2>사이트맵</h2>
+  <p><span class="tag has">시안 있음</span> 아래에 화면이 있음 · <span class="tag none">시안 없음</span> 아직 안 그림 · <span class="tag chal">도전 목표</span> MVP가 끝나고 시간이 남으면 넣음</p>
+  <div class="sm-cols">
+    <ul class="tree">
+      <li><span class="n">앱 실행</span>
+        <ul>
+          <li data-go="login-start"><span class="n">로그인</span> <span class="d">Google로 계속하기</span><span class="tag has">시안 있음</span></li>
+          <li data-go="home-base"><span class="n">홈</span> <span class="d">베이스 / 초안 (미결정)</span><span class="tag has">시안 있음</span>
+            <ul>
+              <li><span class="n">쇼핑하기 → 쇼핑몰 목록</span> <span class="d">이름 + 배송 태그, 주소 입력</span><span class="tag none">시안 없음</span>
+                <ul>
+                  <li><span class="n">인앱 브라우저</span> <span class="d">자동 번역, 켜기/끄기, 원문 보기</span><span class="tag none">시안 없음</span>
+                    <ul>
+                      <li data-go="clerk"><span class="n">AI 점원 패널</span> <span class="d">TOP 3 · 비교 리포트 · 어울리는 내 옷 · 질문</span><span class="tag has">시안 있음</span>
+                        <ul><li data-go="fitting"><span class="n">미리 입어보기</span> <span class="d">이 상품 + 고른 내 옷</span><span class="tag chal">도전 목표</span></li></ul>
+                      </li>
+                      <li><span class="n">결제 완료 → "옷장에 추가할까요?"</span><span class="tag none">시안 없음</span></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <ul class="tree">
+      <li data-go="closet-select"><span class="n">내 옷장</span> <span class="d">격자 목록, 종류·색 필터</span><span class="tag has">고르기 화면만</span>
+        <ul>
+          <li><span class="n">옷 상세 → 수정 / 삭제</span><span class="tag none">시안 없음</span></li>
+          <li><span class="n">등록</span> <span class="d">주문내역 캡처 / 영수증 / 사진</span><span class="tag none">시안 없음</span></li>
+          <li data-go="closet-select"><span class="n">여러 벌 고르기</span><span class="tag has">시안 있음</span>
+            <ul><li data-go="fitting"><span class="n">미리 입어보기</span> <span class="d">고른 내 옷끼리</span><span class="tag chal">도전 목표</span></li></ul>
+          </li>
+        </ul>
+      </li>
+      <li data-go="my"><span class="n">마이</span><span class="tag has">시안 있음</span>
+        <ul>
+          <li><span class="n">화면 테마</span> <span class="d">라이트 / 다크</span></li>
+          <li><span class="n">저장한 코디</span> <span class="d">이 폰에만 저장</span><span class="tag chal">도전 목표</span></li>
+          <li><span class="n">내 데이터 전체 삭제 · 계정 삭제 · 개인정보처리방침</span></li>
+          <li data-go="logout-confirm"><span class="n">로그아웃</span><span class="tag has">시안 있음</span></li>
+        </ul>
+      </li>
+      <li><span class="n">하단 탭</span> <span class="d">홈 / 내 옷장 / 쇼핑(→ 쇼핑몰 목록) / 마이</span></li>
+      <li><span class="n">앱 밖: 다른 쇼핑 앱 → 공유 → 결과</span> <span class="d">상품 정보 + TOP 3 + 리포트</span><span class="tag none">시안 없음</span></li>
+    </ul>
+  </div>
+</section>
 
 <div class="board">
 
@@ -229,7 +411,7 @@
     <div class="phone" id="login-start">
       <div data-tpl="t-status"></div>
       <div class="body" style="position:relative">
-        <div style="position:absolute;left:-40px;top:20px;width:420px;height:330px;border-radius:50%;background:radial-gradient(closest-side,#EEEEFD,transparent)"></div>
+        <div style="position:absolute;left:-40px;top:20px;width:420px;height:330px;border-radius:50%;background:radial-gradient(closest-side,var(--glow),transparent)"></div>
         <div style="position:absolute;left:-14px;top:40px;font-size:64px;opacity:.55">🧥</div>
         <div style="position:absolute;left:10px;top:200px;font-size:44px;opacity:.5">👟</div>
         <div style="position:absolute;right:-10px;top:150px;font-size:50px;opacity:.45">👜</div>
@@ -251,13 +433,13 @@
     <div class="phone" id="logout-confirm">
       <div data-tpl="t-status"></div>
       <div class="body">
-        <div class="back" data-go="home-in"><svg class="i"><use href="#back"/></svg></div>
+        <div class="back" data-go="my"><svg class="i"><use href="#back"/></svg></div>
         <div class="h-title" style="margin-top:20px">로그아웃</div>
         <div style="font-size:14px;margin:8px 0 10px">정말 로그아웃하시겠습니까?</div>
         <div class="h-desc">지금 로그아웃하면 일부 기능을 이용할 수 없습니다.</div>
         <div class="stack">
           <button class="btn primary" data-go="home-out">로그아웃</button>
-          <button class="btn outline" data-go="home-in">취소</button>
+          <button class="btn outline" data-go="my">취소</button>
         </div>
       </div>
     </div>
@@ -282,7 +464,7 @@
           <svg class="i" style="width:16px;height:16px;color:var(--sub)"><use href="#chev"/></svg>
         </div>
       </div>
-      <div data-tpl="t-nav-base"></div>
+      <nav class="nav" data-nav="home"></nav>
     </div>
   </section>
 
@@ -294,11 +476,11 @@
       <div class="scroll" style="padding-top:4px"><div data-tpl="t-hero"></div></div>
       <div class="menu">
         <div class="who"><div class="pic"></div><div><b>홍길동</b><small>user@example.com</small></div></div>
-        <a><svg class="i"><use href="#user"/></svg>내 정보 수정</a>
-        <a><svg class="i"><use href="#gear"/></svg>설정</a>
+        <a data-go="my"><svg class="i"><use href="#user"/></svg>마이</a>
+        <a data-go="my"><svg class="i"><use href="#gear"/></svg>설정</a>
         <a class="danger" data-go="logout-confirm"><svg class="i"><use href="#power"/></svg>로그아웃</a>
       </div>
-      <div data-tpl="t-nav-base"></div>
+      <nav class="nav" data-nav="home"></nav>
     </div>
   </section>
 
@@ -306,18 +488,18 @@
   <section class="item"><h3>메인 화면 (베이스)</h3>
     <div class="phone" id="home-base">
       <div data-tpl="t-status"></div>
-      <div class="appbar"><h1>옷장 AI</h1><div class="acts"><svg class="i"><use href="#search"/></svg><div class="avatar"><svg class="i"><use href="#user"/></svg></div></div></div>
+      <div class="appbar"><h1>옷장 AI</h1><div class="acts"><svg class="i"><use href="#search"/></svg><div class="avatar" data-go="my"><svg class="i"><use href="#user"/></svg></div></div></div>
       <div class="scroll">
         <div data-tpl="t-hero"></div>
-        <div class="closet-card">
+        <div class="closet-card" data-go="closet-select">
           <div class="icon-circle" style="margin:0 auto"><svg class="i"><use href="#hanger"/></svg></div>
           <h2>내 옷장</h2>
           <p>사진으로 옷을 등록하고,<br>나만의 디지털 옷장을 만들어보세요.</p>
           <div class="fab"><svg class="i"><use href="#plus"/></svg></div>
-          <div class="strip"><div class="cloth">👚</div><div class="cloth">🧥</div><div class="cloth">👕</div><div class="cloth" style="filter:brightness(.35)">🧥</div></div>
+          <div class="strip"><div class="cloth">👚</div><div class="cloth">🧥</div><div class="cloth">👕</div><div class="cloth"><span style="filter:brightness(.35)">🧥</span></div></div>
         </div>
       </div>
-      <div data-tpl="t-nav-base"></div>
+      <nav class="nav" data-nav="home"></nav>
     </div>
   </section>
 
@@ -325,12 +507,12 @@
   <section class="item"><h3>메인 화면 (초안)</h3>
     <div class="phone" id="home-draft">
       <div data-tpl="t-status"></div>
-      <div class="appbar"><h1>옷장 AI</h1><div class="acts"><svg class="i"><use href="#search"/></svg><div class="avatar"><svg class="i"><use href="#user"/></svg></div></div></div>
+      <div class="appbar"><h1>옷장 AI</h1><div class="acts"><svg class="i"><use href="#search"/></svg><div class="avatar" data-go="my"><svg class="i"><use href="#user"/></svg></div></div></div>
       <div class="scroll">
         <div class="headline">내 옷장과 해외 쇼핑을<br>한곳에</div>
         <div class="subline">번역하고, 비교하고, 현명하게 쇼핑하세요</div>
         <div class="grid2">
-          <div class="fcard">
+          <div class="fcard" data-go="closet-select">
             <div class="pic"><div class="collage"><div class="cloth">👚</div><div class="cloth">🧥</div><div class="cloth">👔</div><div class="cloth">👖</div><div class="cloth">👜</div><div class="cloth">🧥</div></div></div>
             <div class="icon-sq"><svg class="i"><use href="#hanger"/></svg></div>
             <h4>내 옷장 <svg class="i"><use href="#arrow"/></svg></h4>
@@ -339,7 +521,7 @@
           <div class="fcard">
             <div class="pic">
               <div style="position:absolute;left:6px;top:6px;font-weight:700;font-size:9px;color:var(--sub)">ASOS</div>
-              <div class="cloth" style="position:absolute;left:6px;top:20px;width:50px;font-size:30px;background:#fff">🧥</div>
+              <div class="cloth" style="position:absolute;left:6px;top:20px;width:50px;font-size:30px;background:var(--card)">🧥</div>
               <div style="position:absolute;left:62px;top:22px;font-size:7px;line-height:1.5">Wool Blend Coat<br><b>$129.00</b></div>
               <div class="mini" style="position:absolute;left:44px;top:46px;width:94px;padding:5px 6px;border-radius:8px">
                 <div style="font-size:7px;color:var(--p);font-weight:700">文A 한국어 번역</div>
@@ -351,18 +533,18 @@
             <h4>해외 상품 번역 <svg class="i"><use href="#arrow"/></svg></h4>
             <p>외국어 상품 정보를 한국어로 번역하고<br>핵심 정보를 구조화해보세요.</p>
           </div>
-          <div class="fcard">
-            <div class="pic" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:#fff">
-              <div style="background:#F6F6FA;border-radius:8px;text-align:center"><div style="font-size:34px;margin-top:12px">🧥</div><div style="font-size:6.5px;color:var(--sub);margin-top:16px">비슷한 스타일의 다른 상품</div></div>
-              <div style="background:#F6F6FA;border-radius:8px;text-align:center"><div style="font-size:34px;margin-top:12px;filter:hue-rotate(60deg)">🧥</div><div style="font-size:6.5px;color:var(--sub);margin-top:16px">보유 중인 유사 아이템</div></div>
-              <div style="position:absolute;left:50%;top:38px;transform:translateX(-50%);width:24px;height:24px;border-radius:50%;background:#B9BAF8;color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center">VS</div>
+          <div class="fcard" data-go="clerk">
+            <div class="pic" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--card)">
+              <div style="background:var(--surface2);border-radius:8px;text-align:center"><div style="font-size:34px;margin-top:12px">🧥</div><div style="font-size:6.5px;color:var(--sub);margin-top:16px">비슷한 스타일의 다른 상품</div></div>
+              <div style="background:var(--surface2);border-radius:8px;text-align:center"><div style="font-size:34px;margin-top:12px;filter:hue-rotate(60deg)">🧥</div><div style="font-size:6.5px;color:var(--sub);margin-top:16px">보유 중인 유사 아이템</div></div>
+              <div style="position:absolute;left:50%;top:38px;transform:translateX(-50%);width:24px;height:24px;border-radius:50%;background:var(--accent-l);color:#fff;font-size:9px;font-weight:700;display:grid;place-items:center">VS</div>
             </div>
             <div class="icon-sq"><svg class="i"><use href="#scale"/></svg></div>
             <h4>AI 구매 비교 <svg class="i"><use href="#arrow"/></svg></h4>
             <p>보유한 옷과 유사한 해외 상품을 찾아<br>비교 리포트를 제공해드려요.</p>
           </div>
           <div class="fcard">
-            <div class="pic" style="background:#fff;padding:4px">
+            <div class="pic" style="background:var(--card);padding:4px">
               <div style="display:flex;justify-content:space-between;font-size:8.5px;font-weight:700;color:var(--sub);padding:2px 2px 4px"><span>ASOS</span><span>ZOZOTOWN</span><span>UNIQLO</span><span>GU</span></div>
               <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px"><div class="cloth" style="font-size:22px">👚</div><div class="cloth" style="font-size:22px">🧥</div><div class="cloth" style="font-size:22px">👟</div></div>
               <div class="chips"><span class="on">전체</span><span>상의</span><span>하의</span><span>아우터</span><span>신발</span></div>
@@ -373,12 +555,133 @@
           </div>
         </div>
       </div>
-      <nav class="nav">
-        <a class="on"><svg class="i"><use href="#home"/></svg>홈</a>
-        <a><svg class="i"><use href="#hanger"/></svg>내 옷장</a>
-        <a><svg class="i"><use href="#bag"/></svg>쇼핑</a>
-        <a><svg class="i"><use href="#user"/></svg>마이</a>
-      </nav>
+      <nav class="nav" data-nav="home"></nav>
+    </div>
+  </section>
+
+  <!-- 7. AI 점원 패널 (인앱 브라우저 위) -->
+  <section class="item"><h3>AI 점원 패널</h3>
+    <div class="phone" id="clerk">
+      <div data-tpl="t-status"></div>
+      <div class="webbar">
+        <svg class="i" style="width:20px;height:20px"><use href="#x"/></svg>
+        <div class="url"><svg class="i"><use href="#lock"/></svg>asos.com/…/wool-coat</div>
+        <span class="chip-tr" style="font-size:11px"><span class="dot"><svg class="i"><use href="#translate"/></svg></span>번역 켜짐</span>
+      </div>
+      <div class="webpage">
+        <div class="cloth" style="width:120px;font-size:70px;flex:none">🧥</div>
+        <div style="font-size:12px;line-height:1.5;padding-top:6px">
+          <div class="shopname" style="font-size:11px">ASOS DESIGN</div>
+          <div style="font-weight:800;font-size:15px;margin:2px 0 4px">울 블렌드 코트</div>
+          <div style="font-weight:700">$129.00</div>
+          <div style="color:var(--sub);font-size:11px;margin-top:6px">카멜 · 레귤러 핏<br>울 60%, 폴리에스터 40%</div>
+        </div>
+      </div>
+      <div class="sheet">
+        <div class="handle"></div>
+        <div class="in">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+            <div class="robot mini-bot"><div class="face"><i></i></div></div>
+            <div><b style="font-size:15px">비슷한 옷 2벌 있어요</b><div style="font-size:11px;color:var(--sub)">내 옷장에서 찾았어요 (이미지 기준)</div></div>
+          </div>
+          <div class="top3" style="margin-top:6px">
+            <div><div class="cloth"><span style="filter:sepia(.5)">🧥</span></div><div class="level">매우 비슷</div></div>
+            <div><div class="cloth">🧥</div><div class="level">비슷</div></div>
+            <div><div class="cloth"><span style="opacity:.45">🧥</span></div><div class="level" style="background:var(--surface2);color:var(--sub)">조금 다름</div></div>
+          </div>
+          <div class="note" style="margin-top:10px">갖고 있는 카멜 코트와 색·길이가 비슷해요. 새 상품은 울 60%이고, 기존 옷은 소재 정보가 없어 비교할 수 없어요. <span class="link">리포트 전체 보기</span></div>
+          <div class="sec" style="margin-left:0">이 상품과 어울리는 내 옷</div>
+          <div class="pickgrid" style="grid-template-columns:repeat(4,1fr);gap:6px">
+            <div class="pick sel"><div class="cloth" style="font-size:24px">👖</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>청바지</small></div>
+            <div class="pick sel"><div class="cloth" style="font-size:24px"><span style="filter:brightness(.4)">👕</span></div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>검은 니트</small></div>
+            <div class="pick"><div class="cloth" style="font-size:24px">👔</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>셔츠</small></div>
+            <div class="pick"><div class="cloth" style="font-size:24px">👟</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>운동화</small></div>
+          </div>
+          <button class="btn primary" style="margin-top:12px" data-go="fitting"><svg class="i" style="width:18px;height:18px"><use href="#spark"/></svg>이 상품이랑 입혀보기 <span class="tag chal" style="margin-left:2px">도전</span></button>
+        </div>
+        <div class="ask"><label class="field"><input placeholder="이 상품에 대해 물어보세요 (예: 세탁기 돼?)"><svg class="i" style="color:var(--p)"><use href="#send"/></svg></label></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. 내 옷장 (여러 벌 고르기) -->
+  <section class="item"><h3>내 옷장 · 여러 벌 고르기</h3>
+    <div class="phone" id="closet-select">
+      <div data-tpl="t-status"></div>
+      <div class="appbar"><h1 class="sm">입혀볼 옷 고르기</h1><span class="link" style="font-size:13px" data-go="home-base">취소</span></div>
+      <div class="scroll" style="padding-bottom:96px">
+        <div style="font-size:11.5px;color:var(--sub);margin:0 2px 8px">아우터·상의·하의에서 한 벌씩, 최대 3벌까지 고를 수 있어요.</div>
+        <div class="chips big" style="margin:0 0 12px"><span class="on">전체</span><span>아우터</span><span>상의</span><span>하의</span></div>
+        <div class="pickgrid" data-picker>
+          <div class="pick"><div class="cloth">🧥</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>카멜 코트</small></div>
+          <div class="pick sel"><div class="cloth"><span style="filter:brightness(.4)">🧥</span></div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>검은 패딩</small></div>
+          <div class="pick"><div class="cloth">👚</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>핑크 블라우스</small></div>
+          <div class="pick sel"><div class="cloth">👕</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>줄무늬 티</small></div>
+          <div class="pick"><div class="cloth">👔</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>파란 셔츠</small></div>
+          <div class="pick"><div class="cloth"><span style="filter:brightness(.4)">👕</span></div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>검은 니트</small></div>
+          <div class="pick sel"><div class="cloth">👖</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>청바지</small></div>
+          <div class="pick"><div class="cloth"><span style="filter:grayscale(1)">👖</span></div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>회색 슬랙스</small></div>
+          <div class="pick"><div class="cloth">🩳</div><span class="ck"><svg class="i"><use href="#check"/></svg></span><small>반바지</small></div>
+        </div>
+      </div>
+      <div class="actionbar">
+        <div class="cnt"><b data-count>3</b>벌 선택</div>
+        <button class="btn primary" data-go="fitting"><svg class="i" style="width:18px;height:18px"><use href="#spark"/></svg>마네킹에 입혀보기</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. 미리 입어보기 (결과) -->
+  <section class="item"><h3>미리 입어보기 <span class="tag chal">도전 목표</span></h3>
+    <div class="phone" id="fitting">
+      <div data-tpl="t-status"></div>
+      <div class="appbar"><div class="back" data-go="clerk"><svg class="i"><use href="#back"/></svg></div><h1 class="sm">미리 입어보기</h1><span style="font-size:11px;color:var(--sub)">오늘 4회 남음</span></div>
+      <div class="scroll" style="padding-bottom:20px">
+        <div class="fit-stage">
+          <span class="badge"><svg class="i"><use href="#spark"/></svg>AI가 만든 참고 이미지</span>
+          <div data-tpl="t-mannequin"></div>
+        </div>
+        <div class="sec">마네킹 체형</div>
+        <div class="seg" style="display:flex"><button style="flex:1">슬림</button><button class="on" style="flex:1">보통</button><button style="flex:1">넉넉</button></div>
+        <div class="sec">입힌 옷</div>
+        <div class="worn">
+          <div class="row"><div class="cloth"><span style="filter:sepia(.5)">🧥</span></div><div>울 블렌드 코트<small>ASOS · $129.00</small></div><span class="src shop">쇼핑 중</span></div>
+          <div class="row"><div class="cloth"><span style="filter:brightness(.4)">👕</span></div><div>검은 니트<small>내 옷장</small></div><span class="src mine">내 옷</span></div>
+          <div class="row"><div class="cloth">👖</div><div>청바지<small>내 옷장</small></div><span class="src mine">내 옷</span></div>
+        </div>
+        <div class="note" style="margin-top:12px">실제 핏·색과 다를 수 있어요. 결과 이미지는 서버에 남기지 않고 <b>이 폰에만</b> 저장돼요. 옷 사진은 이미지를 만들 때만 가상 피팅 서비스로 보내요.</div>
+        <div class="row2" style="margin-top:12px">
+          <button class="btn outline"><svg class="i" style="width:18px;height:18px"><use href="#refresh"/></svg>다시 만들기</button>
+          <button class="btn primary"><svg class="i" style="width:18px;height:18px"><use href="#phone"/></svg>폰에 저장</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. 마이 -->
+  <section class="item"><h3>마이</h3>
+    <div class="phone" id="my">
+      <div data-tpl="t-status"></div>
+      <div class="appbar"><h1>마이</h1></div>
+      <div class="scroll">
+        <div class="prof"><div class="pic"></div><div><b>홍길동</b><small>user@example.com · Google 계정</small></div></div>
+        <div class="sec">화면</div>
+        <div class="list">
+          <div class="li"><svg class="i"><use href="#moon"/></svg><div class="grow">테마<small>처음에는 폰 설정을 따라가요</small></div><div class="seg"><button data-theme-btn="light">라이트</button><button data-theme-btn="dark">다크</button></div></div>
+        </div>
+        <div class="sec">코디</div>
+        <div class="list">
+          <div class="li" data-go="fitting"><svg class="i"><use href="#hanger"/></svg><div class="grow">저장한 코디 <span class="tag chal">도전</span><small>3개 · 이 폰에만 저장돼요</small></div><svg class="i"><use href="#chev"/></svg></div>
+        </div>
+        <div class="sec">내 정보</div>
+        <div class="list">
+          <div class="li"><svg class="i"><use href="#doc"/></svg><div class="grow">개인정보처리방침</div><svg class="i"><use href="#chev"/></svg></div>
+          <div class="li" data-go="logout-confirm"><svg class="i"><use href="#power"/></svg><div class="grow">로그아웃</div><svg class="i"><use href="#chev"/></svg></div>
+          <div class="li danger"><svg class="i"><use href="#trash"/></svg><div class="grow">내 데이터 전체 삭제</div></div>
+          <div class="li danger"><svg class="i"><use href="#x"/></svg><div class="grow">계정 삭제</div></div>
+        </div>
+      </div>
+      <nav class="nav" data-nav="my"></nav>
     </div>
   </section>
 
@@ -389,8 +692,44 @@
   document.querySelectorAll('[data-tpl]').forEach(el => {
     el.replaceWith(document.getElementById(el.dataset.tpl).content.cloneNode(true));
   });
-  // 버튼을 누르면 이어지는 화면으로 이동하고 테두리를 잠깐 강조한다
+
+  // 하단 탭 (쇼핑 탭은 쇼핑몰 목록으로 가지만 그 화면은 아직 없음)
+  const TABS = [
+    { key: 'home', label: '홈', icon: 'home', go: 'home-base' },
+    { key: 'closet', label: '내 옷장', icon: 'hanger', go: 'closet-select' },
+    { key: 'shop', label: '쇼핑', icon: 'bag', go: '' },
+    { key: 'my', label: '마이', icon: 'user', go: 'my' },
+  ];
+  document.querySelectorAll('[data-nav]').forEach(nav => {
+    nav.innerHTML = TABS.map(t =>
+      `<a class="${t.key === nav.dataset.nav ? 'on' : ''}"${t.go ? ` data-go="${t.go}"` : ''}>` +
+      `<svg class="i"><use href="#${t.icon}"/></svg>${t.label}</a>`).join('');
+  });
+
+  // 테마: 라이트/다크 두 가지. 저장된 선택이 없으면 기기 설정을 따른다
+  function setTheme(t) {
+    document.documentElement.dataset.theme = t;
+    document.querySelectorAll('[data-theme-btn]').forEach(b => b.classList.toggle('on', b.dataset.themeBtn === t));
+    try { localStorage.setItem('mockup-theme', t); } catch (e) {}
+  }
+  let saved = null;
+  try { saved = localStorage.getItem('mockup-theme'); } catch (e) {}
+  setTheme(saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+
   document.addEventListener('click', e => {
+    const tb = e.target.closest('[data-theme-btn]');
+    if (tb) { setTheme(tb.dataset.themeBtn); return; }
+
+    // 옷 고르기
+    const pick = e.target.closest('.pick');
+    if (pick) {
+      pick.classList.toggle('sel');
+      const grid = pick.closest('[data-picker]');
+      if (grid) grid.closest('.phone').querySelector('[data-count]').textContent = grid.querySelectorAll('.pick.sel').length;
+      return;
+    }
+
+    // 버튼을 누르면 이어지는 화면으로 이동하고 테두리를 잠깐 강조한다
     const go = e.target.closest('[data-go]');
     if (!go) return;
     const target = document.getElementById(go.dataset.go);
