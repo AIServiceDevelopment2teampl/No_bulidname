@@ -233,3 +233,6 @@ Android Studio를 설치하고 안드로이드 프로젝트 뼈대를 `sandbox/m
 - 목업을 다시 찍을 때: `chrome.exe --headless=new --blink-settings=preferredColorScheme=1 --screenshot=<출력.png> --window-size=1150,3300 file:///.../index.html` (1 = 라이트, 0 = 다크. 이 값을 안 주면 PC 설정을 따라가서 다크로 찍힐 수 있다)
 - 목업 색은 `:root`(라이트)와 `[data-theme="dark"]`의 변수로만 쓴다. 새 화면에 색 코드를 직접 넣지 말 것
 - 가상 피팅 서비스, 하루 횟수, 본인 사진 사용은 미결정이다 (progress.md)
+5. **기능 1 앱 화면**: 내 옷장 탭 → 사진으로 등록 → 사진 선택기 → 업로드 → 결과 카드. 앱 테스트 16개 통과. 실제 서버(uvicorn) + 실제 CLIP으로 curl 업로드 확인. 실제 폰 확인은 서버 배포 뒤
+6. **평가 데이터**: 사용자가 "평가 데이터가 필요할 때마다 알려 달라"고 함. 지금 필요한 것: 기능 1 분류 평가용 의류 사진 100장 + 정답 라벨(종류·색)
+

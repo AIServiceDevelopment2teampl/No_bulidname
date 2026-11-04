@@ -21,7 +21,7 @@ class ClosetAppTest {
 
     @Test
     fun startsOnHomeAndShowsFourTabs() {
-        composeRule.setContent { ClosetApp() }
+        composeRule.setContent { ClosetApp(FakeClothesRepository()) }
 
         MainTab.entries.forEach { composeRule.onNodeWithTag("tab_${it.name}").assertIsDisplayed() }
         composeRule.onNodeWithTag("screen_HOME").assertIsDisplayed()
@@ -29,11 +29,21 @@ class ClosetAppTest {
 
     @Test
     fun tappingTabSwitchesScreen() {
-        composeRule.setContent { ClosetApp() }
+        composeRule.setContent { ClosetApp(FakeClothesRepository()) }
 
         composeRule.onNodeWithTag("tab_CLOSET").performClick()
 
         composeRule.onNodeWithTag("screen_CLOSET").assertIsDisplayed()
+    }
+
+    @Test
+    fun closetTabOpensPhotoRegisterScreen() {
+        composeRule.setContent { ClosetApp(FakeClothesRepository()) }
+        composeRule.onNodeWithTag("tab_CLOSET").performClick()
+
+        composeRule.onNodeWithTag("open_register_photo").performClick()
+
+        composeRule.onNodeWithTag("pick_photos").assertIsDisplayed()
     }
 
     // release/play-store-release.md 완료 조건: targetSdk 36 이상

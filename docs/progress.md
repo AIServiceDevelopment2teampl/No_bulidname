@@ -21,6 +21,8 @@
 | 2026-11-04 | 기능 1 옷 사진 등록·자동 분류 **서버** (`sandbox/mmminsung02/`, 검수 전) | `POST /v1/clothes`. 완료 조건 [서버] 5개 + 예외 상황 5개 테스트 통과(가짜 분석기). 실제 CLIP(`openai/clip-vit-base-patch32`, 제로샷) 동작 테스트 2개 통과(`pytest -m slow`, 단색 이미지로 값 범위·차원만 확인, 정확도는 미측정). 실행: `cd sandbox/mmminsung02` → `../../.venv/Scripts/python -m pytest`. 구현 때 정한 값: 업로드 상한 10MB, 분류 신뢰도 0.5 미만이면 `other`, 요청 하나에 사진 1장, 색은 영어 코드로 저장(`server/domain.py`), 로그인 전까지 개발용 사용자 `dev-user`. transformers 5부터 `get_*_features`가 출력 객체를 돌려줘서 `.pooler_output`을 씀 |
 | 2026-11-04 | CLIP 메모리·속도 측정 (이 PC, CPU) | 모델을 올린 Python 프로세스 약 500MB, 모델 로드 11초, 사진 1장 분석 약 180ms. 서버 전체로도 1GB 안쪽으로 예상되어 **Vultr 2GB 요금제로도 될 가능성이 높다** (FAISS·동시 요청을 붙인 뒤 다시 잰다) |
 | 2026-11-04 | 목업에 라이트/다크 테마, 사이트맵, 화면 4개 추가 | 화면: AI 점원 패널, 내 옷장 여러 벌 고르기, 미리 입어보기, 마이(테마 선택). 색을 모두 테마 변수로 바꿈(다크 주 색 `#8E8FFF`). 헤드리스 Chrome으로 두 테마 다 찍어 확인. 미리 입어보기 기능 문서 [compare/virtual-fitting.md](features/compare/virtual-fitting.md) 추가 |
+| 2026-11-04 | 기능 1 옷 사진 등록 **앱 화면** (`sandbox/mmminsung02/android/`, 검수 전) | 내 옷장 탭 → `사진으로 등록` → 시스템 사진 선택기(여러 장) → 한 장씩 업로드 → 결과 카드(종류·색, `미확인`, `종류를 골라 주세요`, `이미 등록된 사진이에요`, 오류 메시지, 연결 실패 시 `다시 시도`). Retrofit + kotlinx.serialization. 테스트 16개 통과: 화면 흐름 6개(서버는 가짜, 완료 조건 [앱] 포함), 서버 응답 읽기 6개(MockWebServer), 탭 4개. 서버 주소는 `-PserverBaseUrl=`로 넘김(기본값 에뮬레이터용 `http://10.0.2.2:8000/`), 디버그 빌드만 http 허용. **실제 폰에서 사진 선택기·업로드는 미확인** (팀원 폰이 이 PC 서버에 닿지 않음. Vultr 배포 후 확인). 분류 결과 고치기는 기능 2(수정 API)에서 붙인다 |
+| 2026-11-04 | 실제 서버 + 실제 CLIP 연결 확인 (이 PC, curl) | uvicorn으로 sandbox 서버를 띄워 사진 업로드 → 201·분류 결과, 같은 사진 다시 → `duplicate: true`, 이미지 아닌 파일 → 400, 사진 파일 저장 확인. 단색 그림이라 종류 분류 결과는 의미 없음 (색 `navy`는 맞음) |
 | 2026-10-21 | 대화 기록 저장, 문서 커밋·푸시 | [conversation-log.md](conversation-log.md). 제출 기획서 PDF는 팀원 이름·학번이 있어 공개 저장소에 올리지 않음 (`.gitignore`) |
 
 ## 결정 사항
@@ -86,7 +88,7 @@
 3. **기술 검증**: 후보 쇼핑몰마다 WebView에서 열림, 로그인·장바구니·결제 화면 진입, JS 주입으로 글자 읽기·바꾸기, JSON-LD Product 유무를 확인하고 결과를 여기에 기록
 4. 안드로이드 프로젝트 뼈대 검수 후 `src/android/`로 옮기기 (sandbox에서 생성 완료). 옮기기 전에 3번째 탭 이름을 `번역`에서 `쇼핑`으로 바꾼다 (`ClosetApp.kt`의 `SHOPPING("번역", ...)`, 테스트에 탭 이름이 있으면 같이). **applicationId 정하기** (Play에 올리면 바꿀 수 없음, 서비스 이름과 함께 첫 비공개 테스트 전까지)
 5. 평가 데이터 준비 시작: 의류 사진 100~200장 라벨링, 영어·일본어 상품 페이지·캡처 30~50개
-6. 기능 1번 [wardrobe/photo-register.md](features/wardrobe/photo-register.md): 서버는 sandbox에서 완료(검수 전). 남은 것: 앱 화면(사진 선택 → 업로드 → 분류 결과 확인), [평가] 의류 100장 정확도. 그다음 기능 2번부터 순서대로
+6. 기능 1번 [wardrobe/photo-register.md](features/wardrobe/photo-register.md): 서버는 sandbox에서 완료(검수 전). 앱 화면도 sandbox에서 완료(검수 전, 실제 폰 미확인). 남은 것: **[평가] 의류 100장 정확도 (팀이 사진·라벨 준비)**. 그다음 기능 2번부터 순서대로
 
 ## 알려진 위험
 [architecture.md](architecture.md)의 '주요 위험' 참고. 가장 큰 두 가지:
