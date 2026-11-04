@@ -195,4 +195,19 @@ class ClosetScreenTest {
         assertEquals(1, repository.deleteAllCalls)
         composeRule.onNodeWithText("모두 지웠어요").assertIsDisplayed()
     }
+
+    // 검수에서 찾은 버그: 옷장 목록을 처음 한 번만 불러와서, 전체 삭제 뒤 돌아오면 지운 옷이 보였다
+    @Test
+    fun closetReloadsWhenComingBackAfterDeleteAll() {
+        openCloset()
+        assertShown(1, 2)
+        composeRule.onNodeWithTag("tab_MY").performClick()
+        composeRule.onNodeWithTag("delete_all_data").performClick()
+        composeRule.onNodeWithTag("confirm_delete_all").performClick()
+
+        composeRule.onNodeWithTag("tab_CLOSET").performClick()
+
+        assertHidden(1, 2)
+        composeRule.onNodeWithTag("closet_empty").assertIsDisplayed()
+    }
 }

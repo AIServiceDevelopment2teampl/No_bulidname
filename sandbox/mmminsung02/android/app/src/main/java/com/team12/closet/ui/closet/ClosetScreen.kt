@@ -21,6 +21,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -45,6 +46,8 @@ fun ClosetScreen(
     onRegister: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
+    // 다른 탭(마이의 전체 삭제 등)에서 바뀌었을 수 있어 화면에 들어올 때마다 다시 불러온다
+    LaunchedEffect(Unit) { viewModel.load() }
     ClosetContent(
         state = state,
         imageUrl = viewModel::imageUrl,

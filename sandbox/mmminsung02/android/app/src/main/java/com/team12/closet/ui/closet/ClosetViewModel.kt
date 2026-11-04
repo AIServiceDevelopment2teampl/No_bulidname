@@ -27,10 +27,7 @@ class ClosetViewModel(
     private val _state = MutableStateFlow(ClosetUiState())
     val state: StateFlow<ClosetUiState> = _state.asStateFlow()
 
-    init {
-        load()
-    }
-
+    /** 화면(ClosetScreen)에 들어올 때마다 부른다 */
     fun load() {
         val filter = _state.value.filter
         _state.update { it.copy(loading = true, error = null) }
