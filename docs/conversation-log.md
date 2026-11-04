@@ -213,8 +213,10 @@ Android Studio를 설치하고 안드로이드 프로젝트 뼈대를 `sandbox/m
 9. **README 요청: 앱 버전 빌드 값** `-PversionCode`·`-PversionName` 처리
 10. **기능 2 옷장 조회·수정·삭제**: 서버 테스트 28개, 앱 테스트 39개 통과. Robolectric 기본 화면이 작아 상세 화면 아래 칩 클릭이 빗나가서 테스트 화면을 `w411dp-h891dp`로 맞춤. 오프라인 Room 캐시와 등록 방법 시트는 남김
 11. **README 요청: 경험 저장소 규칙 확인** (`general/`·`mobile/`만, 읽기만). diff 다시 읽기로 기능 2 버그(전체 삭제 뒤 옛 목록) 찾아 고침. 기능 1·2 상태를 `구현했지만 미검증`으로. 긴 작업 진행 창 규칙은 사용자에게 물어봄
+12. **진행 창**: 사용자가 '창 띄우기'를 고름. `sandbox/mmminsung02/tools/run-gradle.ps1`로 Gradle을 돌리면 진행 창이 뜬다. 앞으로 몇 분 걸리는 빌드·테스트는 이걸로 돌린다
 
 ### 다음 세션 AI에게
+- 앱 빌드·테스트는 `sandbox/mmminsung02/tools/run-gradle.ps1`로 돌린다 (사용자가 진행 창을 원함)
 - applicationId는 임시값이다. Play 업로드 전에 꼭 정한다
 - 실제 폰 실행은 아직 안 했다. 디버그 APK: `sandbox/mmminsung02/android/app/build/outputs/apk/debug/app-debug.apk`
 - 이 PC는 RAM 7.7GB라 Gradle 힙을 2GB로 잡았다 (`gradle.properties`)
