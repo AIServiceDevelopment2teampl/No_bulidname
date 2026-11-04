@@ -26,6 +26,8 @@
     --ph: #DADBE6;       /* 프로필 사진 자리 */
     --hero-a: #F7F7FF; --hero-b: #ECECFD; --glow: #EEEEFD;
     --mq: #E6E0D8;       /* 마네킹 몸 */
+    --ok-bg: #DDF5E6; --ok-fg: #1A7A3E;     /* 초록 태그 (배송 가능) */
+    --warn-bg: #FFE9C7; --warn-fg: #8A5300; /* 주황 태그 (배송대행, 미확인, 도전 목표) */
     --shadow: 0 6px 24px rgba(80, 80, 170, .10);
     --shadow-up: 0 -8px 28px rgba(40, 40, 90, .14);
     color-scheme: light;
@@ -36,6 +38,7 @@
     --bg: #0C0D18; --card: #161727; --surface2: #222338; --line: #2C2E46;
     --text: #ECECF5; --sub: #A3A5BD; --muted: #6E7090; --red: #FF6B70; --ph: #3A3B55;
     --hero-a: #1B1C36; --hero-b: #242550; --glow: #22234A; --mq: #5C5A68;
+    --ok-bg: #123A24; --ok-fg: #7EE0A4; --warn-bg: #4A3410; --warn-fg: #FFCB7A;
     --shadow: 0 6px 24px rgba(0, 0, 0, .40); --shadow-up: 0 -8px 28px rgba(0, 0, 0, .45);
     color-scheme: dark;
   }
@@ -45,6 +48,7 @@
       --bg: #0C0D18; --card: #161727; --surface2: #222338; --line: #2C2E46;
       --text: #ECECF5; --sub: #A3A5BD; --muted: #6E7090; --red: #FF6B70; --ph: #3A3B55;
       --hero-a: #1B1C36; --hero-b: #242550; --glow: #22234A; --mq: #5C5A68;
+      --ok-bg: #123A24; --ok-fg: #7EE0A4; --warn-bg: #4A3410; --warn-fg: #FFCB7A;
       --shadow: 0 6px 24px rgba(0, 0, 0, .40); --shadow-up: 0 -8px 28px rgba(0, 0, 0, .45);
       color-scheme: dark;
     }
@@ -80,8 +84,7 @@
   .tag { display: inline-block; font-size: 10.5px; font-weight: 700; border-radius: 999px; padding: 1px 7px; margin-left: 4px; white-space: nowrap; }
   .tag.has { background: var(--p-soft2); color: var(--p); }
   .tag.none { border: 1px solid var(--line); color: var(--muted); font-weight: 600; }
-  .tag.chal { background: #FFE9C7; color: #8A5300; }
-  :root[data-theme="dark"] .tag.chal { background: #4A3410; color: #FFCB7A; }
+  .tag.chal { background: var(--warn-bg); color: var(--warn-fg); }
 
   /* 폰 틀 */
   .phone { width: 340px; height: 720px; background: var(--card); border: 1px solid var(--line);
@@ -238,8 +241,7 @@
   .worn .cloth { width: 38px; flex: none; font-size: 20px; border-radius: 8px; }
   .worn .row > div:not(.cloth) { flex: 1; } .worn .row small { display: block; color: var(--sub); font-size: 10.5px; margin-top: 1px; }
   .src { font-size: 10px; font-weight: 700; border-radius: 6px; padding: 2px 6px; white-space: nowrap; }
-  .src.shop { background: #FFE9C7; color: #8A5300; }
-  :root[data-theme="dark"] .src.shop { background: #4A3410; color: #FFCB7A; }
+  .src.shop { background: var(--warn-bg); color: var(--warn-fg); }
   .src.mine { background: var(--p-soft2); color: var(--p); }
   .row2 { display: flex; gap: 8px; }
 
@@ -254,6 +256,76 @@
   .list .li .i { width: 18px; height: 18px; color: var(--sub); }
   .list .li.danger, .list .li.danger .i { color: var(--red); }
   .list .seg button { padding: 7px 11px; }
+
+  /* 상태 배지 */
+  .bdg { display: inline-block; font-size: 10px; font-weight: 700; border-radius: 6px; padding: 2px 6px; white-space: nowrap; vertical-align: 1px; }
+  .b-ok { background: var(--ok-bg); color: var(--ok-fg); }
+  .b-warn { background: var(--warn-bg); color: var(--warn-fg); }
+  .b-gray { background: var(--surface2); color: var(--sub); }
+  .b-p { background: var(--p-soft2); color: var(--p); }
+
+  /* 쇼핑몰 목록 */
+  .shoprow { display: flex; align-items: center; gap: 12px; padding: 11px 2px; border-bottom: 1px solid var(--line); }
+  .shoprow .ini { width: 38px; height: 38px; border-radius: 10px; background: var(--surface2); display: grid; place-items: center; font-weight: 800; font-size: 13px; color: var(--sub); flex: none; }
+  .shoprow .grow { flex: 1; min-width: 0; }
+  .shoprow b { font-size: 14px; } .shoprow small { display: block; font-size: 11px; color: var(--sub); margin-top: 2px; }
+  .addrow { display: flex; align-items: center; gap: 8px; padding: 12px 2px; color: var(--p); font-weight: 600; font-size: 13.5px; }
+
+  /* 인앱 브라우저 */
+  .trbar { display: flex; align-items: center; gap: 8px; margin: 0 14px 6px; padding: 7px 10px; border-radius: 10px; background: var(--p-soft); font-size: 11.5px; color: var(--p); font-weight: 600; flex: none; }
+  .trbar .i { width: 16px; height: 16px; }
+  .trbar .grow { flex: 1; }
+  .switch { width: 34px; height: 20px; border-radius: 999px; background: var(--p); position: relative; flex: none; }
+  .switch::after { content: ""; position: absolute; right: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--on-p); }
+  .page { flex: 1; overflow: hidden; padding: 4px 16px; position: relative; }
+  .toolbar { height: 52px; border-top: 1px solid var(--line); display: flex; justify-content: space-around; align-items: center; color: var(--sub); flex: none; background: var(--card); }
+  .toolbar .i { width: 20px; height: 20px; }
+  .clerk-fab { position: absolute; right: 14px; bottom: 66px; display: flex; align-items: center; gap: 8px; z-index: 3; }
+  .clerk-fab .bubble { font-size: 11.5px; padding: 7px 11px; color: var(--p); font-weight: 700; }
+  .size-t { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 8px; }
+  .size-t th, .size-t td { border: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+  .size-t th { background: var(--surface2); color: var(--sub); font-weight: 600; }
+
+  /* 아래에서 올라오는 창 */
+  .dim { position: absolute; inset: 0; background: rgba(8, 8, 22, .45); z-index: 4; }
+  .bsheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--card); border-radius: 22px 22px 0 0; box-shadow: var(--shadow-up); padding: 4px 16px 18px; z-index: 5; }
+  .bsheet .handle { width: 40px; height: 4px; border-radius: 2px; background: var(--line); margin: 6px auto 10px; }
+
+  /* 후보·결과 목록 */
+  .cand { display: flex; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .cand .cloth { width: 48px; font-size: 24px; flex: none; }
+  .cand .grow { flex: 1; min-width: 0; font-size: 12.5px; }
+  .cand small { display: block; font-size: 11px; color: var(--sub); margin-top: 2px; }
+  .cand.off { opacity: .5; }
+  .cbx { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--muted); display: grid; place-items: center; flex: none; color: var(--on-p); }
+  .cbx .i { width: 13px; height: 13px; stroke-width: 3; opacity: 0; }
+  .cbx.on { background: var(--p); border-color: var(--p); }
+  .cbx.on .i { opacity: 1; }
+  .nophoto { border: 1.5px dashed var(--muted); color: var(--muted); }
+  .nophoto .i { width: 20px; height: 20px; }
+  .bar { height: 5px; border-radius: 3px; background: var(--surface2); overflow: hidden; margin: 6px 2px 4px; }
+  .bar i { display: block; height: 100%; background: var(--p); border-radius: 3px; }
+
+  /* 내 옷장 */
+  .gitem { position: relative; cursor: pointer; }
+  .gitem .cloth { font-size: 34px; }
+  .gitem small { display: block; font-size: 10.5px; color: var(--sub); margin-top: 4px; text-align: center; }
+  .gitem .bdg { position: absolute; left: 4px; top: 4px; }
+  .colors { display: flex; gap: 7px; margin: 0 0 12px; flex-wrap: wrap; }
+  .colors i { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--line); display: block; }
+  .colors i.on { outline: 2px solid var(--p); outline-offset: 2px; }
+  .fab-reg { position: absolute; right: 16px; bottom: 78px; height: 46px; padding: 0 18px 0 14px; border-radius: 999px; background: var(--p); color: var(--on-p); display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; box-shadow: var(--shadow); z-index: 3; cursor: pointer; }
+  .optrow { display: flex; gap: 12px; align-items: center; padding: 13px; border: 1px solid var(--line); border-radius: 14px; cursor: pointer; }
+  .optrow .grow { flex: 1; } .optrow b { font-size: 14px; }
+  .optrow small { display: block; font-size: 11.5px; color: var(--sub); margin-top: 3px; line-height: 1.45; }
+  .optrow .i { color: var(--sub); }
+  .optrow .icon-sq .i { color: var(--p); }
+  .form .lab { font-size: 11.5px; color: var(--sub); margin: 14px 2px 6px; font-weight: 600; }
+  .btn.danger { background: var(--card); border: 1.5px solid var(--red); color: var(--red); }
+
+  /* 비교 리포트 */
+  .rep h5 { font-size: 12px; margin: 10px 0 4px; }
+  .rep ul { margin: 0; padding-left: 16px; font-size: 12px; line-height: 1.6; }
 </style>
 </head>
 <body>
@@ -283,6 +355,14 @@
   <symbol id="doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></symbol>
   <symbol id="refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></symbol>
   <symbol id="send" viewBox="0 0 24 24"><path d="M4 12 20 4l-6 16-3-7z"/></symbol>
+  <symbol id="more" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="18.5" r="1.2"/></symbol>
+  <symbol id="fwd" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8L3.5 9.7l5.9-.9z"/></symbol>
+  <symbol id="ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+  <symbol id="camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+  <symbol id="image" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
+  <symbol id="receipt" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol>
+  <symbol id="share" viewBox="0 0 24 24"><circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="m8.2 10.8 7.6-4.1M8.2 13.2l7.6 4.1"/></symbol>
   <symbol id="spark" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 2c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7z"/></symbol>
   <symbol id="google" viewBox="0 0 48 48"><path stroke="none" fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path stroke="none" fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path stroke="none" fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path stroke="none" fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></symbol>
 </svg>
@@ -293,7 +373,7 @@
 </template>
 
 <template id="t-hero">
-  <div class="hero" data-go="home-base">
+  <div class="hero" data-go="shop-list">
     <div class="lead"><svg class="i" style="width:14px;height:14px;color:var(--p);vertical-align:-2px"><use href="#spark"/></svg> 번역하고, 비교하고,<br>&nbsp;&nbsp;&nbsp;&nbsp;더 스마트한 쇼핑을!</div>
     <h2>쇼핑하기</h2>
     <p>해외 상품 번역부터<br>AI 구매 비교까지,<br>한 번에!</p>
@@ -363,14 +443,14 @@
           <li data-go="login-start"><span class="n">로그인</span> <span class="d">Google로 계속하기</span><span class="tag has">시안 있음</span></li>
           <li data-go="home-base"><span class="n">홈</span> <span class="d">베이스 / 초안 (미결정)</span><span class="tag has">시안 있음</span>
             <ul>
-              <li><span class="n">쇼핑하기 → 쇼핑몰 목록</span> <span class="d">이름 + 배송 태그, 주소 입력</span><span class="tag none">시안 없음</span>
+              <li data-go="shop-list"><span class="n">쇼핑하기 → 쇼핑몰 목록</span> <span class="d">이름 + 배송 태그, 주소 입력, 내 쇼핑몰</span><span class="tag has">시안 있음</span>
                 <ul>
-                  <li><span class="n">인앱 브라우저</span> <span class="d">자동 번역, 켜기/끄기, 원문 보기</span><span class="tag none">시안 없음</span>
+                  <li data-go="browser"><span class="n">인앱 브라우저</span> <span class="d">자동 번역, 켜기/끄기, 원문 보기</span><span class="tag has">시안 있음</span>
                     <ul>
                       <li data-go="clerk"><span class="n">AI 점원 패널</span> <span class="d">TOP 3 · 비교 리포트 · 어울리는 내 옷 · 질문</span><span class="tag has">시안 있음</span>
                         <ul><li data-go="fitting"><span class="n">미리 입어보기</span> <span class="d">이 상품 + 고른 내 옷</span><span class="tag chal">도전 목표</span></li></ul>
                       </li>
-                      <li><span class="n">결제 완료 → "옷장에 추가할까요?"</span><span class="tag none">시안 없음</span></li>
+                      <li data-go="purchase-add"><span class="n">결제 완료 → "옷장에 추가할까요?"</span><span class="tag has">시안 있음</span></li>
                     </ul>
                   </li>
                 </ul>
@@ -518,7 +598,7 @@
             <h4>내 옷장 <svg class="i"><use href="#arrow"/></svg></h4>
             <p>사진으로 옷을 등록하고<br>나만의 디지털 옷장을 만들어보세요.</p>
           </div>
-          <div class="fcard">
+          <div class="fcard" data-go="browser">
             <div class="pic">
               <div style="position:absolute;left:6px;top:6px;font-weight:700;font-size:9px;color:var(--sub)">ASOS</div>
               <div class="cloth" style="position:absolute;left:6px;top:20px;width:50px;font-size:30px;background:var(--card)">🧥</div>
@@ -543,7 +623,7 @@
             <h4>AI 구매 비교 <svg class="i"><use href="#arrow"/></svg></h4>
             <p>보유한 옷과 유사한 해외 상품을 찾아<br>비교 리포트를 제공해드려요.</p>
           </div>
-          <div class="fcard">
+          <div class="fcard" data-go="shop-list">
             <div class="pic" style="background:var(--card);padding:4px">
               <div style="display:flex;justify-content:space-between;font-size:8.5px;font-weight:700;color:var(--sub);padding:2px 2px 4px"><span>ASOS</span><span>ZOZOTOWN</span><span>UNIQLO</span><span>GU</span></div>
               <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px"><div class="cloth" style="font-size:22px">👚</div><div class="cloth" style="font-size:22px">🧥</div><div class="cloth" style="font-size:22px">👟</div></div>
@@ -685,6 +765,88 @@
     </div>
   </section>
 
+
+  <!-- 11. 쇼핑몰 목록 (쇼핑 탭) -->
+  <section class="item"><h3>쇼핑몰 목록 (쇼핑 탭)</h3>
+    <div class="phone" id="shop-list">
+      <div data-tpl="t-status"></div>
+      <div class="appbar"><h1>쇼핑</h1></div>
+      <div class="scroll">
+        <label class="field" style="border-radius:999px"><svg class="i"><use href="#search"/></svg><input placeholder="쇼핑몰 주소 입력 (https://…)"></label>
+        <div class="chips big" style="margin:10px 0 2px"><span class="on">전체</span><span>영어</span><span>일본어</span></div>
+        <div class="sec">기본 쇼핑몰 <span style="font-weight:500">· 한국어를 지원하지 않는 곳</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">A</div><div class="grow"><b>ASOS</b><small>asos.com · 영어</small></div><span class="bdg b-ok">배송 가능</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">Z</div><div class="grow"><b>ZOZOTOWN</b><small>zozo.jp · 일본어</small></div><span class="bdg b-warn">배송대행 필요</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">U</div><div class="grow"><b>유니클로 일본</b><small>uniqlo.com/jp · 일본어</small></div><span class="bdg b-warn">배송대행 필요</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">G</div><div class="grow"><b>GU 일본</b><small>gu-global.com/jp · 일본어</small></div><span class="bdg b-warn">배송대행 필요</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">U</div><div class="grow"><b>유니클로 미국</b><small>uniqlo.com/us · 영어</small></div><span class="bdg b-warn">배송대행 필요</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">J</div><div class="grow"><b>J.Crew</b><small>jcrew.com · 영어</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">B</div><div class="grow"><b>BEAMS</b><small>beams.co.jp · 일본어</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">U</div><div class="grow"><b>Urban Outfitters</b><small>urbanoutfitters.com · 영어</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">N</div><div class="grow"><b>Nordstrom</b><small>nordstrom.com · 영어</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">A</div><div class="grow"><b>Abercrombie &amp; Fitch</b><small>abercrombie.com · 영어</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">E</div><div class="grow"><b>END. Clothing</b><small>endclothing.com · 영어</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="sec">내 쇼핑몰 <span style="font-weight:500">· 이 폰에만 저장</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">A</div><div class="grow"><b>Amazon 일본</b><small>amazon.co.jp · 내가 추가</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="addrow"><svg class="i" style="width:18px;height:18px"><use href="#plus"/></svg>쇼핑몰 직접 추가</div>
+        <div class="note" style="margin-top:6px">배송 태그: <b>배송 가능</b> 한국으로 바로 배송 · <b>배송대행 필요</b> 배송대행지를 써야 함 · <b>그 외</b> 아직 확인 안 됨. 기본 목록은 초안(미결정)</div>
+      </div>
+      <nav class="nav" data-nav="shop"></nav>
+    </div>
+  </section>
+
+  <!-- 12. 인앱 브라우저 (번역된 상태) -->
+  <section class="item"><h3>인앱 브라우저 (번역된 상태)</h3>
+    <div class="phone" id="browser">
+      <div data-tpl="t-status"></div>
+      <div class="webbar">
+        <svg class="i" style="width:20px;height:20px" data-go="shop-list"><use href="#x"/></svg>
+        <div class="url"><svg class="i"><use href="#lock"/></svg>zozo.jp/shop/beams/goods/7781</div>
+        <svg class="i" style="width:20px;height:20px"><use href="#more"/></svg>
+      </div>
+      <div class="trbar"><svg class="i"><use href="#translate"/></svg><div class="grow">일본어 → 한국어로 바꿨어요 · <u>원문 보기</u></div><span class="switch" title="번역 켜기/끄기"></span></div>
+      <div class="page">
+        <div class="shopname" style="font-size:11px">ZOZOTOWN › 니트·스웨터 › 카디건</div>
+        <div class="cloth" style="height:168px;aspect-ratio:auto;font-size:84px;margin:6px 0 10px"><span style="filter:grayscale(.7) brightness(.55)">🧥</span></div>
+        <div style="font-size:11px;color:var(--sub)">BEAMS</div>
+        <div style="font-size:16px;font-weight:800;margin:2px 0 3px">울 블렌드 크루넥 카디건</div>
+        <div style="font-weight:700;font-size:14px">¥8,800 <span style="font-size:11px;color:var(--sub);font-weight:500">세금 포함</span></div>
+        <div class="chips big" style="margin-top:8px"><span class="on">차콜</span><span>아이보리</span><span>네이비</span></div>
+        <table class="size-t"><tr><th>사이즈</th><th>총장</th><th>가슴너비</th><th>소매길이</th></tr><tr><td>M</td><td>64cm</td><td>54cm</td><td>60cm</td></tr><tr><td>L</td><td>67cm</td><td>57cm</td><td>62cm</td></tr></table>
+        <div style="font-size:11.5px;margin-top:8px;line-height:1.65"><b>소재</b> 겉감: 울 50%, 아크릴 50%<br><b>세탁</b> 손세탁 가능</div>
+      </div>
+      <div class="clerk-fab" data-go="clerk"><div class="bubble">비슷한 옷 2벌 있어요</div><div class="robot" style="transform:scale(.8)"><div class="face"><i></i></div></div></div>
+      <div class="toolbar"><svg class="i"><use href="#back"/></svg><svg class="i"><use href="#fwd"/></svg><svg class="i"><use href="#refresh"/></svg><svg class="i" title="내 쇼핑몰에 추가"><use href="#star"/></svg><svg class="i" title="외부 브라우저로 열기"><use href="#ext"/></svg></div>
+    </div>
+  </section>
+
+  <!-- 13. 결제 완료 → 옷장에 추가 -->
+  <section class="item"><h3>결제 완료 → 옷장에 추가</h3>
+    <div class="phone" id="purchase-add">
+      <div data-tpl="t-status"></div>
+      <div class="webbar">
+        <svg class="i" style="width:20px;height:20px"><use href="#x"/></svg>
+        <div class="url"><svg class="i"><use href="#lock"/></svg>zozo.jp/…/order/complete</div>
+        <svg class="i" style="width:20px;height:20px"><use href="#more"/></svg>
+      </div>
+      <div class="trbar"><svg class="i"><use href="#translate"/></svg><div class="grow">일본어 → 한국어로 바꿨어요</div><span class="switch"></span></div>
+      <div class="page" style="text-align:center;padding-top:40px">
+        <div class="icon-circle" style="margin:0 auto;width:60px;height:60px"><svg class="i" style="width:30px;height:30px"><use href="#check"/></svg></div>
+        <div style="font-weight:800;font-size:17px;margin-top:14px">주문해 주셔서 감사합니다</div>
+        <div style="font-size:12px;color:var(--sub);margin-top:6px">주문번호 2611-0412-88</div>
+      </div>
+      <div class="dim"></div>
+      <div class="bsheet">
+        <div class="handle"></div>
+        <b style="font-size:17px">옷장에 추가할까요?</b>
+        <div style="font-size:12px;color:var(--sub);margin:4px 0 4px">방금 주문한 상품이에요. 고른 것만 옷장에 저장해요.</div>
+        <div class="cand"><span class="cbx on"><svg class="i"><use href="#check"/></svg></span><div class="cloth"><span style="filter:grayscale(.7) brightness(.55)">🧥</span></div><div class="grow">울 블렌드 크루넥 카디건<small>BEAMS · 차콜 · M · ¥8,800</small></div><span class="bdg b-p">상의</span></div>
+        <div class="cand off"><span class="cbx"><svg class="i"><use href="#check"/></svg></span><div class="cloth">👜</div><div class="grow">캔버스 토트백<small>¥3,300</small></div><span class="bdg b-gray">의류 아님</span></div>
+        <div style="font-size:11px;color:var(--sub);margin:10px 2px 12px">이름·주소·연락처·결제 정보는 읽지 않아요.</div>
+        <div class="row2"><button class="btn outline" style="width:110px">닫기</button><button class="btn primary" data-go="closet">옷장에 추가 (1)</button></div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <script>
@@ -693,11 +855,11 @@
     el.replaceWith(document.getElementById(el.dataset.tpl).content.cloneNode(true));
   });
 
-  // 하단 탭 (쇼핑 탭은 쇼핑몰 목록으로 가지만 그 화면은 아직 없음)
+  // 하단 탭 (쇼핑 탭은 쇼핑몰 목록으로 바로 간다)
   const TABS = [
     { key: 'home', label: '홈', icon: 'home', go: 'home-base' },
     { key: 'closet', label: '내 옷장', icon: 'hanger', go: 'closet-select' },
-    { key: 'shop', label: '쇼핑', icon: 'bag', go: '' },
+    { key: 'shop', label: '쇼핑', icon: 'bag', go: 'shop-list' },
     { key: 'my', label: '마이', icon: 'user', go: 'my' },
   ];
   document.querySelectorAll('[data-nav]').forEach(nav => {
