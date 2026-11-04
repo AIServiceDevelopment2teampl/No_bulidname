@@ -443,9 +443,9 @@
           <li data-go="login-start"><span class="n">로그인</span> <span class="d">Google로 계속하기</span><span class="tag has">시안 있음</span></li>
           <li data-go="home-base"><span class="n">홈</span> <span class="d">베이스 / 초안 (미결정)</span><span class="tag has">시안 있음</span>
             <ul>
-              <li data-go="shop-list"><span class="n">쇼핑하기 → 쇼핑몰 목록</span> <span class="d">이름 + 배송 태그, 주소 입력, 내 쇼핑몰</span><span class="tag has">시안 있음</span>
+              <li data-go="shop-list"><span class="n">쇼핑하기 → 쇼핑몰 목록</span> <span class="d">한국어 지원 여부와 상관없이 해외 쇼핑몰 + 배송 태그, 주소 입력, 내 쇼핑몰</span><span class="tag has">시안 있음</span>
                 <ul>
-                  <li data-go="browser"><span class="n">인앱 브라우저</span> <span class="d">자동 번역, 켜기/끄기, 원문 보기</span><span class="tag has">시안 있음</span>
+                  <li data-go="browser"><span class="n">인앱 브라우저</span> <span class="d">한국어가 아닌 페이지만 자동 번역 (부가 기능), 켜기/끄기, 원문 보기</span><span class="tag has">시안 있음</span>
                     <ul>
                       <li data-go="clerk"><span class="n">AI 점원 패널</span> <span class="d">TOP 3 · 비교 리포트 · 어울리는 내 옷 · 질문</span><span class="tag has">시안 있음</span>
                         <ul><li data-go="fitting"><span class="n">미리 입어보기</span> <span class="d">이 상품 + 고른 내 옷</span><span class="tag chal">도전 목표</span></li></ul>
@@ -773,23 +773,27 @@
       <div class="appbar"><h1>쇼핑</h1></div>
       <div class="scroll">
         <label class="field" style="border-radius:999px"><svg class="i"><use href="#search"/></svg><input placeholder="쇼핑몰 주소 입력 (https://…)"></label>
-        <div class="chips big" style="margin:10px 0 2px"><span class="on">전체</span><span>영어</span><span>일본어</span></div>
-        <div class="sec">기본 쇼핑몰 <span style="font-weight:500">· 한국어를 지원하지 않는 곳</span></div>
-        <div class="shoprow" data-go="browser"><div class="ini">A</div><div class="grow"><b>ASOS</b><small>asos.com · 영어</small></div><span class="bdg b-ok">배송 가능</span></div>
-        <div class="shoprow" data-go="browser"><div class="ini">Z</div><div class="grow"><b>ZOZOTOWN</b><small>zozo.jp · 일본어</small></div><span class="bdg b-warn">배송대행 필요</span></div>
-        <div class="shoprow" data-go="browser"><div class="ini">U</div><div class="grow"><b>유니클로 일본</b><small>uniqlo.com/jp · 일본어</small></div><span class="bdg b-warn">배송대행 필요</span></div>
-        <div class="shoprow" data-go="browser"><div class="ini">G</div><div class="grow"><b>GU 일본</b><small>gu-global.com/jp · 일본어</small></div><span class="bdg b-warn">배송대행 필요</span></div>
-        <div class="shoprow" data-go="browser"><div class="ini">U</div><div class="grow"><b>유니클로 미국</b><small>uniqlo.com/us · 영어</small></div><span class="bdg b-warn">배송대행 필요</span></div>
-        <div class="shoprow" data-go="browser"><div class="ini">J</div><div class="grow"><b>J.Crew</b><small>jcrew.com · 영어</small></div><span class="bdg b-gray">그 외</span></div>
-        <div class="shoprow" data-go="browser"><div class="ini">B</div><div class="grow"><b>BEAMS</b><small>beams.co.jp · 일본어</small></div><span class="bdg b-gray">그 외</span></div>
-        <div class="shoprow" data-go="browser"><div class="ini">U</div><div class="grow"><b>Urban Outfitters</b><small>urbanoutfitters.com · 영어</small></div><span class="bdg b-gray">그 외</span></div>
-        <div class="shoprow" data-go="browser"><div class="ini">N</div><div class="grow"><b>Nordstrom</b><small>nordstrom.com · 영어</small></div><span class="bdg b-gray">그 외</span></div>
-        <div class="shoprow" data-go="browser"><div class="ini">A</div><div class="grow"><b>Abercrombie &amp; Fitch</b><small>abercrombie.com · 영어</small></div><span class="bdg b-gray">그 외</span></div>
-        <div class="shoprow" data-go="browser"><div class="ini">E</div><div class="grow"><b>END. Clothing</b><small>endclothing.com · 영어</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="chips big" style="margin:10px 0 2px"><span class="on">전체</span><span>한국어 페이지</span><span>번역 필요</span></div>
+        <div class="sec">기본 쇼핑몰</div>
+        <div class="shoprow" data-go="browser"><div class="ini">A</div><div class="grow"><b>Amazon</b><small>amazon.com · 한국어 페이지 있음</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">Z</div><div class="grow"><b>ZARA</b><small>zara.com/kr · 한국어</small></div><span class="bdg b-ok">배송 가능</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">H</div><div class="grow"><b>H&amp;M</b><small>hm.com/ko_kr · 한국어</small></div><span class="bdg b-ok">배송 가능</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">S</div><div class="grow"><b>SSENSE</b><small>ssense.com · 한국어 페이지 있음</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">A</div><div class="grow"><b>ASOS</b><small>asos.com · 영어 → 번역</small></div><span class="bdg b-ok">배송 가능</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">Z</div><div class="grow"><b>ZOZOTOWN</b><small>zozo.jp · 일본어 → 번역</small></div><span class="bdg b-warn">배송대행 필요</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">U</div><div class="grow"><b>유니클로 일본</b><small>uniqlo.com/jp · 일본어 → 번역</small></div><span class="bdg b-warn">배송대행 필요</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">G</div><div class="grow"><b>GU 일본</b><small>gu-global.com/jp · 일본어 → 번역</small></div><span class="bdg b-warn">배송대행 필요</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">U</div><div class="grow"><b>유니클로 미국</b><small>uniqlo.com/us · 영어 → 번역</small></div><span class="bdg b-warn">배송대행 필요</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">J</div><div class="grow"><b>J.Crew</b><small>jcrew.com · 영어 → 번역</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">B</div><div class="grow"><b>BEAMS</b><small>beams.co.jp · 일본어 → 번역</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">U</div><div class="grow"><b>Urban Outfitters</b><small>urbanoutfitters.com · 영어 → 번역</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">N</div><div class="grow"><b>Nordstrom</b><small>nordstrom.com · 영어 → 번역</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">A</div><div class="grow"><b>Abercrombie &amp; Fitch</b><small>abercrombie.com · 영어 → 번역</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">E</div><div class="grow"><b>END. Clothing</b><small>endclothing.com · 영어 → 번역</small></div><span class="bdg b-gray">그 외</span></div>
         <div class="sec">내 쇼핑몰 <span style="font-weight:500">· 이 폰에만 저장</span></div>
-        <div class="shoprow" data-go="browser"><div class="ini">A</div><div class="grow"><b>Amazon 일본</b><small>amazon.co.jp · 내가 추가</small></div><span class="bdg b-gray">그 외</span></div>
+        <div class="shoprow" data-go="browser"><div class="ini">C</div><div class="grow"><b>COS</b><small>cos.com · 내가 추가</small></div><span class="bdg b-gray">그 외</span></div>
         <div class="addrow"><svg class="i" style="width:18px;height:18px"><use href="#plus"/></svg>쇼핑몰 직접 추가</div>
-        <div class="note" style="margin-top:6px">배송 태그: <b>배송 가능</b> 한국으로 바로 배송 · <b>배송대행 필요</b> 배송대행지를 써야 함 · <b>그 외</b> 아직 확인 안 됨. 기본 목록은 초안(미결정)</div>
+        <div class="note" style="margin-top:6px">배송 태그: <b>배송 가능</b> 한국으로 바로 배송 · <b>배송대행 필요</b> 배송대행지를 써야 함 · <b>그 외</b> 아직 확인 안 됨. 한국어 페이지는 번역 없이 그대로 열고, 다른 언어 페이지만 한국어로 바꿔요. 기본 목록은 초안(미결정)</div>
       </div>
       <nav class="nav" data-nav="shop"></nav>
     </div>
