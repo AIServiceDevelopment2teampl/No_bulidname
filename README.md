@@ -29,4 +29,5 @@
 | mmminsung02 | 앱 테마를 라이트/다크 두 가지로 만들기. 색은 위 '따를 결정'의 시안 값 사용 | [x] |
 | mmminsung02 | 화면 시안이 `sandbox/moneyhipo/mockup/`에서 **`docs/app-sitemap/index.html`**로 옮겨졌다. 앱 화면은 이 시안을 보고 만든다 (CLAUDE.md 문서 안내). 확인했으면 `[x]` | [x] |
 | mmminsung02 | 앱 버전을 빌드할 때 넘길 수 있게 하기: `versionCode`·`versionName`을 `-PversionCode=`·`-PversionName=`으로 받고, 없으면 지금 값(1, `0.1.0`)을 쓴다 (`serverBaseUrl`과 같은 방식, `app/build.gradle.kts`). 시험용 APK는 moneyhipo가 빌드해 구글 드라이브에 `closet-v0.1.n-<커밋>.apk`로 한 단계씩 올리고 예전 것은 `old/`에 보관한다. 지금 v0.1.1 파일도 앱 안에는 0.1.0으로 찍혀서 맞추려는 것 | [x] |
+| mmminsung02 | 경험 저장소 https://github.com/moneyhipo/Personal_AI_Work_Experience_Repository 를 참고하기: 그 저장소 README의 '공유받은 분께'를 먼저 읽고, `general/`(범용)과 `mobile/`(안드로이드·Play 출시)의 **규칙**을 이 프로젝트 작업에 적용한다. **읽기만** 하고 고치거나 푸시하지 않는다. `game/`, `handoff/`는 되도록 보지 않는다. 읽고 나서 지금 작업에 바로 걸리는 규칙이 있으면 사용자에게 알리고, 확인했으면 `[x]` | [ ] |
 | moneyhipo | 기능 1 분류 평가용 **의류 사진 100장 + 정답 라벨(종류·색)** 준비 (mmminsung02 요청) | [ ] |
