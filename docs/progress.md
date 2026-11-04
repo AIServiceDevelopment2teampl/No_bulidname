@@ -27,6 +27,7 @@
 | 2026-11-04 | **실제 폰 설치·실행 확인** (moneyhipo 폰) | 이 노트북에서 디버그 APK 빌드(`2f09abb`, Android Studio jbr로 `./gradlew assembleDebug`, 약 2분) → 구글 드라이브로 옮겨 설치, 앱이 정상으로 열림. 사진 업로드는 서버 미배포라 아직 확인 못 함. 같은 PC에서 빌드한 APK는 지우지 않고 덮어써서 설치된다(PC가 다르면 디버그 서명이 달라 먼저 지워야 함). Expo Go는 React Native 전용이라 이 앱(Kotlin)에는 못 씀 |
 | 2026-11-04 | 화면 시안을 `sandbox/moneyhipo/mockup/index.html` → **`docs/app-sitemap/index.html`**로 옮김 | 앱 화면의 기준 문서라서 sandbox(완성본 아님)가 아닌 docs에 둔다. CLAUDE.md 문서 안내에 "앱 화면은 이 시안을 보고 만든다"를 넣고 README 링크·요청 표를 고침. 위 로그의 옛 경로는 그대로 둠 |
 | 2026-11-04 | 사이트맵 시안 다 채움 (`docs/app-sitemap/index.html`, 화면 19개) | 추가 9개: 쇼핑몰 목록, 인앱 브라우저(번역됨), 결제 완료 → 옷장에 추가, 내 옷장, 옷 상세·수정, 등록 방법 고르기, 사진으로 등록 결과(문구는 mmminsung02 앱과 같음), 자동 등록 후보 확인, 공유로 받은 상품. 내용은 각 기능 문서의 입력·출력·예외 상황을 따름. 사이트맵의 `시안 없음`이 0개가 됨. 배송·상태 태그 색을 테마 변수(`--ok-*`, `--warn-*`)로 추가. 헤드리스 Chrome으로 라이트·다크 확인 |
+| 2026-11-04 | README 'AI에게 요청' 3건 처리 (mmminsung02) | ① 하단 탭 `번역` → **`쇼핑`**, 탭 아이콘 4개를 시안 SVG(home·hanger·bag·user)로 바꿈 ② **라이트/다크 테마** (`ui/theme/Theme.kt`, 색은 `docs/app-sitemap/index.html` 값 그대로). 저장된 선택이 없으면 기기 설정을 따르고, 마이 탭의 `라이트`/`다크` 버튼으로 바꾸면 기기에 저장 ③ 시안 위치 변경 확인. 앱 테스트 20개 통과(탭 이름, 색 값, 기기 설정 따르기, 테마 저장 추가). 실제 폰 미확인 |
 | 2026-10-21 | 대화 기록 저장, 문서 커밋·푸시 | [conversation-log.md](conversation-log.md). 제출 기획서 PDF는 팀원 이름·학번이 있어 공개 저장소에 올리지 않음 (`.gitignore`) |
 
 ## 결정 사항
