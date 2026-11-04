@@ -29,7 +29,7 @@
 원본 자료 `아이디어_상세.md`, `추가 idea.txt`, 제출 기획서 PDF는 수정하지 않는다.
 
 ## 작업 규칙
-0. 작업 전에 경험 저장소 https://github.com/moneyhipo/AI_Experience-repository 의 README부터 읽고 따른다. 채팅 답변은 한국어로 한다.
+0. 작업 전에 경험 저장소 https://github.com/moneyhipo/Personal_AI_Work_Experience_Repository 의 README부터 읽고 따른다. 단 **읽는 곳은 `general/`과 `mobile/`만**이고(`game/`, `handoff/`는 개인 프로젝트 기록이라 되도록 보지 않음), 그 저장소는 **읽기만 하고 고치거나 푸시하지 않는다**. 추가할 교훈은 이 저장소 README의 'AI에게 요청' 표에 적어 moneyhipo에게 부탁한다. 채팅 답변은 한국어로 한다.
 0-1. `git pull` 다음에 이 저장소 [README.md](README.md)의 **'AI에게 요청'**을 읽는다. 팀원끼리 서로의 AI에게 남긴 규칙과 할 일이 있다. 나에게 온 요청이 있으면 사용자에게 알린다.
 1. 한 번에 하나의 기능(`docs/features/` 문서 하나) 단위로 작업한다.
 2. 기능 문서의 **완료 조건**을 테스트로 먼저 작성하고, 테스트가 통과해야 완료로 본다.
