@@ -19,7 +19,7 @@
 - 하단 탭: **홈 / 내 옷장 / 쇼핑 / 마이**. 쇼핑 탭은 쇼핑몰 목록으로 바로 간다.
 - 쇼핑몰은 로고 대신 **이름 글자**로 보여 준다.
 - 유사도는 숫자(%)를 보여 주지 않고 **`매우 비슷` / `비슷`** 같은 단계로 보여 준다.
-- 테마는 **라이트 / 다크** 두 가지. 처음에는 기기 설정을 따르고 마이에서 바꾼다. 색 값은 화면 시안 [sandbox/moneyhipo/mockup/index.html](sandbox/moneyhipo/mockup/index.html) 맨 위 `:root`(라이트)와 `[data-theme="dark"]`(다크)에 모여 있다. 주 색은 라이트 `#5B5CEB`, 다크 `#8E8FFF`.
+- 테마는 **라이트 / 다크** 두 가지. 처음에는 기기 설정을 따르고 마이에서 바꾼다. 색 값은 화면 시안 [docs/app-sitemap/index.html](docs/app-sitemap/index.html) 맨 위 `:root`(라이트)와 `[data-theme="dark"]`(다크)에 모여 있다. 주 색은 라이트 `#5B5CEB`, 다크 `#8E8FFF`.
 - 화면 배치는 위 시안을 기준으로 한다. 시안에 없는 화면은 사이트맵(시안 맨 위)에서 위치를 확인한다.
 
 ### 지금 요청
@@ -27,4 +27,5 @@
 |-----------|------|------|
 | mmminsung02 | 앱 하단 탭 3번째 이름을 `번역` → **`쇼핑`**으로 바꾸기 (`sandbox/mmminsung02/android/.../ui/ClosetApp.kt`의 `SHOPPING("번역", ...)`, 아이콘도 쇼핑백 계열로). 탭 이름을 확인하는 테스트가 있으면 같이 | [ ] |
 | mmminsung02 | 앱 테마를 라이트/다크 두 가지로 만들기. 색은 위 '따를 결정'의 시안 값 사용 | [ ] |
+| mmminsung02 | 화면 시안이 `sandbox/moneyhipo/mockup/`에서 **`docs/app-sitemap/index.html`**로 옮겨졌다. 앱 화면은 이 시안을 보고 만든다 (CLAUDE.md 문서 안내). 확인했으면 `[x]` | [ ] |
 | moneyhipo | 기능 1 분류 평가용 **의류 사진 100장 + 정답 라벨(종류·색)** 준비 (mmminsung02 요청) | [ ] |

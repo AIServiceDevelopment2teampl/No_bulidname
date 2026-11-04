@@ -25,6 +25,7 @@
 | 2026-11-04 | 실제 서버 + 실제 CLIP 연결 확인 (이 PC, curl) | uvicorn으로 sandbox 서버를 띄워 사진 업로드 → 201·분류 결과, 같은 사진 다시 → `duplicate: true`, 이미지 아닌 파일 → 400, 사진 파일 저장 확인. 단색 그림이라 종류 분류 결과는 의미 없음 (색 `navy`는 맞음) |
 | 2026-11-04 | README.md에 "AI에게 요청" 추가, CLAUDE.md 규칙 0-1 추가 (moneyhipo) | 팀원 AI끼리 지킬 규칙(대화 기록은 내 세션 칸에만, 푸시 전 `pull --rebase`, 남의 sandbox 안 고침, 문서가 기준), 앱 화면 결정 요약, 지금 요청 표(탭 이름 `쇼핑`, 라이트/다크 테마, 평가 사진 100장) |
 | 2026-11-04 | **실제 폰 설치·실행 확인** (moneyhipo 폰) | 이 노트북에서 디버그 APK 빌드(`2f09abb`, Android Studio jbr로 `./gradlew assembleDebug`, 약 2분) → 구글 드라이브로 옮겨 설치, 앱이 정상으로 열림. 사진 업로드는 서버 미배포라 아직 확인 못 함. 같은 PC에서 빌드한 APK는 지우지 않고 덮어써서 설치된다(PC가 다르면 디버그 서명이 달라 먼저 지워야 함). Expo Go는 React Native 전용이라 이 앱(Kotlin)에는 못 씀 |
+| 2026-11-04 | 화면 시안을 `sandbox/moneyhipo/mockup/index.html` → **`docs/app-sitemap/index.html`**로 옮김 | 앱 화면의 기준 문서라서 sandbox(완성본 아님)가 아닌 docs에 둔다. CLAUDE.md 문서 안내에 "앱 화면은 이 시안을 보고 만든다"를 넣고 README 링크·요청 표를 고침. 위 로그의 옛 경로는 그대로 둠 |
 | 2026-10-21 | 대화 기록 저장, 문서 커밋·푸시 | [conversation-log.md](conversation-log.md). 제출 기획서 PDF는 팀원 이름·학번이 있어 공개 저장소에 올리지 않음 (`.gitignore`) |
 
 ## 결정 사항
