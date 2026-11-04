@@ -228,3 +228,6 @@ Android Studio를 설치하고 안드로이드 프로젝트 뼈대를 `sandbox/m
 - 홈 시안(베이스 / 초안)은 아직 미결정이다. 목업에는 둘 다 있다
 - 안드로이드 앱 코드의 탭 이름은 아직 `번역`이다 (`sandbox/mmminsung02/.../ClosetApp.kt`, 다른 팀원 sandbox라 고치지 않음). progress.md 다음 할 일 4번에 적어 둠
 - 목업을 다시 찍을 때: `chrome.exe --headless=new --screenshot=<출력.png> --window-size=1150,1700 file:///.../index.html`
+4. **기능 1 서버**: sandbox에서 테스트 먼저 쓰고 구현. 가짜 분석기 테스트 10개, 실제 CLIP 테스트 2개 통과. CLIP 메모리 약 500MB 측정
+   - 사용자에게 알린 임의 결정: 일반 CLIP으로 시작, 업로드 상한 10MB, 신뢰도 0.5 미만은 `기타`, 요청당 사진 1장, 색 영어 코드 저장, 로그인 전 개발용 사용자
+

@@ -18,6 +18,8 @@
 | 2026-10-28 | 서버 뼈대·테스트 환경 생성 | `src/server/`(FastAPI, `/health`), `tests/server/`(pytest), `tests/inject/`(Node 내장 테스트 + jsdom), ruff 설정(`pyproject.toml`). 실행: `python -m venv .venv` → `.venv/Scripts/pip install -r src/server/requirements-dev.txt` → `.venv/Scripts/python -m pytest`, `npm install` → `npm run test:inject`. 안드로이드 프로젝트는 이 PC에 Android Studio가 없어 아직 못 만듦 |
 | 2026-11-04 | 안드로이드 프로젝트 뼈대 생성 (`sandbox/mmminsung02/android/`, 검수 전) | AGP 9.4.0 (설치된 Android Studio 2026.2.1이 지원하는 최신. 9.5.0은 동기화 실패), Gradle 9.8.2, Kotlin 2.4.21, Compose BOM 2026.09.00, compileSdk 37, targetSdk 36, minSdk 26, ktlint. 하단 탭 4개(홈/내 옷장/번역/마이) 빈 화면. Robolectric 테스트 3개(탭 표시, 탭 전환, targetSdk 36 이상) 통과, 디버그 APK 빌드 성공. 실제 폰 실행은 미확인. 실행: `cd sandbox/mmminsung02/android` → `./gradlew ktlintCheck testDebugUnitTest assembleDebug` (JAVA_HOME은 Android Studio의 `jbr`). JDK 25에서 Robolectric을 돌리려고 테스트 JVM에 `--add-opens java.io`, `--add-exports jdk.internal.access`를 넣음. applicationId는 임시 `com.team12.closet` |
 | 2026-11-04 | 화면 시안 PNG 3장을 HTML 목업으로 옮김 (`sandbox/moneyhipo/mockup/index.html`, 검수 전) | 화면 6개: 로그인(Google), 로그아웃 확인, 비로그인 홈, 로그인 후 메인(프로필 메뉴), 홈 베이스, 홈 초안. 버튼을 누르면 이어지는 화면으로 이동. 옷 사진·로봇 그림은 이모지·도형으로 대신함. 색은 `:root`에 모아 둠(주 색 `#5B5CEB`), 앱 테마를 만들 때 쓴다. 시안과 문서가 어긋난 4곳은 아래 결정 사항대로 고침 |
+| 2026-11-04 | 기능 1 옷 사진 등록·자동 분류 **서버** (`sandbox/mmminsung02/`, 검수 전) | `POST /v1/clothes`. 완료 조건 [서버] 5개 + 예외 상황 5개 테스트 통과(가짜 분석기). 실제 CLIP(`openai/clip-vit-base-patch32`, 제로샷) 동작 테스트 2개 통과(`pytest -m slow`, 단색 이미지로 값 범위·차원만 확인, 정확도는 미측정). 실행: `cd sandbox/mmminsung02` → `../../.venv/Scripts/python -m pytest`. 구현 때 정한 값: 업로드 상한 10MB, 분류 신뢰도 0.5 미만이면 `other`, 요청 하나에 사진 1장, 색은 영어 코드로 저장(`server/domain.py`), 로그인 전까지 개발용 사용자 `dev-user`. transformers 5부터 `get_*_features`가 출력 객체를 돌려줘서 `.pooler_output`을 씀 |
+| 2026-11-04 | CLIP 메모리·속도 측정 (이 PC, CPU) | 모델을 올린 Python 프로세스 약 500MB, 모델 로드 11초, 사진 1장 분석 약 180ms. 서버 전체로도 1GB 안쪽으로 예상되어 **Vultr 2GB 요금제로도 될 가능성이 높다** (FAISS·동시 요청을 붙인 뒤 다시 잰다) |
 | 2026-10-21 | 대화 기록 저장, 문서 커밋·푸시 | [conversation-log.md](conversation-log.md). 제출 기획서 PDF는 팀원 이름·학번이 있어 공개 저장소에 올리지 않음 (`.gitignore`) |
 
 ## 결정 사항
@@ -69,7 +71,7 @@
 | 번역 방식 | LLM 전부 / 번역 API + LLM(구조화만) | 비용·속도 비교 후 |
 | OCR | EasyOCR(서버) / ML Kit(기기) | |
 | CLIP 모델 | 일반 CLIP / 패션 특화 CLIP | 평가로 결정 |
-| 서버 요금제 | Vultr 4GB(예정) / 2GB | CLIP 메모리 사용량을 재고 결정 |
+| 서버 요금제 | Vultr 4GB(예정) / 2GB | CLIP 단독 측정 약 500MB (2026-11-04). 서버를 다 붙인 뒤 다시 재고 결정 |
 | 지원 쇼핑몰 목록 | 기준: 많이 쓰이는 해외 쇼핑몰 중 **한국어를 지원하지 않는 곳**. 2026-10-28 직접 확인 결과 한국어 미지원 후보: 영어 **ASOS** (https://www.asos.com/women/), **Urban Outfitters** (https://www.urbanoutfitters.com/), **Abercrombie & Fitch** (https://www.abercrombie.com/, Hollister는 같은 회사라 하나만), **END. Clothing** (https://www.endclothing.com/), **J.Crew** (https://www.jcrew.com/), **Nordstrom** (https://www.nordstrom.com/), **유니클로 미국** (https://www.uniqlo.com/us/en/) / 일본어 **ZOZOTOWN** (https://zozo.jp/), **유니클로 일본** (https://www.uniqlo.com/jp/ja/), **GU 일본** (https://www.gu-global.com/jp/ja/), **BEAMS** (https://www.beams.co.jp/). 한국 직배송(웹 검색, 확인 필요): ASOS 있음(공식 배송 페이지), J.Crew 있음 가능성 높음(한국용 `/kr` 스토어), Urban Outfitters·A&F·END.·Nordstrom 불확실, 유니클로 미국·ZOZOTOWN·유니클로 일본·GU 일본 없음(국내 전용, 배송대행지 필요), BEAMS 자료가 엇갈림. **배송 태그로 표시하고 후보에서 빼지는 않는다** (2026-10-28 결정, [shop-browser.md](features/shopping/shop-browser.md)): `배송 가능` ASOS / `배송대행 필요` 유니클로 미국·ZOZOTOWN·유니클로 일본·GU 일본 / `그 외`(확인 전) J.Crew·Urban Outfitters·A&F·Nordstrom·END.·BEAMS. `그 외`는 결제 화면에서 배송 국가를 한국으로 바꿔 확인하면 옮긴다. Amazon 일본은 한국어 미지원이지만 종합몰이라 기본 목록에서는 빼고 사용자가 직접 추가하게 둔다(초안). 한국어를 지원해서 제외: Amazon(미국), SSENSE, 라쿠텐, UNITED ARROWS, ZARA, H&M | 상품 페이지 구조 확인 완료: ASOS·ZOZOTOWN(JSON-LD 있음), 유니클로 일본(페이지 데이터). 나머지는 앱이 생기면 실제 폰 WebView에서 열림·상품 정보 읽기를 확인하고 기본 목록을 정한다 |
 
 ## 다음 할 일 (순서대로)
@@ -78,7 +80,7 @@
 3. **기술 검증**: 후보 쇼핑몰마다 WebView에서 열림, 로그인·장바구니·결제 화면 진입, JS 주입으로 글자 읽기·바꾸기, JSON-LD Product 유무를 확인하고 결과를 여기에 기록
 4. 안드로이드 프로젝트 뼈대 검수 후 `src/android/`로 옮기기 (sandbox에서 생성 완료). 옮기기 전에 3번째 탭 이름을 `번역`에서 `쇼핑`으로 바꾼다 (`ClosetApp.kt`의 `SHOPPING("번역", ...)`, 테스트에 탭 이름이 있으면 같이). **applicationId 정하기** (Play에 올리면 바꿀 수 없음, 서비스 이름과 함께 첫 비공개 테스트 전까지)
 5. 평가 데이터 준비 시작: 의류 사진 100~200장 라벨링, 영어·일본어 상품 페이지·캡처 30~50개
-6. 기능 1번 [wardrobe/photo-register.md](features/wardrobe/photo-register.md)부터 순서대로
+6. 기능 1번 [wardrobe/photo-register.md](features/wardrobe/photo-register.md): 서버는 sandbox에서 완료(검수 전). 남은 것: 앱 화면(사진 선택 → 업로드 → 분류 결과 확인), [평가] 의류 100장 정확도. 그다음 기능 2번부터 순서대로
 
 ## 알려진 위험
 [architecture.md](architecture.md)의 '주요 위험' 참고. 가장 큰 두 가지:

@@ -1,0 +1,4 @@
+# 실제 CLIP 실행용 (테스트는 가짜 분석기라 필요 없음). torch는 CPU 버전:
+# pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch==2.15.0
+transformers==5.22.1
