@@ -2,6 +2,7 @@ import io
 
 import numpy as np
 import pytest
+from fastapi import Request
 from fastapi.testclient import TestClient
 from PIL import Image
 
@@ -55,3 +56,29 @@ def app(settings, analyzer):
 def client(app):
     with TestClient(app) as c:
         yield c
+
+
+@pytest.fixture
+def as_user(app):
+    """요청하는 사용자를 바꾼다. 로그인(기능 3) 전이라 의존성을 바꿔 끼운다"""
+    from server.api.deps import ensure_user, get_current_user_id
+
+    def switch(user_id: str):
+        def current_user(request: Request) -> str:
+            ensure_user(request.app.state.conn, user_id)
+            return user_id
+
+        app.dependency_overrides[get_current_user_id] = current_user
+
+    yield switch
+    app.dependency_overrides.clear()
+
+
+def upload(client, data: bytes | None = None, name="shirt.png", mime="image/png"):
+    return client.post("/v1/clothes", files={"image": (name, data or make_image_bytes(), mime)})
+
+
+def add_cloth(client, analyzer, category="top", color="black", seed=0) -> int:
+    """가짜 분석 결과를 정해 놓고 옷 하나를 등록한다. seed마다 다른 사진"""
+    analyzer.category, analyzer.color = category, color
+    return upload(client, make_image_bytes(color=(seed % 256, seed // 256, 7))).json()["id"]
