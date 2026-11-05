@@ -10,3 +10,6 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 node_modules/
+
+# DeepFashion 데이터셋 zip(13GB): GitHub 100MB 제한·재배포 금지 라이선스라 로컬에만 둔다
+DeepFashin_dataset/
