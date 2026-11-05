@@ -248,3 +248,11 @@ Android Studio를 설치하고 안드로이드 프로젝트 뼈대를 `sandbox/m
 - README.md에 "AI에게 요청"(서로의 AI에게 남기는 규칙·할 일)을 만들고 CLAUDE.md 0-1번에서 읽게 했다. 팀원 AI가 대화 기록을 파일 끝에 덧붙여 남의 세션 칸에 들어가는 일이 두 번 있어서다. 요청을 처리하면 README 표에서 `[x]`로 바꾼다
 - 앱 시험: 이 노트북에서 디버그 APK를 빌드해 구글 드라이브로 폰에 설치하는 방식으로 함(사용자 결정). moneyhipo 폰에서 설치·실행 확인. Expo Go는 Kotlin 앱이라 불가. 앱 안 삭제 버튼은 하지 않기로 함(같은 PC 빌드면 덮어쓰기 설치가 됨)
 
+## 2026-11-06 세션 (Copilot SDK, VS Code, moneyhipo)
+
+### 한 줄 요약
+DeepFashion-MultiModal 데이터 아카이브의 로컬 확보 사실, 출처, 라이선스 주의사항을 AI 진입 문서와 진행 기록에 남겼다.
+
+### 대화 흐름
+1. `DeepFashin_dataset/`의 압축 파일을 확인하고 출처를 [DeepFashion-MultiModal](https://github.com/yumingj/DeepFashion-MultiModal)로 기록했다.
+2. 원본 README와 LICENSE에서 비상업 연구용 및 재배포 제한을 확인했다. 평가·학습 적합성은 아직 검증하지 않았으므로 사용 전에 라이선스와 라벨 적합성을 확인하도록 기록했다.

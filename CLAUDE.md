@@ -16,6 +16,11 @@
 - 테스트: pytest (서버), Node + jsdom (WebView 주입 JS), JUnit·Compose UI 테스트 (앱)
 - 배포: Google Play (비공개 테스트 → 프로덕션), 서버는 Vultr (서울 리전, 선불 크레딧)
 
+## 데이터셋
+- DeepFashion-MultiModal 압축 파일을 로컬 `DeepFashin_dataset/`에 확보했다. 폴더는 `.gitignore` 대상이며 저장소에 추가하지 않는다.
+- 출처: [DeepFashion-MultiModal](https://github.com/yumingj/DeepFashion-MultiModal)
+- 저장소의 README와 LICENSE에 따르면 비상업 연구용이며 재배포가 제한된다. 분류 학습·평가에 사용하기 전에 라이선스 허용 범위와 현재 100장 평가 요구사항에 맞는지 확인한다. 아직 데이터 적합성은 검증하지 않았다.
+
 ## 문서 안내
 작업 전 관련 문서를 반드시 먼저 읽을 것.
 - `docs/00-overview.md` — 전체 목표, 범위, 기능 목록, 일정
