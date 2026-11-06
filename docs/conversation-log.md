@@ -256,3 +256,19 @@ DeepFashion-MultiModal 데이터 아카이브의 로컬 확보 사실, 출처, �
 ### 대화 흐름
 1. `DeepFashin_dataset/`의 압축 파일을 확인하고 출처를 [DeepFashion-MultiModal](https://github.com/yumingj/DeepFashion-MultiModal)로 기록했다.
 2. 원본 README와 LICENSE에서 비상업 연구용 및 재배포 제한을 확인했다. 평가·학습 적합성은 아직 검증하지 않았으므로 사용 전에 라이선스와 라벨 적합성을 확인하도록 기록했다.
+
+## 2026-11-07 세션 (Claude Code, VS Code, moneyhipo)
+
+### 한 줄 요약
+DeepFashion-MultiModal이 이 프로젝트에 맞는지 확인하고, 기능 1 종류 분류를 DeepFashion 100장으로 재서 86%(목표 85%)를 얻었다.
+
+### 대화 흐름
+1. **데이터 확인**: 압축 파일 7개의 내용을 봤다. 쇼핑몰 상품 사진 44,096장(대부분 모델 착용), 부위 마스크 12,701장, 소매·소재·무늬 라벨, 설명문, 관절 위치, DensePose. 종류 정답은 파일 이름에서 얻을 수 있고 같은 상품의 여러 각도 사진은 유사 검색 평가에 쓸 수 있다. 색 정답은 없다. 라이선스는 비상업 연구용 + 원본·파생 데이터 배포 금지
+2. **사용자 결정**: 가디건·후드 집업은 아우터, 지퍼 없는 후드티는 상의. 앱은 무료·광고 없음·약 1달 운영이라 비상업. 평가는 종류마다 25장씩, DeepFashion과 실제 옷장 사진을 둘 다 쓴다
+3. **평가 도구** (`sandbox/moneyhipo/eval/`): 부위 마스크로 해당 옷만 잘라 종류마다 25장을 뽑고(`deepfashion_set.py`), mmminsung02의 `ClipAnalyzer`로 서버 규칙 그대로 정확도·혼동 행렬·색 정확도를 잰다(`eval_category.py`, 묶음 여러 개 가능). 이 PC에 `.venv`가 없어서 새로 만들었다(torch 2.15.0 CPU)
+4. **결과**: 86/100 (top 23, bottom 22, outer 21, other 20). 가디건과 원피스·점프수트에서 많이 틀린다 → README 요청 표에 mmminsung02에게 문장 보강 제안
+
+### 다음 세션 AI에게
+- 실제 옷장 사진 묶음은 아직 없다. `DeepFashin_dataset/eval/closet/`에 사진과 `labels.csv`(file, category, color, source)를 넣고 `eval_category.py DeepFashin_dataset/eval/deepfashion_100 DeepFashin_dataset/eval/closet`으로 잰다
+- 기능 1 완료 조건 [평가]는 옷장 사진까지 재기 전이라 체크하지 않았다
+- DeepFashion에서 잘라 낸 사진·라벨·결과는 `DeepFashin_dataset/eval/`에만 있다(Git 제외, 라이선스). 같은 seed로 다시 만들면 같은 100장이 나온다

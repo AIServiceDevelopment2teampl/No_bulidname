@@ -19,7 +19,8 @@
 ## 데이터셋
 - DeepFashion-MultiModal 압축 파일을 로컬 `DeepFashin_dataset/`에 확보했다. 폴더는 `.gitignore` 대상이며 저장소에 추가하지 않는다.
 - 출처: [DeepFashion-MultiModal](https://github.com/yumingj/DeepFashion-MultiModal)
-- 저장소의 README와 LICENSE에 따르면 비상업 연구용이며 재배포가 제한된다. 분류 학습·평가에 사용하기 전에 라이선스 허용 범위와 현재 100장 평가 요구사항에 맞는지 확인한다. 아직 데이터 적합성은 검증하지 않았다.
+- 저장소의 README와 LICENSE에 따르면 비상업 연구용이며 원본·파생 데이터의 복사·배포가 금지다. **평가에만 쓴다**: 사진·잘라 낸 사진·라벨을 Git·공개 드라이브에 올리지 않고, 이 데이터로 학습한 모델을 앱·서버에 넣지 않는다 (progress.md 결정 사항 2026-11-07).
+- 적합성 확인 결과(2026-11-07): 종류 정답(파일 이름의 상품 종류)과 부위 마스크는 있고, **색 정답은 없다**. 대부분 모델이 입은 쇼핑몰 사진이다. 같은 상품의 여러 각도 사진이 있어 유사 검색(Recall@3) 평가에도 쓸 수 있다. 기능 1 평가 도구와 사용법: `sandbox/moneyhipo/eval/README.md`. 필요 없는 `densepose.zip의 사본`(6GB)은 지워도 된다.
 
 ## 문서 안내
 작업 전 관련 문서를 반드시 먼저 읽을 것.
