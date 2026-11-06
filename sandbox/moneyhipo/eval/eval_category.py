@@ -29,6 +29,54 @@ from server.domain import CATEGORIES, COLORS  # noqa: E402
 
 MIN_CONFIDENCE = 0.5
 
+# 시험용 종류 문장 (서버 코드는 고치지 않고 평가에서만 바꿔 본다). 종류 기준은
+# progress.md 결정 사항 2026-11-07: 가디건·후드 집업은 아우터, 지퍼 없는 후드티는 상의
+PROMPTS_V2 = {
+    "top": [
+        "a t-shirt",
+        "a shirt",
+        "a blouse",
+        "a sweater",
+        "a tank top",
+        "a sweatshirt",
+        "a pullover hoodie",
+        "a polo shirt",
+    ],
+    "bottom": ["pants", "jeans", "shorts", "a skirt", "leggings"],
+    "outer": [
+        "a jacket",
+        "a coat",
+        "a cardigan",
+        "a zip-up hoodie",
+        "a vest",
+        "a blazer",
+        "a padded jacket",
+    ],
+    "other": ["a dress", "a jumpsuit", "a romper", "shoes", "a bag", "a hat"],
+}
+
+
+def use_prompts(analyzer: ClipAnalyzer, variant: str) -> None:
+    """analyzer의 종류 문장을 바꾼다.
+
+    server: 서버 코드 그대로 (문장별 확률을 종류별로 더함)
+    v2: PROMPTS_V2, 서버처럼 확률을 더함 (문장이 많은 종류가 유리해질 수 있음)
+    v2-mean: PROMPTS_V2, 종류마다 문장 벡터를 평균 내 종류 하나에 벡터 하나
+    """
+    if variant == "server":
+        return
+    texts = {c: [f"a photo of {p}" for p in ps] for c, ps in PROMPTS_V2.items()}
+    if variant == "v2":
+        analyzer._category_labels = [c for c, ps in texts.items() for _ in ps]
+        analyzer._category_text = analyzer._encode_text([t for ts in texts.values() for t in ts])
+    elif variant == "v2-mean":
+        means = [analyzer._encode_text(ts).mean(dim=0) for ts in texts.values()]
+        stacked = analyzer._torch.stack(means)
+        analyzer._category_labels = list(texts)
+        analyzer._category_text = stacked / stacked.norm(dim=-1, keepdim=True)
+    else:
+        sys.exit(f"모르는 문장 묶음: {variant}")
+
 
 def read_labels(set_dir: Path) -> list[dict]:
     with open(set_dir / "labels.csv", encoding="utf-8-sig", newline="") as f:
@@ -54,8 +102,11 @@ def accuracy(pairs: list[tuple[str, str]]) -> str:
     return f"{hit}/{len(pairs)} = {hit / len(pairs):.1%}"
 
 
-def report(results: list[dict]) -> str:
-    lines = [f"모델: {DEFAULT_MODEL}, 신뢰도 기준 {MIN_CONFIDENCE} 미만 → other", ""]
+def report(results: list[dict], model_name: str, prompts: str) -> str:
+    lines = [
+        f"모델: {model_name}, 종류 문장: {prompts}, 신뢰도 기준 {MIN_CONFIDENCE} 미만 → other",
+        "",
+    ]
     groups = {"전체": results}
     for source in sorted({r["source"] for r in results}):
         groups[source] = [r for r in results if r["source"] == source]
@@ -91,10 +142,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("sets", nargs="+", type=Path, help="labels.csv가 있는 폴더")
     parser.add_argument("--out", type=Path, help="결과를 이 파일(.md)에도 쓴다")
+    parser.add_argument(
+        "--model", default=DEFAULT_MODEL, help="Hugging Face CLIP 모델 이름 (모델 비교용)"
+    )
+    parser.add_argument(
+        "--prompts", default="server", choices=["server", "v2", "v2-mean"], help="종류 문장 묶음"
+    )
     args = parser.parse_args()
 
     rows = [row for set_dir in args.sets for row in read_labels(set_dir)]
-    analyzer = ClipAnalyzer()
+    load_start = time.perf_counter()
+    analyzer = ClipAnalyzer(args.model)
+    use_prompts(analyzer, args.prompts)
+    print(f"모델 로드 {time.perf_counter() - load_start:.1f}초")
     start = time.perf_counter()
     for row in rows:
         with Image.open(row["path"]) as image:
@@ -105,7 +165,7 @@ def main() -> None:
         row["got_color"] = analysis.color
     print(f"{len(rows)}장 분석, 장당 {(time.perf_counter() - start) / len(rows) * 1000:.0f}ms\n")
 
-    text = report(rows)
+    text = report(rows, args.model, args.prompts)
     print(text)
     if args.out:
         args.out.write_text(text + "\n", encoding="utf-8")

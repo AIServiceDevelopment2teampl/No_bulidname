@@ -44,6 +44,12 @@ python -m venv .venv
 .venv/Scripts/python -m pytest sandbox/moneyhipo/eval -q
 ```
 
+모델·문장 비교: `--model patrickjohncyh/fashion-clip`(Hugging Face CLIP 모델 이름), `--prompts v2`
+(`server` = 서버 코드 그대로, `v2` = `PROMPTS_V2`, `v2-mean` = 종류별 문장 벡터 평균). 서버 코드는 고치지 않는다.
+더 큰 비교용 묶음:
+`deepfashion_set.py --per-category 100 --seed 400 --source deepfashion_400 --out DeepFashin_dataset/eval/deepfashion_400`
+2026-11-07 결과는 `docs/progress.md` 작업 로그.
+
 ## 라이선스
 
 DeepFashion-MultiModal은 비상업 연구용이고 원본·파생 데이터의 복사·배포가 금지다.

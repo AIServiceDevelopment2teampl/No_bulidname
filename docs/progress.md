@@ -8,7 +8,8 @@
 | 날짜 | 작업 | 비고 |
 |------|------|------|
 | 2026-11-06 | DeepFashion-MultiModal 데이터 아카이브 로컬 확보 | `DeepFashin_dataset/`에 압축 파일을 보관하며 Git에는 올리지 않음. [출처](https://github.com/yumingj/DeepFashion-MultiModal). 저장소 README·LICENSE는 비상업 연구용으로 명시하고 재배포를 제한함. 분류 학습·평가에 쓸 수 있는지 라이선스와 라벨 적합성을 먼저 확인해야 함 |
-| 2026-11-07 | DeepFashion 적합성 확인 + **기능 1 종류 분류 평가 (DeepFashion 100장)** (`sandbox/moneyhipo/eval/`, 검수 전) | **결과: 86/100 = 86.0%** (목표 85%, 서버 규칙 = 신뢰도 0.5 미만 `other`). 기준 없이 87%. 종류별: top 23/25, bottom 22/25, outer 21/25, other 20/25. 틀린 14장 중 가디건 3장(outer → top·other), 원피스·점프수트 5장(other → bottom·top·outer). 장당 98ms(이 PC, CPU). 모델 `openai/clip-vit-base-patch32`, mmminsung02 `ClipAnalyzer` 그대로. **데이터 확인 결과**: 쇼핑몰 상품 사진 44,096장(대부분 모델 착용, 옷만 찍은 사진 69장), 종류 정답은 파일 이름의 상품 종류, 전신 12,701장에 사람이 칠한 부위 마스크가 있음. **색 정답은 없음**(README의 color 라벨은 실제로는 무늬). 그래서 마스크가 있는 사진에서 해당 옷 부분만 잘라 종류마다 25장(상품 하나에 한 장, seed 20261107)을 뽑음. 풀오버·집업이 섞인 `Sweatshirts_Hoodies`, 청바지·청재킷이 섞인 `Denim`, `Suiting`은 뺌. 잘린 사진·라벨·결과는 `DeepFashin_dataset/eval/`(Git 제외). 실행: 저장소 루트에서 `.venv/Scripts/python sandbox/moneyhipo/eval/deepfashion_set.py` → `eval_category.py DeepFashin_dataset/eval/deepfashion_100`. 단위 테스트 4개 통과(`pytest sandbox/moneyhipo/eval`), ruff 통과. **남은 것**: 실제 옷장 사진 묶음(색 포함)을 찍어 따로·합쳐서 재기. 쇼핑몰 스튜디오 사진이라 실제 옷장 사진보다 쉬울 수 있다 |
+| 2026-11-07 | DeepFashion 적합성 확인 + **기능 1 종류 분류 평가 (DeepFashion 100장)** (`sandbox/moneyhipo/eval/`, 검수 전) | **결과: 86/100 = 86.0%** (목표 85%, 서버 규칙 = 신뢰도 0.5 미만 `other`). 기준 없이 87%. 종류별: top 23/25, bottom 22/25, outer 21/25, other 20/25. 틀린 14장 중 가디건 3장(outer → top·other), 원피스·점프수트 5장(other → bottom·top·outer). 장당 98ms(이 PC, CPU). 모델 `openai/clip-vit-base-patch32`, mmminsung02 `ClipAnalyzer` 그대로. **데이터 확인 결과**: 쇼핑몰 상품 사진 44,096장(대부분 모델 착용, 옷만 찍은 사진 69장), 종류 정답은 파일 이름의 상품 종류, 전신 12,701장에 사람이 칠한 부위 마스크가 있음. **색 정답은 없음**(README의 color 라벨은 실제로는 무늬). 그래서 마스크가 있는 사진에서 해당 옷 부분만 잘라 종류마다 25장(상품 하나에 한 장, seed 20261107)을 뽑음. 풀오버·집업이 섞인 `Sweatshirts_Hoodies`, 청바지·청재킷이 섞인 `Denim`, `Suiting`은 뺌. 잘린 사진·라벨·결과는 `DeepFashin_dataset/eval/`(Git 제외). 실행: 저장소 루트에서 `.venv/Scripts/python sandbox/moneyhipo/eval/deepfashion_set.py` → `eval_category.py DeepFashin_dataset/eval/deepfashion_100`. 단위 테스트 4개 통과(`pytest sandbox/moneyhipo/eval`), ruff 통과. **남은 것**: 실제 옷장 사진 묶음(색 포함)을 찍어 따로·합쳐서 재기. 쇼핑몰 스튜디오 사진이라 실제 옷장 사진보다 쉬울 수 있다. **→ 바로 아래 줄: 400장으로 다시 재니 지금 서버 설정은 79.8%로 목표 미달** |
+| 2026-11-07 | **CLIP 모델·종류 문장 비교** (DeepFashion 400장 + 100장, `sandbox/moneyhipo/eval/`) | 100장은 오차가 커서 종류마다 100장씩 400장 묶음(seed 400, 100장 묶음과 상품 8개 겹침)을 더 만듦. 400장 기준 종류 정확도(서버 규칙): **지금 서버 설정(일반 CLIP B/32 + 서버 문장) 79.8%** / FashionCLIP + 서버 문장 77.2% / CLIP B/16 + 서버 문장 82.2% / B/32 + v2 문장 84.0% / **FashionCLIP + v2 문장 88.0%** (100장 91%, 500장 전체 88.6%) / B/16 + v2 문장 86.8%. 문장 벡터를 종류별로 평균 내는 방식(v2-mean)은 더 나빴다(80.0~85.2%). v2 문장: 종류 기준대로 상의 8개(후드티·맨투맨 포함)·하의 5개·아우터 7개(가디건·후드 집업 포함)·기타 6개(원피스·점프수트 등), `eval_category.py` `PROMPTS_V2`. 속도(이 PC CPU, 장당): B/32 90ms, FashionCLIP 81ms, B/16 217ms. FashionCLIP(`patrickjohncyh/fashion-clip`)은 B/32와 같은 구조·크기라 메모리도 같고 라이선스 MIT. FashionCLIP + v2의 남은 오류는 원피스 → 하의 20장이 가장 많다. **주의**: v2 문장은 100장 결과를 본 뒤 만들었으므로, 최종 확인은 실제 옷장 사진으로 한다. 실행: `eval_category.py <묶음들> --model patrickjohncyh/fashion-clip --prompts v2` |
 | 2026-10-07 | 프로젝트 뼈대 생성 | CLAUDE.md, docs/ 템플릿 |
 | 2026-10-14 | 팀 프로젝트 기획서 제출 | `팀플기획서-12조 (1).pdf` |
 | 2026-10-21 | 개발용 기획 문서 작성 | 아이디어_상세.md, 추가 idea.txt, 제출 기획서, UI 시안을 합쳐 정리. 원본은 수정하지 않음 |
@@ -97,7 +98,7 @@
 | 홈 화면 시안 | 베이스(2카드), 초안(4카드) | `docs/image/` |
 | 번역 방식 | LLM 전부 / 번역 API + LLM(구조화만) | 비용·속도 비교 후 |
 | OCR | EasyOCR(서버) / ML Kit(기기) | |
-| CLIP 모델 | 일반 CLIP / 패션 특화 CLIP | 평가로 결정 |
+| CLIP 모델 | 일반 CLIP / 패션 특화 CLIP | 평가로 결정. 2026-11-07 DeepFashion 400장 결과로는 **FashionCLIP + v2 문장(88.0%)을 추천** (작업 로그). 실제 옷장 사진으로 확인한 뒤 정한다 |
 | 서버 요금제 | Vultr 4GB(예정) / 2GB | CLIP 단독 측정 약 500MB (2026-11-04). 서버를 다 붙인 뒤 다시 재고 결정 |
 | 가상 피팅 서비스 (도전 목표) | FASHN (장당 약 $0.075), Google Vertex AI Virtual Try-On (재판매처 기준 장당 약 $0.063), 그 밖의 API | 2026-11-04 웹 검색 결과이고 비교 사이트·재판매처 가격이라 공식 가격을 확인해야 한다. 학교 지원금으로 낼 수 있는지, 업체의 이미지 보관 정책, 여러 벌을 한 번에 입힐 수 있는지 함께 본다 |
 | 미리 입어보기 하루 횟수 | 시안은 5회 | 서비스와 예산을 정한 뒤 |
@@ -117,7 +118,7 @@
 3. **기술 검증**: 후보 쇼핑몰마다 WebView에서 열림, 로그인·장바구니·결제 화면 진입, JS 주입으로 글자 읽기·바꾸기, JSON-LD Product 유무를 확인하고 결과를 여기에 기록
 4. 안드로이드 프로젝트 뼈대 검수 후 `src/android/`로 옮기기 (sandbox에서 생성 완료). 옮기기 전에 3번째 탭 이름을 `번역`에서 `쇼핑`으로 바꾼다 (`ClosetApp.kt`의 `SHOPPING("번역", ...)`, 테스트에 탭 이름이 있으면 같이). **applicationId 정하기** (Play에 올리면 바꿀 수 없음, 서비스 이름과 함께 첫 비공개 테스트 전까지)
 5. 평가 데이터 준비 시작: 의류 사진 100~200장 라벨링, 영어·일본어 상품 페이지·캡처 30~50개
-6. 기능 1번 [wardrobe/photo-register.md](features/wardrobe/photo-register.md): 서버는 sandbox에서 완료(검수 전). 앱 화면도 sandbox에서 완료(검수 전, 실제 폰 미확인). 남은 것: **[평가]** DeepFashion 100장은 86%로 쟀다(2026-11-07). **실제 옷장 사진 묶음(종류·색 라벨)을 찍어 넣고 다시 재기** (`sandbox/moneyhipo/eval/README.md`). 기능 2번은 sandbox에서 완료(검수 전, 오프라인 캐시 남음). 그다음 기능 3번(Google 로그인)부터 순서대로
+6. 기능 1번 [wardrobe/photo-register.md](features/wardrobe/photo-register.md): 서버는 sandbox에서 완료(검수 전). 앱 화면도 sandbox에서 완료(검수 전, 실제 폰 미확인). 남은 것: **[평가]** DeepFashion으로 쟀다(2026-11-07): 지금 서버 설정 79.8%(400장), FashionCLIP + v2 문장이면 88.0%. **실제 옷장 사진 묶음(종류·색 라벨)을 찍어 넣고 다시 재기** (`sandbox/moneyhipo/eval/README.md`). 기능 2번은 sandbox에서 완료(검수 전, 오프라인 캐시 남음). 그다음 기능 3번(Google 로그인)부터 순서대로
 
 ## 알려진 위험
 [architecture.md](architecture.md)의 '주요 위험' 참고. 가장 큰 두 가지:

@@ -97,7 +97,7 @@ def open_segm_zip() -> zipfile.ZipFile:
     return zipfile.ZipFile(io.BytesIO(outer.read("segm.zip")))
 
 
-def build(out_dir: Path, per_category: int, seed: int) -> None:
+def build(out_dir: Path, per_category: int, seed: int, source: str) -> None:
     segm = open_segm_zip()
     images = zipfile.ZipFile(IMAGES_ZIP)
 
@@ -130,9 +130,7 @@ def build(out_dir: Path, per_category: int, seed: int) -> None:
                 continue
             image = Image.open(io.BytesIO(images.read(f"images/{image_name}"))).convert("RGB")
             image.crop(box).save(out_dir / image_name, quality=95)
-            rows.append(
-                {"file": image_name, "category": category, "color": "", "source": "deepfashion"}
-            )
+            rows.append({"file": image_name, "category": category, "color": "", "source": source})
             picked += 1
         print(f"{category}: {picked}장 (후보 상품 {len(keys)}개)")
         if picked < per_category:
@@ -151,8 +149,9 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--per-category", type=int, default=25)
     parser.add_argument("--seed", type=int, default=20261107)
+    parser.add_argument("--source", default="deepfashion", help="결과 표에서 묶음을 가르는 이름")
     args = parser.parse_args()
-    build(args.out, args.per_category, args.seed)
+    build(args.out, args.per_category, args.seed, args.source)
 
 
 if __name__ == "__main__":
