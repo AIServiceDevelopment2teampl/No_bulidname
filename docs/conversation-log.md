@@ -268,6 +268,7 @@ DeepFashion-MultiModal이 이 프로젝트에 맞는지 확인하고, 기능 1 �
 3. **평가 도구** (`sandbox/moneyhipo/eval/`): 부위 마스크로 해당 옷만 잘라 종류마다 25장을 뽑고(`deepfashion_set.py`), mmminsung02의 `ClipAnalyzer`로 서버 규칙 그대로 정확도·혼동 행렬·색 정확도를 잰다(`eval_category.py`, 묶음 여러 개 가능). 이 PC에 `.venv`가 없어서 새로 만들었다(torch 2.15.0 CPU)
 4. **결과**: 86/100 (top 23, bottom 22, outer 21, other 20). 가디건과 원피스·점프수트에서 많이 틀린다 → README 요청 표에 mmminsung02에게 문장 보강 제안
 5. **모델 비교** (사용자가 진행 요청): 100장은 오차가 커서 400장 묶음을 더 만들었다. 400장에서는 지금 서버 설정이 **79.8%로 목표 미달**(100장의 86%는 운이 좋았던 쪽). 모델만 바꾸면 FashionCLIP 77.2%, B/16 82.2%로 부족했고, 종류 기준대로 문장을 늘린 v2와 합치니 **FashionCLIP + v2가 88.0%**(속도·크기는 지금과 같음). mmminsung02 코드는 고치지 않고 평가 스크립트 안에서만 바꿔 쟀고, README 제안을 이 결과로 바꿨다
+6. **기능 5 단위·사이즈 변환** (사용자가 '겹치지 않는 일 진행'을 고름. 앱은 11/04 기능 3 작업 중간에 멈춰 컴파일 안 되는 상태라 mmminsung02 확인 필요): `sandbox/moneyhipo/units/`에 순수 함수와 테스트 31개. 검수 중 `Only 3 in stock`을 인치로 바꾸는 문제를 찾아, `in` 뒤가 글 끝·문장부호·치수 단어일 때만 인치로 보게 고쳤다. 사이즈 환산표는 초안이라 미결정 사항에 올렸다
 
 ### 다음 세션 AI에게
 - 실제 옷장 사진 묶음은 아직 없다. `DeepFashin_dataset/eval/closet/`에 사진과 `labels.csv`(file, category, color, source)를 넣고 `eval_category.py DeepFashin_dataset/eval/deepfashion_100 DeepFashin_dataset/eval/closet`으로 잰다
