@@ -274,3 +274,17 @@ DeepFashion-MultiModal이 이 프로젝트에 맞는지 확인하고, 기능 1 �
 - 실제 옷장 사진 묶음은 아직 없다. `DeepFashin_dataset/eval/closet/`에 사진과 `labels.csv`(file, category, color, source)를 넣고 `eval_category.py DeepFashin_dataset/eval/deepfashion_100 DeepFashin_dataset/eval/closet`으로 잰다
 - 기능 1 완료 조건 [평가]는 옷장 사진까지 재기 전이라 체크하지 않았다
 - DeepFashion에서 잘라 낸 사진·라벨·결과는 `DeepFashin_dataset/eval/`에만 있다(Git 제외, 라이선스). 같은 seed로 다시 만들면 같은 100장이 나온다
+
+## 2026-11-08 세션 (Claude Code, VS Code, moneyhipo)
+
+### 한 줄 요약
+moneyhipo가 집에서 찍은 실제 옷 사진 29장에 종류·색 라벨을 붙여 기능 1 분류를 쟀다. 지금 서버 설정이 종류 82.8%, 색 62.1%였고 FashionCLIP + v2보다 나았다.
+
+### 대화 흐름
+1. **사진 확인**: `옷 사진/`에 폴더 4개(겉옷 12, 바지 8, 양말 5, 티셔츠 4). 겉옷 폴더의 셔츠 2장은 종류 기준(2026-11-07)대로 `top`, 양말은 `other`로 라벨을 붙였다. 원본 폴더는 개인 사진이라 `.gitignore`에 넣었고, 평가용 사본과 `labels.csv`는 `DeepFashin_dataset/eval/closet/`에 둔다. 이 PC(노트북)에는 `.venv`와 DeepFashion이 없어 `.venv`를 새로 만들었다(torch 2.15.0 CPU)
+2. **평가**: 지금 서버 설정 종류 82.8%·색 62.1%, FashionCLIP + v2 종류 75.9%·색 48.3%. DeepFashion 400장과 순위가 반대다. 29장이라 아직 결론을 내지 않고 README 제안에 적었다. 색은 어두운 옷의 검정 → 남색·회색 오류가 대부분이다. EXIF 회전을 적용해도 결과는 거의 같다
+
+### 다음 세션 AI에게
+- 옷장 사진 라벨 중 애매한 것은 사용자 확인 전이다: `121556` 가죽 재킷(brown으로 붙임), `121809` 데님 재킷(navy), `121921` 연한 셔츠(beige), `121536` 플리스(navy)
+- 다시 재기: `.venv/Scripts/python sandbox/moneyhipo/eval/eval_category.py DeepFashin_dataset/eval/closet [--model patrickjohncyh/fashion-clip --prompts v2]`
+- v2 기타 문장에는 양말이 없다. 양말·모자 같은 소품을 옷장에 넣을지는 정하지 않았다

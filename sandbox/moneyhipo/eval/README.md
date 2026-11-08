@@ -6,7 +6,7 @@
 | 묶음 | 폴더 (Git에 안 올림) | 장수 | 만드는 법 |
 |---|---|---|---|
 | DeepFashion | `DeepFashin_dataset/eval/deepfashion_100/` | 종류마다 25장 = 100장 | `deepfashion_set.py`가 자동으로 뽑는다 |
-| 실제 옷장 사진 | `DeepFashin_dataset/eval/closet/` | 종류마다 같은 수로 | 팀이 직접 찍고 `labels.csv`를 쓴다 (아래) |
+| 실제 옷장 사진 | `DeepFashin_dataset/eval/closet/` | 종류마다 같은 수로 (2026-11-08 기준 29장: top 6, bottom 8, outer 10, other 5) | 팀이 직접 찍고 `labels.csv`를 쓴다 (아래). 원본은 저장소 루트 `옷 사진/`(Git 제외) |
 
 ## 종류 기준
 

@@ -13,3 +13,6 @@ node_modules/
 
 # DeepFashion 데이터셋 zip(13GB): GitHub 100MB 제한·재배포 금지 라이선스라 로컬에만 둔다
 DeepFashin_dataset/
+
+# 팀이 찍은 실제 옷장 사진 원본: 개인 사진이라 올리지 않는다. 평가용 사본은 DeepFashin_dataset/eval/closet/
+옷 사진/
