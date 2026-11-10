@@ -34,4 +34,5 @@ class ServerConnection(
 
     val clothes = NetworkClothesRepository(retrofit.create(ClothesApi::class.java), baseUrl)
     val auth = NetworkAuthRepository(retrofit.create(AuthApi::class.java), sessions)
+    val products = NetworkProductsRepository(retrofit.create(ProductsApi::class.java))
 }
