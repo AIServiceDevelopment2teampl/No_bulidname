@@ -86,6 +86,14 @@ CREATE TABLE IF NOT EXISTS imports (
     candidates TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 페이지 번역 캐시 (원문+대상 언어의 해시 → 번역문). 개인 정보가 아니라 사용자끼리 함께 쓴다
+CREATE TABLE IF NOT EXISTS translation_cache (
+    key TEXT PRIMARY KEY,
+    src_lang TEXT,
+    text_ko TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 """
 
 

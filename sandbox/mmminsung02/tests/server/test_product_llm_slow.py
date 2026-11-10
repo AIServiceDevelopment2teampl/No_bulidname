@@ -34,3 +34,21 @@ def test_real_claude_fills_fields_from_page_text():
     assert result.name is not None and result.name.original in PAGE
     # 한국어로 옮겼는지
     assert any("가" <= ch <= "힣" for ch in result.material.ko)
+
+
+def test_real_claude_translates_page_pieces_in_order():
+    from server.ai.translator import ClaudeTranslator
+
+    texts = [
+        "Add to bag",
+        "Regular fit",
+        "Main: 50% Wool, 50% Polyester.",
+        "手洗い可",
+        "ASOS DESIGN",
+    ]
+
+    out = ClaudeTranslator().translate(texts)
+
+    assert len(out) == len(texts)
+    assert all(any("가" <= ch <= "힣" for ch in t) for t in out[:4]), out
+    assert "ASOS" in out[4]

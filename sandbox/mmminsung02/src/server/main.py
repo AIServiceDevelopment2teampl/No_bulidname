@@ -7,13 +7,22 @@ from fastapi import FastAPI
 from server.ai.analyzer import ImageAnalyzer
 from server.ai.product_llm import ProductLLM
 from server.ai.units import load_convert_text
-from server.api import auth, clothes, products, shops
+from server.api import auth, clothes, products, shops, translate
 from server.auth import GoogleIdTokenVerifier, GoogleVerifier
 from server.config import Settings
 from server.db.database import connect, init_db
 from server.services.products import ImageFetcher, default_image_fetcher
 
 log = logging.getLogger(__name__)
+
+
+def _default_translator():
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        log.warning("ANTHROPIC_API_KEY가 없어 페이지 번역을 끕니다")
+        return None
+    from server.ai.translator import ClaudeTranslator
+
+    return ClaudeTranslator()
 
 
 def _default_llm() -> ProductLLM | None:
@@ -52,6 +61,7 @@ def create_app(
             getattr(app.state, "test_image_fetcher", None) or image_fetcher or default_image_fetcher
         )
         app.state.convert_units = load_convert_text()
+        app.state.translator = getattr(app.state, "test_translator", None) or _default_translator()
         if analyzer is None:
             from server.ai.clip_analyzer import ClipAnalyzer
 
@@ -71,4 +81,5 @@ def create_app(
     app.include_router(clothes.router)
     app.include_router(products.router)
     app.include_router(shops.router)
+    app.include_router(translate.router)
     return app
