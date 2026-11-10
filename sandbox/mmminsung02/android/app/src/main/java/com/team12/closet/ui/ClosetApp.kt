@@ -35,6 +35,7 @@ import com.team12.closet.data.GoogleSignIn
 import com.team12.closet.data.GoogleSignInResult
 import com.team12.closet.data.MyShop
 import com.team12.closet.data.PickedPhoto
+import com.team12.closet.data.ProductsRepository
 import com.team12.closet.data.Session
 import com.team12.closet.data.Shop
 import com.team12.closet.data.ShopsRepository
@@ -75,6 +76,7 @@ fun ClosetApp(
     authRepository: AuthRepository,
     googleSignIn: GoogleSignIn,
     shopsRepository: ShopsRepository,
+    productsRepository: ProductsRepository,
 ) {
     var chosenTheme by remember { mutableStateOf(themeStore.load()) }
     val darkTheme = chosenTheme?.let { it == AppTheme.DARK } ?: isSystemInDarkTheme()
@@ -89,6 +91,7 @@ fun ClosetApp(
                 clothesRepository = clothesRepository,
                 authRepository = authRepository,
                 shopsRepository = shopsRepository,
+                productsRepository = productsRepository,
                 currentTheme = if (darkTheme) AppTheme.DARK else AppTheme.LIGHT,
                 onThemeChange = {
                     themeStore.save(it)
@@ -105,6 +108,7 @@ private fun MainTabs(
     clothesRepository: ClothesRepository,
     authRepository: AuthRepository,
     shopsRepository: ShopsRepository,
+    productsRepository: ProductsRepository,
     currentTheme: AppTheme,
     onThemeChange: (AppTheme) -> Unit,
 ) {
@@ -137,7 +141,8 @@ private fun MainTabs(
             when (selected) {
                 MainTab.CLOSET -> ClosetTab(sessionKey, clothesRepository)
                 MainTab.HOME -> HomeScreen(onShop = { selected = MainTab.SHOPPING }, onCloset = { selected = MainTab.CLOSET })
-                MainTab.SHOPPING -> ShopTab(shopsRepository)
+                MainTab.SHOPPING ->
+                    ShopTab(shopsRepository, productsRepository, imageUrl = { clothesRepository.imageUrl(it.imageUrl) })
                 MainTab.MY -> MyScreen(currentTheme, onThemeChange, authRepository, clothesRepository)
             }
         }
@@ -222,6 +227,12 @@ private class PreviewAuthRepository(
 
 private val previewSignIn = GoogleSignIn { GoogleSignInResult.NotConfigured }
 
+private object PreviewProductsRepository : ProductsRepository {
+    override suspend fun extract(pageJson: String) = ApiResult.Error("미리보기")
+
+    override suspend fun findSimilar(productId: Long) = ApiResult.Error("미리보기")
+}
+
 private object PreviewShopsRepository : ShopsRepository {
     override suspend fun defaultShops() = emptyList<Shop>()
 
@@ -245,6 +256,7 @@ private fun ClosetAppLightPreview() {
         PreviewAuthRepository(true),
         previewSignIn,
         PreviewShopsRepository,
+        PreviewProductsRepository,
     )
 }
 
@@ -257,6 +269,7 @@ private fun ClosetAppDarkPreview() {
         PreviewAuthRepository(true),
         previewSignIn,
         PreviewShopsRepository,
+        PreviewProductsRepository,
     )
 }
 
@@ -269,5 +282,6 @@ private fun ClosetAppLoggedOutPreview() {
         PreviewAuthRepository(false),
         previewSignIn,
         PreviewShopsRepository,
+        PreviewProductsRepository,
     )
 }

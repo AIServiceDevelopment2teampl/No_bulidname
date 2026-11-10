@@ -69,4 +69,37 @@ class NetworkProductsRepositoryTest {
             assertEquals(ApiResult.Error("상품 사진을 찾지 못했어요"), repository().findSimilar(1))
             assertEquals(ApiResult.Error("상품을 찾을 수 없어요"), repository().findSimilar(2))
         }
+
+    // 기능 7: 상품 정보 구조화
+
+    @Test
+    fun extractSendsPageJsonUnchangedAndParsesFields() =
+        runTest {
+            respond(
+                201,
+                """{"id":41,"url":"https://zozo.jp/x","site":"zozo.jp","lang":"ja","category":"top",""" +
+                    """"image_url":"https://img/x.jpg","has_image":true,"fields":{"name":{"original":"ニット","ko":"니트"},""" +
+                    """"material":null,"size":{"original":"25 in","ko":"25 in","converted":"63.5 cm (25 in)"}}}""",
+            )
+            val page = """{"url":"https://zozo.jp/x","json_ld":[[{"@type":"Product"}]],"og":{},"text":"ニット"}"""
+
+            val product = (repository().extract(page) as ApiResult.Ok).value
+
+            assertEquals("니트", product.field("name")?.ko)
+            assertEquals(null, product.field("material"))
+            assertEquals("63.5 cm (25 in)", product.field("size")?.converted)
+            val request = server.takeRequest()
+            assertEquals("/v1/products/extract", request.url.encodedPath)
+            // 앱은 페이지 데이터를 해석하지 않고 그대로 넘긴다
+            assertEquals(page, request.body!!.utf8())
+            assertEquals("Bearer t", request.headers["Authorization"])
+        }
+
+    @Test
+    fun extractFailureBecomesMessage() =
+        runTest {
+            respond(422, """{"detail":[]}""")
+
+            assertEquals(ApiResult.Error("상품 정보를 읽지 못했어요"), repository().extract("{}"))
+        }
 }

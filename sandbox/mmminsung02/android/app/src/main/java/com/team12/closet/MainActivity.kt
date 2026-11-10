@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
                     .components { add(OkHttpNetworkFetcherFactory(callFactory = { server.httpClient })) }
                     .build()
             }
-            ClosetApp(server.clothes, themeStore, server.auth, googleSignIn, shops)
+            ClosetApp(server.clothes, themeStore, server.auth, googleSignIn, shops, server.products)
         }
     }
 }

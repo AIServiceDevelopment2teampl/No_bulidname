@@ -35,7 +35,14 @@ class ClosetAppTest {
     @Test
     fun startsOnHomeAndShowsFourTabs() {
         composeRule.setContent {
-            ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn(), FakeShopsRepository())
+            ClosetApp(
+                FakeClothesRepository(),
+                InMemoryThemeStore(),
+                FakeAuthRepository(),
+                FakeGoogleSignIn(),
+                FakeShopsRepository(),
+                FakeProductsRepository(),
+            )
         }
 
         MainTab.entries.forEach { composeRule.onNodeWithTag("tab_${it.name}").assertIsDisplayed() }
@@ -45,7 +52,14 @@ class ClosetAppTest {
     @Test
     fun tappingTabSwitchesScreen() {
         composeRule.setContent {
-            ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn(), FakeShopsRepository())
+            ClosetApp(
+                FakeClothesRepository(),
+                InMemoryThemeStore(),
+                FakeAuthRepository(),
+                FakeGoogleSignIn(),
+                FakeShopsRepository(),
+                FakeProductsRepository(),
+            )
         }
 
         composeRule.onNodeWithTag("tab_CLOSET").performClick()
@@ -56,7 +70,14 @@ class ClosetAppTest {
     @Test
     fun closetTabOpensPhotoRegisterScreen() {
         composeRule.setContent {
-            ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn(), FakeShopsRepository())
+            ClosetApp(
+                FakeClothesRepository(),
+                InMemoryThemeStore(),
+                FakeAuthRepository(),
+                FakeGoogleSignIn(),
+                FakeShopsRepository(),
+                FakeProductsRepository(),
+            )
         }
         composeRule.onNodeWithTag("tab_CLOSET").performClick()
 
@@ -77,7 +98,14 @@ class ClosetAppTest {
     @Test
     fun tabLabelsMatchSitemap() {
         composeRule.setContent {
-            ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn(), FakeShopsRepository())
+            ClosetApp(
+                FakeClothesRepository(),
+                InMemoryThemeStore(),
+                FakeAuthRepository(),
+                FakeGoogleSignIn(),
+                FakeShopsRepository(),
+                FakeProductsRepository(),
+            )
         }
 
         // 홈 화면에도 '내 옷장' 글자가 있어서 탭 안에서만 찾는다
@@ -100,7 +128,14 @@ class ClosetAppTest {
     @Config(qualifiers = "night")
     fun withoutChoiceThemeFollowsDevice() {
         composeRule.setContent {
-            ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn(), FakeShopsRepository())
+            ClosetApp(
+                FakeClothesRepository(),
+                InMemoryThemeStore(),
+                FakeAuthRepository(),
+                FakeGoogleSignIn(),
+                FakeShopsRepository(),
+                FakeProductsRepository(),
+            )
         }
 
         composeRule.onNodeWithTag("tab_MY").performClick()
@@ -118,6 +153,7 @@ class ClosetAppTest {
                 FakeAuthRepository(),
                 FakeGoogleSignIn(),
                 FakeShopsRepository(),
+                FakeProductsRepository(),
             )
         }
         composeRule.onNodeWithTag("tab_MY").performClick()

@@ -40,7 +40,14 @@ class ShopBrowserTest {
 
     private fun openShoppingTab() {
         composeRule.setContent {
-            ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn(), shops)
+            ClosetApp(
+                FakeClothesRepository(),
+                InMemoryThemeStore(),
+                FakeAuthRepository(),
+                FakeGoogleSignIn(),
+                shops,
+                FakeProductsRepository(),
+            )
         }
         composeRule.onNodeWithTag("tab_SHOPPING").performClick()
     }
@@ -216,7 +223,14 @@ class ShopBrowserTest {
     @Test
     fun homeCardsGoToShoppingAndCloset() {
         composeRule.setContent {
-            ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn(), shops)
+            ClosetApp(
+                FakeClothesRepository(),
+                InMemoryThemeStore(),
+                FakeAuthRepository(),
+                FakeGoogleSignIn(),
+                shops,
+                FakeProductsRepository(),
+            )
         }
 
         composeRule.onNodeWithTag("home_shop").performClick()

@@ -6,9 +6,11 @@ LLM 결과는 **근거 검사**를 거친다: original이 입력 글자 안에 �
 
 import hashlib
 import io
+import ipaddress
 import json
 import logging
 import re
+import socket
 import sqlite3
 from collections.abc import Callable
 from urllib.parse import urlparse
@@ -253,16 +255,60 @@ def product_row_to_dict(row: sqlite3.Row) -> dict:
     }
 
 
-def default_image_fetcher(url: str) -> bytes | None:
+def _resolve(host: str) -> list[str]:
+    return [info[4][0] for info in socket.getaddrinfo(host, 443, proto=socket.IPPROTO_TCP)]
+
+
+def is_public_host(host: str, resolve: Callable[[str], list[str]] = _resolve) -> bool:
+    """이미지 주소는 웹페이지가 준 값이다 (SSRF 막기).
+
+    서버 내부망·localhost·클라우드 관리 주소로 접속하지 않도록 공개 주소만 통과시킨다
+    """
+    try:
+        addresses = resolve(host)
+    except OSError:
+        return False
+    if not addresses:
+        return False
+    for address in addresses:
+        ip = ipaddress.ip_address(address.split("%")[0])
+        if not ip.is_global:
+            return False
+    return True
+
+
+def fetch_public_image(
+    url: str,
+    client=None,
+    resolve: Callable[[str], list[str]] = _resolve,
+    max_redirects: int = 3,
+) -> bytes | None:
+    """https 공개 주소만 받는다. 넘겨주기(redirect)는 직접 따라가며 단계마다 다시 검사한다"""
     import httpx
 
-    response = httpx.get(
-        url,
-        timeout=10,
-        follow_redirects=True,
-        # 일부 쇼핑몰 이미지 서버는 브라우저가 아니면 막는다
-        headers={"User-Agent": MOBILE_UA},
-    )
-    if response.status_code != 200:
+    own_client = client is None
+    client = client or httpx.Client(timeout=10, follow_redirects=False)
+    try:
+        for _ in range(max_redirects + 1):
+            parsed = urlparse(url)
+            if parsed.scheme != "https" or not parsed.hostname:
+                return None
+            if not is_public_host(parsed.hostname, resolve):
+                log.warning("공개 주소가 아닌 이미지 주소를 막았어요: %s", parsed.hostname)
+                return None
+            # 일부 쇼핑몰 이미지 서버는 브라우저가 아니면 막는다
+            response = client.get(url, headers={"User-Agent": MOBILE_UA}, follow_redirects=False)
+            if response.is_redirect:
+                url = str(response.next_request.url) if response.next_request else ""
+                continue
+            if response.status_code != 200:
+                return None
+            return response.content
         return None
-    return response.content
+    finally:
+        if own_client:
+            client.close()
+
+
+def default_image_fetcher(url: str) -> bytes | None:
+    return fetch_public_image(url)

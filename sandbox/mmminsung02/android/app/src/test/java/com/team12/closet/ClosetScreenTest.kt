@@ -42,7 +42,9 @@ class ClosetScreenTest {
         )
 
     private fun openCloset(repo: FakeClothesRepository = repository) {
-        composeRule.setContent { ClosetApp(repo, InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn(), FakeShopsRepository()) }
+        composeRule.setContent {
+            ClosetApp(repo, InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn(), FakeShopsRepository(), FakeProductsRepository())
+        }
         composeRule.onNodeWithTag("tab_CLOSET").performClick()
     }
 

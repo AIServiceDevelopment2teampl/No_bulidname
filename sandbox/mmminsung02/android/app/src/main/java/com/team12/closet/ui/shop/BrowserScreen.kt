@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
+import android.webkit.JavascriptInterface
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,6 +35,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +45,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.team12.closet.data.Cloth
 import com.team12.closet.data.ShopUrls
+import kotlinx.coroutines.launch
 
 /** 브라우저 화면 상태. 테스트에서 직접 만들어 넘길 수 있다 */
 @Stable
@@ -65,16 +73,40 @@ class BrowserState(
 /** https는 그대로 연다. http:// 와 앱 실행 링크(intent:// 등)는 묻는다 */
 fun shouldAsk(url: String): Boolean = !url.startsWith("https://", ignoreCase = true)
 
-/** 시안 '12. 인앱 브라우저'. 번역 막대·AI 점원 버튼은 기능 6·12에서 붙인다 */
+/**
+ * 상품 페이지 스크립트(product.js)가 부르는 다리. WebView의 다른 스레드에서 불리므로 메인 스레드로 넘긴다.
+ * 페이지에 내보내는 함수는 글자 하나를 받는 이것뿐이다
+ */
+class ProductBridge(
+    private val onProduct: (String) -> Unit,
+) {
+    private val main = Handler(Looper.getMainLooper())
+
+    @JavascriptInterface
+    fun onProduct(pageJson: String) {
+        main.post { onProduct.invoke(pageJson) }
+    }
+}
+
+/** 시안 '12. 인앱 브라우저'. 번역 막대는 기능 6, AI 점원 대화는 기능 12에서 붙인다 */
 @Composable
 fun BrowserScreen(
     state: BrowserState,
     onClose: () -> Unit,
     onAddToMyShops: (name: String, url: String) -> Unit,
     script: () -> String,
+    lookup: ProductLookup? = null,
+    imageUrl: (Cloth) -> String? = { null },
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var webView by remember { mutableStateOf<WebView?>(null) }
+    var panelOpen by rememberSaveable { mutableStateOf(false) }
+    val onProduct: (String) -> Unit = { json -> scope.launch { lookup?.onProductPage(json) } }
+    val onNewPage: () -> Unit = {
+        lookup?.clear()
+        panelOpen = false
+    }
 
     BackHandler {
         val view = webView
@@ -99,7 +131,7 @@ fun BrowserScreen(
 
         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
             AndroidView(
-                factory = { ctx -> createWebView(ctx, state, script).also { webView = it } },
+                factory = { ctx -> createWebView(ctx, state, script, onProduct, onNewPage).also { webView = it } },
                 modifier = Modifier.fillMaxSize().testTag("browser_web"),
             )
             if (state.loadFailed) {
@@ -110,6 +142,23 @@ fun BrowserScreen(
                     },
                     onExternal = { openExternally(context, state.currentUrl) },
                 )
+            }
+            val product = lookup?.state
+            if (product != null && !state.loadFailed) {
+                if (panelOpen) {
+                    ProductPanel(
+                        state = product,
+                        imageUrl = imageUrl,
+                        onClose = { panelOpen = false },
+                        modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.6f),
+                    )
+                } else {
+                    ProductBubble(
+                        state = product,
+                        onClick = { panelOpen = true },
+                        modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
+                    )
+                }
             }
         }
 
@@ -185,10 +234,13 @@ private fun createWebView(
     context: Context,
     state: BrowserState,
     script: () -> String,
+    onProduct: (String) -> Unit,
+    onNewPage: () -> Unit,
 ): WebView {
     val view = WebView(context)
     view.settings.javaScriptEnabled = true
     view.settings.domStorageEnabled = true
+    view.addJavascriptInterface(ProductBridge(onProduct), "DupeCheckBridge")
     val injector = PageInjector(script) { js -> view.evaluateJavascript(js, null) }
     view.webViewClient =
         object : WebViewClient() {
@@ -208,6 +260,7 @@ private fun createWebView(
                 favicon: Bitmap?,
             ) {
                 injector.onPageStarted()
+                onNewPage()
                 state.currentUrl = url
                 state.loading = true
                 state.loadFailed = false
