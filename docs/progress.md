@@ -13,6 +13,7 @@
 | 2026-11-08 | **기능 1 평가: 실제 옷장 사진 29장** (moneyhipo가 찍음, `sandbox/moneyhipo/eval/`) | 바닥에 옷걸이째 펼치거나 접어 놓고 폰으로 찍은 사진. 라벨은 AI가 사진을 보고 붙임(종류 기준 2026-11-07, 셔츠 2장은 `겉옷` 폴더에 있었지만 기준대로 `top`, 양말은 `other`). 종류별 장수: top 6, bottom 8, outer 10, other(양말) 5. **결과(서버 규칙)**: 지금 서버 설정(B/32 + 서버 문장) **종류 24/29 = 82.8%, 색 19/29 = 65.5%** / FashionCLIP + v2 문장 **종류 22/29 = 75.9%, 색 13/29 = 44.8%**. 종류마다 같은 비중으로 평균 내면 80.6% / 72.1%. 색 라벨 4장은 사용자가 확인함(가죽 재킷·플리스 남색, 데님 재킷 진한 파랑, 연한 셔츠 흰색). **DeepFashion 400장과 순위가 반대**다(그쪽은 FashionCLIP + v2가 88.0%로 앞섬). 다만 29장이라 한 장이 3.4%p라서 아직 어느 쪽으로도 정할 수 없다. 틀린 곳: B/32는 바닥에 놓은 바지 3장 → outer, 양말 2장 → bottom. FashionCLIP + v2는 양말 3장 → top·bottom(v2 기타 문장에 양말이 없음), 접은 티셔츠 → bottom, 회색 집업 재킷 → top. **색**: 대부분 검정 → 남색·회색(나무 바닥 위 어두운 옷)이다. B/32는 남색 가죽 재킷을 갈색으로 봤다. 사진 18장에 EXIF 회전값이 있는데 서버(`_open_image`)도 평가도 회전하지 않는다. 회전시켜 다시 재도 종류·색이 한 장씩만 바뀌어서 결론에는 영향 없다. 사진 원본은 `옷 사진/`, 평가용 사본·`labels.csv`는 `DeepFashin_dataset/eval/closet/`(둘 다 Git 제외, 개인 사진) |
 | 2026-11-10 | 서비스 이름 **DupeCheck** 잠정 결정 (moneyhipo) | CLAUDE.md·README·00-overview·결정 사항·미결정 사항에 반영. applicationId와 앱 화면 속 이름은 아직 그대로 |
 | 2026-11-10 | **Google OAuth 클라이언트 만듦** (moneyhipo, Google Cloud 프로젝트 `dupecheck-514310`) | Web 클라이언트 `599165364681-s9frbpm05o8nko732c27715j557fuvni.apps.googleusercontent.com`(앱 `-PgoogleWebClientId`, 서버 `GOOGLE_CLIENT_ID`), Android 클라이언트(패키지 `com.team12.closet`, moneyhipo PC 디버그 SHA-1). 실제 로그인은 아직 시험 안 함(기능 3 앱이 컴파일 안 되는 상태). 다음 할 일 0번에 자세히 |
+| 2026-11-10 | **Play 출시 준비** (moneyhipo) | Play Console에 앱 생성(`com.dupecheck.app`). 설정 답안 [play-console-setup.md](features/release/play-console-setup.md). 개인정보처리방침·계정 삭제 페이지 `docs/legal/` + GitHub Pages. 스토어 아이콘·그래픽 초안 `docs/legal/store/`. 업로드 키를 moneyhipo PC에 만들고(저장소 밖) **첫 AAB** `dupecheck-0.1.3-vc4.aab`(versionCode 4)를 `0b240cd`에서 applicationId·앱 이름만 바꿔 빌드·서명. 서버 주소가 개발용이라 이 빌드에서 옷장 기능은 동작하지 않는다. Play Console 입력·업로드는 사용자가 진행 |
 | 2026-11-07 | **CLIP 모델·종류 문장 비교** (DeepFashion 400장 + 100장, `sandbox/moneyhipo/eval/`) | 100장은 오차가 커서 종류마다 100장씩 400장 묶음(seed 400, 100장 묶음과 상품 8개 겹침)을 더 만듦. 400장 기준 종류 정확도(서버 규칙): **지금 서버 설정(일반 CLIP B/32 + 서버 문장) 79.8%** / FashionCLIP + 서버 문장 77.2% / CLIP B/16 + 서버 문장 82.2% / B/32 + v2 문장 84.0% / **FashionCLIP + v2 문장 88.0%** (100장 91%, 500장 전체 88.6%) / B/16 + v2 문장 86.8%. 문장 벡터를 종류별로 평균 내는 방식(v2-mean)은 더 나빴다(80.0~85.2%). v2 문장: 종류 기준대로 상의 8개(후드티·맨투맨 포함)·하의 5개·아우터 7개(가디건·후드 집업 포함)·기타 6개(원피스·점프수트 등), `eval_category.py` `PROMPTS_V2`. 속도(이 PC CPU, 장당): B/32 90ms, FashionCLIP 81ms, B/16 217ms. FashionCLIP(`patrickjohncyh/fashion-clip`)은 B/32와 같은 구조·크기라 메모리도 같고 라이선스 MIT. FashionCLIP + v2의 남은 오류는 원피스 → 하의 20장이 가장 많다. **주의**: v2 문장은 100장 결과를 본 뒤 만들었으므로, 최종 확인은 실제 옷장 사진으로 한다. 실행: `eval_category.py <묶음들> --model patrickjohncyh/fashion-clip --prompts v2` |
 | 2026-10-07 | 프로젝트 뼈대 생성 | CLAUDE.md, docs/ 템플릿 |
 | 2026-10-14 | 팀 프로젝트 기획서 제출 | `팀플기획서-12조 (1).pdf` |
@@ -76,6 +77,7 @@
 | 2026-11-07 | 분류 평가는 **종류마다 같은 장수**로, **DeepFashion 100장(25장씩)과 실제 옷장 사진 두 묶음**으로 재고 따로·합쳐서 기록한다 | 사용자 결정. DeepFashion은 쇼핑몰 스튜디오 사진이라 실제 옷장 사진과 다르다 |
 | 2026-11-07 | DeepFashion-MultiModal은 **평가에만** 쓴다. 사진·잘라 낸 사진·라벨은 Git·공개 드라이브에 올리지 않고, 이 데이터로 학습한 모델을 앱·서버에 넣지 않는다 | 라이선스가 비상업 연구용이고 원본·파생 데이터의 복사·배포를 금지한다. 앱은 무료·광고 없음·약 1달 운영이라 비상업이지만, 배포 금지는 따로 걸린다 |
 | 2026-11-10 | 서비스 이름을 **DupeCheck**으로 한다 (잠정). 후보였던 ClosetLens·옷장 AI 대신 | 사용자 결정("묵직해서 좋다"). 이미 가진 옷과 겹치는지(dupe) 확인한다는 앱 목적이 이름에 드러난다. applicationId와 Play 스토어 중복 확인은 아직 |
+| 2026-11-10 | applicationId를 **`com.dupecheck.app`**으로 한다. Play Console(moneyhipo 아버님 개인 계정)에 앱 DupeCheck을 만듦 | 사용자 결정. Play에 앱을 만들면 바꿀 수 없다. 계정은 2023-11-13 이후 조건이 걸려 **테스터 12명·14일 비공개 테스트**가 필요하다(대시보드 확인). 개인정보처리방침·웹 계정 삭제 페이지는 이 저장소 `docs/legal/`을 **GitHub Pages**로 올린다(사용자 선택, 연락처 이메일은 OAuth 개발자 연락처 주소) |
 
 ## 제출 기획서와 달라진 점 (Sprint 발표에서 설명할 것)
 | 항목 | 제출 기획서 (10/14) | 현재 | 이유 |
@@ -99,7 +101,6 @@
 ## 미결정 사항
 | 항목 | 후보 | 비고 |
 |------|------|------|
-| applicationId (앱 고유 ID) | 지금은 임시 `com.team12.closet` | 서비스 이름은 **DupeCheck**으로 잠정 결정(2026-11-10, 결정 사항). Play에 올리면 바꿀 수 없어 첫 비공개 테스트 전까지 정한다. Play 스토어에 같은 이름의 앱이 있는지도 확인 |
 | 홈 화면 시안 | 베이스(2카드), 초안(4카드) | `docs/image/` |
 | 번역 방식 | LLM 전부 / 번역 API + LLM(구조화만) | 비용·속도 비교 후 |
 | OCR | EasyOCR(서버) / ML Kit(기기) | |

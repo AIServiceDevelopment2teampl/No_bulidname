@@ -298,8 +298,10 @@ moneyhipo가 집에서 찍은 실제 옷 사진 29장에 종류·색 라벨을 �
 1. 진행 상황 질문: 기능 1·2·5는 sandbox에서 구현(검수 전), 기능 3은 서버만 되고 앱은 컴파일 안 되는 상태, 나머지는 구현 전이라고 정리했다. progress.md '현재 상태' 칸("코드는 아직 없음", 8주차)이 실제와 다르다는 점도 알렸다(아직 고치지 않음)
 2. 이름 추천: 옷장각, 겹옷, 살까말까, Twinfit, DupeCheck, Wardrobe Mate, Closy 등을 제안했다. 사용자가 **DupeCheck**을 골랐다("묵직해서 좋다", 잠정)
 3. **Google OAuth 클라이언트**: 사용자가 Google Cloud 프로젝트 `dupecheck-514310`에서 Android 클라이언트(패키지 `com.team12.closet`, 이 PC 디버그 SHA-1)를 만들었다. 내려받은 JSON이 `installed`(Android)라 Web 클라이언트를 따로 만들게 안내했고(원본·리디렉션 URI 비움), 그 ID를 progress.md와 README 요청에 적었다. `client_secret`은 쓰지 않아 기록하지 않았다
+4. **Play 출시 준비**: 사용자가 아버님 개인 개발자 계정으로 Play Console에 앱 DupeCheck(`com.dupecheck.app`, 한국어, 무료)을 만들었다. 대시보드에 12명·14일 비공개 테스트 조건이 떠 있어 필요한 계정으로 확인. '일단 해 달라'고 해서: 개인정보처리방침·계정 삭제 페이지(`docs/legal/`, 사용자 선택으로 GitHub Pages, 연락처 이메일은 OAuth 개발자 연락처), Play 설정 답안 문서, 스토어 아이콘·그래픽 초안을 만들고, 업로드 키(저장소 밖)와 첫 AAB를 만들었다
 
 ### 다음 세션 AI에게
 - applicationId는 아직 임시 `com.team12.closet`. 첫 비공개 테스트 전에 정해야 한다(Play에 올리면 못 바꿈). Play 스토어에 같은 이름이 있는지도 확인
 - 앱 화면 문구·시안(`docs/app-sitemap/index.html`)의 앱 이름은 아직 바꾸지 않았다
+- Play: 답안은 `docs/features/release/play-console-setup.md`. 첫 AAB는 `C:\git_desk\dupecheck-0.1.3-vc4.aab`(저장소 밖, versionCode 4). 다음 업로드는 versionCode 5부터. 업로드 키·비밀번호는 moneyhipo PC `~/.android/dupecheck-upload.*`에만 있다. Android OAuth 클라이언트를 `com.dupecheck.app`으로 하나 더 만들어야 한다
 - Google OAuth: Web 클라이언트 `599165364681-s9frbpm05o8nko732c27715j557fuvni.apps.googleusercontent.com`, Android 클라이언트(moneyhipo PC 디버그 SHA-1만 등록). 실제 로그인은 기능 3 앱이 컴파일되면 확인. 다른 PC 빌드는 SHA-1을 더 등록해야 한다

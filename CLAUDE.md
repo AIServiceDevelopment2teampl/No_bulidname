@@ -3,7 +3,7 @@
 이 파일은 AI 에이전트가 가장 먼저 읽는 진입점 문서입니다.
 
 ## 프로젝트 개요
-- 이름: **DupeCheck** (2026-11-10 잠정, applicationId는 아직 임시 `com.team12.closet`)
+- 이름: **DupeCheck** (2026-11-10). applicationId **`com.dupecheck.app`** (Play Console에 앱을 만듦, 바꿀 수 없음). Play 설정 답안은 [docs/features/release/play-console-setup.md](docs/features/release/play-console-setup.md)
 - 한 줄 설명: 국내·해외 쇼핑몰에서 옷을 볼 때 내 옷장 속 비슷한 옷과 바로 비교해 구매 판단을 돕는 안드로이드 앱. 외국어 페이지는 그 자리에서 한국어로 바꿔 준다(부가 기능)
 - 자세한 목표/범위: [docs/00-overview.md](docs/00-overview.md)
 - 제출한 팀 기획서: `팀플기획서-12조 (1).pdf` (인공지능서비스개발II, 2026-10-14). 팀원 개인 정보가 있어 저장소에 올리지 않음(로컬에만 있음). 달라진 점과 PDF 검토 결과는 [docs/progress.md](docs/progress.md)에 기록
