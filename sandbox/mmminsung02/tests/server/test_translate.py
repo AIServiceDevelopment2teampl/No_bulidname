@@ -157,3 +157,27 @@ def test_cache_is_shared_between_users(client, translator, as_user):
     translate(client, ["Wool coat"])
 
     assert len(translator.calls) == 1
+
+
+# 검수에서 찾은 문제: 브라우저 다리는 어느 페이지든 부를 수 있어,
+# 악성 페이지가 번역 요청을 끝없이 보내
+# Claude 비용을 쓰게 할 수 있었다. 사용자마다 짧은 시간의 요청 수를 묶는다
+
+
+def test_too_many_requests_from_one_user_get_429(app, client, translator):
+    app.state.settings.translate_requests_per_window = 3
+
+    codes = [
+        client.post("/v1/translate", json={"texts": [f"Item {i}"]}).status_code for i in range(5)
+    ]
+
+    assert codes == [200, 200, 200, 429, 429]
+
+
+def test_limit_is_per_user(app, client, translator, as_user):
+    app.state.settings.translate_requests_per_window = 1
+    as_user("a")
+    assert client.post("/v1/translate", json={"texts": ["Coat"]}).status_code == 200
+    as_user("b")
+
+    assert client.post("/v1/translate", json={"texts": ["Coat"]}).status_code == 200

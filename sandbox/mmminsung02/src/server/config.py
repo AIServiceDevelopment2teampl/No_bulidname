@@ -28,6 +28,10 @@ class Settings:
     # 유사 의류 검색 단계 기준 (이미지 유사도). 초안 값이며 Recall@3 평가로 다시 정한다
     very_similar_score: float = 0.90  # 이상이면 '매우 비슷'
     similar_score: float = 0.80  # 이상이면 '비슷', 모두 미만이면 no_similar
+    # 번역 요청 상한: 사용자마다 이 시간(초) 안에 이 횟수까지.
+    # 페이지가 끝없이 요청해 비용을 쓰지 못하게 한다
+    translate_window_seconds: int = 60
+    translate_requests_per_window: int = 60
     # 쇼핑몰 기본 목록 (GET /v1/shops)
     shops_file: Path = field(default_factory=_default_shops_file)
 

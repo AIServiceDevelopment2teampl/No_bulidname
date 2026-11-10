@@ -39,6 +39,7 @@ import com.team12.closet.data.ProductsRepository
 import com.team12.closet.data.Session
 import com.team12.closet.data.Shop
 import com.team12.closet.data.ShopsRepository
+import com.team12.closet.data.TranslateRepository
 import com.team12.closet.data.UploadOutcome
 import com.team12.closet.ui.account.LoginScreen
 import com.team12.closet.ui.account.MyScreen
@@ -77,6 +78,8 @@ fun ClosetApp(
     googleSignIn: GoogleSignIn,
     shopsRepository: ShopsRepository,
     productsRepository: ProductsRepository,
+    // 없으면 페이지 번역이 '번역하지 못했어요'로 끝난다 (테스트·미리보기)
+    translateRepository: TranslateRepository? = null,
 ) {
     var chosenTheme by remember { mutableStateOf(themeStore.load()) }
     val darkTheme = chosenTheme?.let { it == AppTheme.DARK } ?: isSystemInDarkTheme()
@@ -92,6 +95,7 @@ fun ClosetApp(
                 authRepository = authRepository,
                 shopsRepository = shopsRepository,
                 productsRepository = productsRepository,
+                translateRepository = translateRepository,
                 currentTheme = if (darkTheme) AppTheme.DARK else AppTheme.LIGHT,
                 onThemeChange = {
                     themeStore.save(it)
@@ -109,6 +113,7 @@ private fun MainTabs(
     authRepository: AuthRepository,
     shopsRepository: ShopsRepository,
     productsRepository: ProductsRepository,
+    translateRepository: TranslateRepository?,
     currentTheme: AppTheme,
     onThemeChange: (AppTheme) -> Unit,
 ) {
@@ -142,7 +147,12 @@ private fun MainTabs(
                 MainTab.CLOSET -> ClosetTab(sessionKey, clothesRepository)
                 MainTab.HOME -> HomeScreen(onShop = { selected = MainTab.SHOPPING }, onCloset = { selected = MainTab.CLOSET })
                 MainTab.SHOPPING ->
-                    ShopTab(shopsRepository, productsRepository, imageUrl = { clothesRepository.imageUrl(it.imageUrl) })
+                    ShopTab(
+                        shopsRepository,
+                        productsRepository,
+                        imageUrl = { clothesRepository.imageUrl(it.imageUrl) },
+                        translator = translateRepository,
+                    )
                 MainTab.MY -> MyScreen(currentTheme, onThemeChange, authRepository, clothesRepository)
             }
         }

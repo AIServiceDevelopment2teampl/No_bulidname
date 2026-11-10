@@ -45,9 +45,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.team12.closet.data.ApiResult
 import com.team12.closet.data.Cloth
 import com.team12.closet.data.ShopUrls
+import com.team12.closet.data.TranslateRepository
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import org.json.JSONObject
 
 /** 브라우저 화면 상태. 테스트에서 직접 만들어 넘길 수 있다 */
 @Stable
@@ -74,11 +78,13 @@ class BrowserState(
 fun shouldAsk(url: String): Boolean = !url.startsWith("https://", ignoreCase = true)
 
 /**
- * 상품 페이지 스크립트(product.js)가 부르는 다리. WebView의 다른 스레드에서 불리므로 메인 스레드로 넘긴다.
- * 페이지에 내보내는 함수는 글자 하나를 받는 이것뿐이다
+ * 주입 스크립트(product.js, translate.js)가 부르는 다리. WebView의 다른 스레드에서 불리므로 메인 스레드로 넘긴다.
+ * 페이지에 내보내는 함수는 글자만 받는 아래 세 개뿐이다
  */
-class ProductBridge(
+class PageBridge(
     private val onProduct: (String) -> Unit,
+    private val onTranslate: (requestId: String, textsJson: String) -> Unit,
+    private val onTranslateState: (String) -> Unit,
 ) {
     private val main = Handler(Looper.getMainLooper())
 
@@ -86,7 +92,31 @@ class ProductBridge(
     fun onProduct(pageJson: String) {
         main.post { onProduct.invoke(pageJson) }
     }
+
+    @JavascriptInterface
+    fun translate(
+        requestId: String,
+        textsJson: String,
+    ) {
+        main.post { onTranslate.invoke(requestId, textsJson) }
+    }
+
+    @JavascriptInterface
+    fun onTranslateState(stateJson: String) {
+        main.post { onTranslateState.invoke(stateJson) }
+    }
 }
+
+private val bridgeJson = Json { ignoreUnknownKeys = true }
+
+const val MAX_TRANSLATE_REQUESTS_PER_PAGE = 30
+
+/** 앱 → 페이지 호출. 글자는 JSON 문자열로 감싸 그대로 넘긴다 */
+private fun jsCall(
+    function: String,
+    vararg args: String,
+) = "window.__dupecheck && window.__dupecheck.translate && window.__dupecheck.translate.$function(" +
+    args.joinToString(",") { JSONObject.quote(it) } + ");"
 
 /** 시안 '12. 인앱 브라우저'. 번역 막대는 기능 6, AI 점원 대화는 기능 12에서 붙인다 */
 @Composable
@@ -97,15 +127,52 @@ fun BrowserScreen(
     script: () -> String,
     lookup: ProductLookup? = null,
     imageUrl: (Cloth) -> String? = { null },
+    translator: TranslateRepository? = null,
+    translation: TranslationUi = remember { TranslationUi() },
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var webView by remember { mutableStateOf<WebView?>(null) }
     var panelOpen by rememberSaveable { mutableStateOf(false) }
     val onProduct: (String) -> Unit = { json -> scope.launch { lookup?.onProductPage(json) } }
+    // 페이지 하나가 보낼 수 있는 번역 요청 수. 악성 페이지가 끝없이 요청해 비용을 쓰지 못하게 (서버에도 상한)
+    val translateRequests = remember { intArrayOf(0) }
     val onNewPage: () -> Unit = {
         lookup?.clear()
+        translation.clear()
+        translateRequests[0] = 0
         panelOpen = false
+    }
+    val bridge =
+        remember {
+            PageBridge(
+                onProduct = { json -> onProduct(json) },
+                onTranslate = { id, textsJson ->
+                    if (++translateRequests[0] > MAX_TRANSLATE_REQUESTS_PER_PAGE) {
+                        webView?.evaluateJavascript(jsCall("fail", id), null)
+                        return@PageBridge
+                    }
+                    scope.launch {
+                        val texts = runCatching { bridgeJson.decodeFromString<List<String>>(textsJson) }.getOrNull()
+                        val result = texts?.let { translator?.translate(it) }
+                        val js =
+                            if (result is ApiResult.Ok) {
+                                jsCall("apply", id, bridgeJson.encodeToString(result.value))
+                            } else {
+                                jsCall("fail", id)
+                            }
+                        webView?.evaluateJavascript(js, null)
+                    }
+                },
+                onTranslateState = { json ->
+                    runCatching { bridgeJson.decodeFromString<TranslateState>(json) }.getOrNull()?.let { translation.state = it }
+                },
+            )
+        }
+    // 사용자가 번역을 껐으면 새 페이지에서도 시작하지 않는다
+    val pageScript = {
+        (if (translation.enabled) "" else "window.__dupecheckTranslateOff=true;\n") + script() +
+            "\n;if(!window.__dupecheckTranslateOff&&window.__dupecheck&&window.__dupecheck.translate)window.__dupecheck.translate.start();"
     }
 
     BackHandler {
@@ -127,11 +194,15 @@ fun BrowserScreen(
                 modifier = Modifier.weight(1f).testTag("browser_url"),
             )
         }
+        TranslationBar(translation) { on ->
+            translation.enabled = on
+            webView?.evaluateJavascript(jsCall(if (on) "showTranslation" else "showOriginal"), null)
+        }
         if (state.loading) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
 
         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
             AndroidView(
-                factory = { ctx -> createWebView(ctx, state, script, onProduct, onNewPage).also { webView = it } },
+                factory = { ctx -> createWebView(ctx, state, pageScript, bridge, onNewPage).also { webView = it } },
                 modifier = Modifier.fillMaxSize().testTag("browser_web"),
             )
             if (state.loadFailed) {
@@ -234,13 +305,13 @@ private fun createWebView(
     context: Context,
     state: BrowserState,
     script: () -> String,
-    onProduct: (String) -> Unit,
+    bridge: PageBridge,
     onNewPage: () -> Unit,
 ): WebView {
     val view = WebView(context)
     view.settings.javaScriptEnabled = true
     view.settings.domStorageEnabled = true
-    view.addJavascriptInterface(ProductBridge(onProduct), "DupeCheckBridge")
+    view.addJavascriptInterface(bridge, "DupeCheckBridge")
     val injector = PageInjector(script) { js -> view.evaluateJavascript(js, null) }
     view.webViewClient =
         object : WebViewClient() {

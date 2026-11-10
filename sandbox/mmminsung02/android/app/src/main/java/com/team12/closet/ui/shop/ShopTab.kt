@@ -11,6 +11,7 @@ import com.team12.closet.data.Cloth
 import com.team12.closet.data.ProductsRepository
 import com.team12.closet.data.ShopUrls
 import com.team12.closet.data.ShopsRepository
+import com.team12.closet.data.TranslateRepository
 
 /** 쇼핑 탭: 쇼핑몰 목록 ↔ 인앱 브라우저 */
 @Composable
@@ -18,6 +19,7 @@ fun ShopTab(
     repository: ShopsRepository,
     products: ProductsRepository,
     imageUrl: (Cloth) -> String?,
+    translator: TranslateRepository?,
 ) {
     val context = LocalContext.current
     var openUrl by rememberSaveable { mutableStateOf<String?>(null) }
@@ -26,7 +28,7 @@ fun ShopTab(
     val script =
         remember {
             {
-                listOf("bootstrap.js", "product.js").joinToString("\n") { name ->
+                listOf("bootstrap.js", "product.js", "translate.js").joinToString("\n") { name ->
                     context.assets.open(name).use { it.readBytes().decodeToString() }
                 }
             }
@@ -51,6 +53,7 @@ fun ShopTab(
             script = script,
             lookup = lookup,
             imageUrl = imageUrl,
+            translator = translator,
         )
     }
 }

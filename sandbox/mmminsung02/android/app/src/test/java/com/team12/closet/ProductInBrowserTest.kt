@@ -15,7 +15,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.team12.closet.data.ApiResult
 import com.team12.closet.ui.ClosetApp
-import com.team12.closet.ui.shop.ProductBridge
+import com.team12.closet.ui.shop.PageBridge
 import com.team12.closet.ui.shop.ProductCard
 import com.team12.closet.ui.theme.ClosetTheme
 import com.team12.closet.ui.theme.InMemoryThemeStore
@@ -62,7 +62,7 @@ class ProductInBrowserTest {
 
     /** 페이지의 product.js가 window.DupeCheckBridge.onProduct(...)를 부른 것처럼 한다 */
     private fun pageReportsProduct(json: String = pageJson) {
-        val bridge = shadowOf(findWebView()!!).getJavascriptInterface("DupeCheckBridge") as ProductBridge
+        val bridge = shadowOf(findWebView()!!).getJavascriptInterface("DupeCheckBridge") as PageBridge
         bridge.onProduct(json)
         ShadowLooper.idleMainLooper()
         composeRule.waitForIdle()
@@ -72,7 +72,7 @@ class ProductInBrowserTest {
     fun bridgeIsRegisteredForTheProductScript() {
         openZozo()
 
-        assertEquals(true, shadowOf(findWebView()!!).getJavascriptInterface("DupeCheckBridge") is ProductBridge)
+        assertEquals(true, shadowOf(findWebView()!!).getJavascriptInterface("DupeCheckBridge") is PageBridge)
     }
 
     @Test
