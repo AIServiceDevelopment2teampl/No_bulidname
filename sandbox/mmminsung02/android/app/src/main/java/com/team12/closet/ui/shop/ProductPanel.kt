@@ -35,6 +35,7 @@ import com.team12.closet.data.ProductField
 import com.team12.closet.data.ProductInfo
 import com.team12.closet.data.SimilarCloth
 import com.team12.closet.data.SimilarResult
+import com.team12.closet.ui.compare.PurchaseReportSection
 import com.team12.closet.ui.compare.SimilarClothesSection
 import com.team12.closet.ui.compare.headline
 import com.team12.closet.ui.theme.ClosetTheme
@@ -112,6 +113,7 @@ fun ProductPanel(
                         state.similar != null -> SimilarClothesSection(state.similar, imageUrl)
                         state.similarError != null -> Text(state.similarError, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
+                    PurchaseReportSection(state.report)
                     HorizontalDivider()
                     ProductCard(state.product)
                 }

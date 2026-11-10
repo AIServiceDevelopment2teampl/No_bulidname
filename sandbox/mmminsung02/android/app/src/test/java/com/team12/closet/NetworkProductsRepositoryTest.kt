@@ -102,4 +102,40 @@ class NetworkProductsRepositoryTest {
 
             assertEquals(ApiResult.Error("상품 정보를 읽지 못했어요"), repository().extract("{}"))
         }
+
+    // compare/purchase-report.md: 서버 sandbox/mmminsung02/src/server/services/report.py 응답
+    @Test
+    fun parsesPurchaseReportAndCallsReportEndpoint() =
+        runTest {
+            respond(
+                201,
+                """{"id":3,"product_id":12,"status":"ok","headline":"가장 비슷한 내 옷과 비교했어요",""" +
+                    """"cloth":{"id":4,"image_url":"/v1/clothes/4/image","category":"outer","color":"beige",""" +
+                    """"name":"카멜 코트","source":"photo","confirmed":true},"level":"very_similar",""" +
+                    """"summary":"종류와 색이 비슷하고 소재가 달라요.",""" +
+                    """"similar":[{"field":"color","label":"색","product":"카멜","cloth":"베이지","basis":"page",""" +
+                    """"text":"둘 다 베이지 계열이에요."}],""" +
+                    """"different":[{"field":"material","label":"소재","product":"울 60%","cloth":"면 100%",""" +
+                    """"basis":null,"text":null}],"unknown":[]}""",
+            )
+
+            val report = (repository().report(12) as ApiResult.Ok).value
+
+            assertEquals("ok", report.status)
+            assertEquals(4L, report.cloth?.id)
+            assertEquals("종류와 색이 비슷하고 소재가 달라요.", report.summary)
+            assertEquals("page", report.similar[0].basis)
+            assertEquals(null, report.different[0].text)
+            val request = server.takeRequest()
+            assertEquals("POST", request.method)
+            assertEquals("/v1/products/12/report", request.url.encodedPath)
+        }
+
+    @Test
+    fun reportFailureBecomesMessage() =
+        runTest {
+            respond(500, "{}")
+
+            assertEquals(ApiResult.Error("비교 리포트를 만들지 못했어요"), repository().report(12))
+        }
 }

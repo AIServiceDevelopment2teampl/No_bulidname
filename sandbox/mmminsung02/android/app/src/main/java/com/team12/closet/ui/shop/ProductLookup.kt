@@ -8,6 +8,7 @@ import com.team12.closet.data.ApiResult
 import com.team12.closet.data.ProductInfo
 import com.team12.closet.data.ProductsRepository
 import com.team12.closet.data.SimilarResult
+import com.team12.closet.ui.compare.ReportState
 
 /** 브라우저에서 감지한 상품 하나의 상태: 상품 정보 → 비슷한 옷 */
 sealed interface ProductState {
@@ -18,6 +19,7 @@ sealed interface ProductState {
         /** null이면 비슷한 옷을 찾지 못함 (similarError에 이유) */
         val similar: SimilarResult?,
         val similarError: String? = null,
+        val report: ReportState = ReportState.None,
     ) : ProductState
 
     data class Failed(
@@ -62,6 +64,18 @@ class ProductLookup(
                 }
             }
         // 그 사이 다른 페이지로 갔으면 늦게 온 결과는 버린다
-        if (currentPage == pageJson) state = next
+        if (currentPage != pageJson) return
+        // 옷장이 비었으면 비교할 게 없다. 비슷한 옷이 없으면 서버가 '비슷한 옷이 없어요' 리포트를 준다
+        if (next.similar == null || next.similar.status == "empty_closet") {
+            state = next
+            return
+        }
+        state = next.copy(report = ReportState.Loading)
+        val report =
+            when (val result = repository.report(product.id)) {
+                is ApiResult.Ok -> ReportState.Ready(result.value)
+                is ApiResult.Error -> ReportState.Failed(result.message)
+            }
+        if (currentPage == pageJson) state = next.copy(report = report)
     }
 }

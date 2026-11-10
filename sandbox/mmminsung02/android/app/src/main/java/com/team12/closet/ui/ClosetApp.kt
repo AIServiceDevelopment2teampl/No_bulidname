@@ -241,6 +241,8 @@ private object PreviewProductsRepository : ProductsRepository {
     override suspend fun extract(pageJson: String) = ApiResult.Error("미리보기")
 
     override suspend fun findSimilar(productId: Long) = ApiResult.Error("미리보기")
+
+    override suspend fun report(productId: Long) = ApiResult.Error("미리보기")
 }
 
 private object PreviewShopsRepository : ShopsRepository {

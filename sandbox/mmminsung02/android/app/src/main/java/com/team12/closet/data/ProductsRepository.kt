@@ -51,6 +51,35 @@ data class ProductInfo(
     fun field(key: String): ProductField? = fields[key]
 }
 
+/** 비교 리포트 한 줄. 근거 필드명과 양쪽 값. text는 LLM 문장 (실패하면 null → 비교표로 보여 줌) */
+@Serializable
+data class ReportItem(
+    val field: String,
+    val label: String,
+    val product: String? = null,
+    val cloth: String? = null,
+    /** 색의 근거: page(쇼핑몰에 적힘) / photo(상품 사진에서 읽음) */
+    val basis: String? = null,
+    val text: String? = null,
+)
+
+/** 서버 POST /v1/products/{id}/report 결과 (compare/purchase-report.md) */
+@Serializable
+data class PurchaseReport(
+    val id: Long,
+    @SerialName("product_id") val productId: Long,
+    /** ok / no_similar */
+    val status: String,
+    val headline: String,
+    /** 비교한 내 옷 (가장 비슷한 1벌). 비슷한 옷이 없으면 null */
+    val cloth: Cloth? = null,
+    val level: String? = null,
+    val summary: String? = null,
+    val similar: List<ReportItem> = emptyList(),
+    val different: List<ReportItem> = emptyList(),
+    val unknown: List<ReportItem> = emptyList(),
+)
+
 interface ProductsApi {
     @POST("v1/products/extract")
     suspend fun extract(
@@ -61,6 +90,11 @@ interface ProductsApi {
     suspend fun similar(
         @Path("id") productId: Long,
     ): Response<SimilarResult>
+
+    @POST("v1/products/{id}/report")
+    suspend fun report(
+        @Path("id") productId: Long,
+    ): Response<PurchaseReport>
 }
 
 interface ProductsRepository {
@@ -68,6 +102,8 @@ interface ProductsRepository {
     suspend fun extract(pageJson: String): ApiResult<ProductInfo>
 
     suspend fun findSimilar(productId: Long): ApiResult<SimilarResult>
+
+    suspend fun report(productId: Long): ApiResult<PurchaseReport>
 }
 
 class NetworkProductsRepository(
@@ -102,5 +138,17 @@ class NetworkProductsRepository(
                 else -> NetworkClothesRepository.TRY_LATER
             },
         )
+    }
+
+    override suspend fun report(productId: Long): ApiResult<PurchaseReport> {
+        val response =
+            try {
+                api.report(productId)
+            } catch (e: IOException) {
+                return ApiResult.Error(NetworkClothesRepository.NO_CONNECTION)
+            }
+        val body = response.body()
+        if (response.isSuccessful && body != null) return ApiResult.Ok(body)
+        return ApiResult.Error("비교 리포트를 만들지 못했어요")
     }
 }

@@ -14,6 +14,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.team12.closet.data.ApiResult
+import com.team12.closet.data.ReportItem
+import com.team12.closet.data.SimilarResult
 import com.team12.closet.ui.ClosetApp
 import com.team12.closet.ui.shop.PageBridge
 import com.team12.closet.ui.shop.ProductCard
@@ -143,6 +145,99 @@ class ProductInBrowserTest {
         pageReportsProduct()
 
         composeRule.onNodeWithText("상품 정보를 읽지 못했어요").assertIsDisplayed()
+    }
+
+    // 구매 전 비교 리포트 (compare/purchase-report.md, 시안 '7. AI 점원 패널'·'공유로 받은 상품')
+
+    private fun openPanel() {
+        openZozo()
+        pageReportsProduct()
+        composeRule.onNodeWithTag("product_bubble").performClick()
+    }
+
+    @Test
+    fun reportIsRequestedAfterSimilarAndSummaryIsShown() {
+        openPanel()
+
+        assertEquals(listOf(41L), products.reportFor)
+        composeRule.onNodeWithText("회색 카디건과 종류·색이 비슷하고, 소재는 내 옷 정보가 없어요.").performScrollTo().assertIsDisplayed()
+        // 전체는 접혀 있다
+        composeRule.onNodeWithText("비슷한 점").assertDoesNotExist()
+    }
+
+    @Test
+    fun seeFullReportShowsThreePartsAndDisclaimer() {
+        openPanel()
+
+        composeRule.onNodeWithTag("report_toggle").performScrollTo().performClick()
+
+        composeRule.onNodeWithText("비슷한 점").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("둘 다 그레이 계열이에요.").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("확인 안 된 점").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("내 옷의 소재 정보가 없어요.").performScrollTo().assertIsDisplayed()
+        // 비어 있는 부분은 제목도 보이지 않는다
+        composeRule.onNodeWithText("다른 점").assertDoesNotExist()
+        composeRule.onNodeWithText("구매는 직접 판단해 주세요. 비교는 사진과 적힌 정보로만 했어요.").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun reportWithoutSentencesShowsComparisonTable() {
+        // LLM이 실패하면 서버는 문장 없이 비교표만 준다
+        val table =
+            FakeProductsRepository.SAMPLE_REPORT.copy(
+                summary = null,
+                similar = listOf(ReportItem("color", "색", "블랙", "블랙", "photo")),
+                different = listOf(ReportItem("material", "소재", "울 100%", "면 100%")),
+                unknown = listOf(ReportItem("fit", "핏", "레귤러 핏", null)),
+            )
+        products.reportResult = ApiResult.Ok(table)
+
+        openPanel()
+
+        composeRule.onNodeWithText("색: 새 상품 블랙 (사진 기준) · 내 옷 블랙").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("소재: 새 상품 울 100% · 내 옷 면 100%").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("핏: 새 상품 레귤러 핏 · 내 옷 정보 없음").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun noSimilarReportListsOnlyProductInfo() {
+        products.similarResult = ApiResult.Ok(SimilarResult("no_similar", emptyList()))
+        products.reportResult =
+            ApiResult.Ok(
+                FakeProductsRepository.SAMPLE_REPORT.copy(
+                    status = "no_similar",
+                    headline = "옷장에 비슷한 옷이 없어요",
+                    cloth = null,
+                    level = null,
+                    summary = null,
+                    similar = emptyList(),
+                    unknown = listOf(ReportItem("material", "소재", "울 50%, 아크릴 50%", null)),
+                ),
+            )
+
+        openPanel()
+
+        composeRule.onNodeWithText("옷장에 비슷한 옷이 없어요").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("소재: 울 50%, 아크릴 50%").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun reportFailureKeepsSimilarClothes() {
+        products.reportResult = ApiResult.Error("비교 리포트를 만들지 못했어요")
+
+        openPanel()
+
+        composeRule.onNodeWithTag("similar_7").assertIsDisplayed()
+        composeRule.onNodeWithText("비교 리포트를 만들지 못했어요").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun emptyClosetDoesNotAskForReport() {
+        products.similarResult = ApiResult.Ok(SimilarResult("empty_closet", emptyList()))
+
+        openPanel()
+
+        assertEquals(emptyList<Long>(), products.reportFor)
     }
 
     // 상품 카드 (translation/product-extraction.md 출력: 상품명/색상/소재/핏/사이즈/세탁, 원문 보기, 정보 없음)
