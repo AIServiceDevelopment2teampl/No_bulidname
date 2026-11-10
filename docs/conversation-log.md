@@ -310,3 +310,20 @@ moneyhipo가 집에서 찍은 실제 옷 사진 29장에 종류·색 라벨을 �
 - SP2 덱 발표자 노트에 대본을 넣었다: 1~8장 윤재건, 9~15장 김민성(시연은 김민성 설명·윤재건 폰 조작). 표지 김민성 학번, 10장 테스터 수, 11장 현황, 12장 시연 3·4번은 발표 전에 채운다
 - Play: 답안은 `docs/features/release/play-console-setup.md`. 첫 AAB는 `C:\git_desk\dupecheck-0.1.3-vc4.aab`(저장소 밖, versionCode 4). 다음 업로드는 versionCode 5부터. 업로드 키·비밀번호는 moneyhipo PC `~/.android/dupecheck-upload.*`에만 있다. Android OAuth 클라이언트를 `com.dupecheck.app`으로 하나 더 만들어야 한다
 - Google OAuth: Web 클라이언트 `599165364681-s9frbpm05o8nko732c27715j557fuvni.apps.googleusercontent.com`, Android 클라이언트(moneyhipo PC 디버그 SHA-1만 등록). 실제 로그인은 기능 3 앱이 컴파일되면 확인. 다른 PC 빌드는 SHA-1을 더 등록해야 한다
+
+---
+
+## 2026-11-10 세션 (Claude Code, VS Code, mmminsung02)
+
+### 한 줄 요약
+멈췄던 기능 3 앱(Google 로그인)을 마무리했다. README 요청대로 applicationId·앱 이름을 바꾸고 이 PC 디버그 SHA-1을 적었다.
+
+### 대화 흐름
+1. **"이제 다시 가보자"**: 11-06~11-10 moneyhipo 작업 확인(서비스 이름 DupeCheck, Play 비공개 테스트 출시, Google 로그인 ID 생성, 기능 1 평가, 기능 5). README에 mmminsung02 요청 3개(applicationId, 로그인 ID 확인·SHA-1, CLIP 모델은 보류)
+2. **기능 3 앱 마무리**: 로그인 화면 연결, 마이 화면 교체, 테스트 18개 추가. applicationId `com.dupecheck.app`, 앱 이름 DupeCheck. 앱 테스트 58개 통과
+3. **검수**: 다음 사람이 로그인하면 앞사람 옷이 잠깐 보이는 문제 → 재현 테스트가 실패하는 것 확인 → ViewModel을 세션마다 새로 만들어 고침 → 59개 통과
+
+### 다음 세션 AI에게
+- 실제 Google 로그인은 아직 못 해 봤다. Android 클라이언트를 `com.dupecheck.app`으로 다시 등록해야 하고(README 요청 표), 폰에서 닿는 서버가 필요하다
+- 앱 빌드·테스트는 `sandbox/mmminsung02/tools/run-gradle.ps1`로 (진행 창)
+
