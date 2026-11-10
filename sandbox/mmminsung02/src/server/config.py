@@ -32,6 +32,9 @@ class Settings:
     # 페이지가 끝없이 요청해 비용을 쓰지 못하게 한다
     translate_window_seconds: int = 60
     translate_requests_per_window: int = 60
+    # 비교 리포트 문장(Claude)은 사용자당 1분에 20번까지. 넘으면 비교표만
+    report_window_seconds: int = 60
+    report_llm_per_window: int = 20
     # 쇼핑몰 기본 목록 (GET /v1/shops)
     shops_file: Path = field(default_factory=_default_shops_file)
 

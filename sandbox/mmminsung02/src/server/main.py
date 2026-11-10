@@ -25,6 +25,15 @@ def _default_translator():
     return ClaudeTranslator()
 
 
+def _default_report_writer():
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        log.warning("ANTHROPIC_API_KEY가 없어 비교 리포트는 문장 없이 비교표만 만듭니다")
+        return None
+    from server.ai.report_writer import ClaudeReportWriter
+
+    return ClaudeReportWriter()
+
+
 def _default_llm() -> ProductLLM | None:
     # ANTHROPIC_API_KEY가 없으면 LLM 없이 구조화 데이터(JSON-LD·OG)만 쓴다
     if not os.environ.get("ANTHROPIC_API_KEY"):
@@ -62,6 +71,9 @@ def create_app(
         )
         app.state.convert_units = load_convert_text()
         app.state.translator = getattr(app.state, "test_translator", None) or _default_translator()
+        app.state.report_writer = (
+            getattr(app.state, "test_report_writer", None) or _default_report_writer()
+        )
         if analyzer is None:
             from server.ai.clip_analyzer import ClipAnalyzer
 

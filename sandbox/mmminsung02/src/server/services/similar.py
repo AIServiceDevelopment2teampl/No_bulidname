@@ -10,7 +10,7 @@ import sqlite3
 import numpy as np
 from PIL import Image, UnidentifiedImageError
 
-from server.ai.analyzer import ImageAnalyzer
+from server.ai.analyzer import Analysis, ImageAnalyzer
 from server.config import Settings
 from server.services.clothes import cloth_row_to_dict
 
@@ -37,14 +37,14 @@ def _level(score: float, settings: Settings) -> str:
     return "different"
 
 
-def find_similar(
+def analyze_product(
     conn: sqlite3.Connection,
     settings: Settings,
     analyzer: ImageAnalyzer,
     user_id: str,
     product_id: int,
-) -> dict | None:
-    """다른 사용자의 상품이거나 없으면 None"""
+) -> tuple[sqlite3.Row, Analysis] | None:
+    """상품 행과 상품 사진 분석 결과. 다른 사용자의 상품이거나 없으면 None"""
     product = conn.execute(
         "SELECT * FROM products WHERE id = ? AND user_id = ?", (product_id, user_id)
     ).fetchone()
@@ -57,7 +57,18 @@ def find_similar(
         image.load()
     except (UnidentifiedImageError, OSError) as e:
         raise MissingProductImage from e
-    query = _unit(analyzer.analyze(image).embedding.astype(np.float32))
+    return product, analyzer.analyze(image)
+
+
+def rank_similar(
+    conn: sqlite3.Connection,
+    settings: Settings,
+    analyzer: ImageAnalyzer,
+    user_id: str,
+    product: sqlite3.Row,
+    analysis: Analysis,
+) -> dict:
+    query = _unit(analysis.embedding.astype(np.float32))
 
     # 사진이 있고, 같은 모델로 만든 임베딩이 있는 옷만 (모델을 바꾸면 다시 만들어야 한다)
     sql = (
@@ -87,3 +98,18 @@ def find_similar(
     if all(item["level"] == "different" for item in items):
         return {"status": "no_similar", "items": items}
     return {"status": "ok", "items": items}
+
+
+def find_similar(
+    conn: sqlite3.Connection,
+    settings: Settings,
+    analyzer: ImageAnalyzer,
+    user_id: str,
+    product_id: int,
+) -> dict | None:
+    """다른 사용자의 상품이거나 없으면 None"""
+    found = analyze_product(conn, settings, analyzer, user_id, product_id)
+    if found is None:
+        return None
+    product, analysis = found
+    return rank_similar(conn, settings, analyzer, user_id, product, analysis)
