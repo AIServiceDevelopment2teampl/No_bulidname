@@ -288,3 +288,16 @@ moneyhipo가 집에서 찍은 실제 옷 사진 29장에 종류·색 라벨을 �
 - 애매했던 색 라벨 4장은 사용자가 확인해 고쳤다: `121556` 가죽 재킷·`121536` 플리스 navy, `121809` 데님 재킷 blue, `121921` 연한 셔츠 white
 - 다시 재기: `.venv/Scripts/python sandbox/moneyhipo/eval/eval_category.py DeepFashin_dataset/eval/closet [--model patrickjohncyh/fashion-clip --prompts v2]`
 - v2 기타 문장에는 양말이 없다. 양말·모자 같은 소품을 옷장에 넣을지는 정하지 않았다
+
+## 2026-11-10 세션 1 (Claude Code, VS Code, moneyhipo)
+
+### 한 줄 요약
+진행 상황을 정리해 알려 주고, 서비스 이름을 **DupeCheck**으로 잠정 결정했다.
+
+### 대화 흐름
+1. 진행 상황 질문: 기능 1·2·5는 sandbox에서 구현(검수 전), 기능 3은 서버만 되고 앱은 컴파일 안 되는 상태, 나머지는 구현 전이라고 정리했다. progress.md '현재 상태' 칸("코드는 아직 없음", 8주차)이 실제와 다르다는 점도 알렸다(아직 고치지 않음)
+2. 이름 추천: 옷장각, 겹옷, 살까말까, Twinfit, DupeCheck, Wardrobe Mate, Closy 등을 제안했다. 사용자가 **DupeCheck**을 골랐다("묵직해서 좋다", 잠정)
+
+### 다음 세션 AI에게
+- applicationId는 아직 임시 `com.team12.closet`. 첫 비공개 테스트 전에 정해야 한다(Play에 올리면 못 바꿈). Play 스토어에 같은 이름이 있는지도 확인
+- 앱 화면 문구·시안(`docs/app-sitemap/index.html`)의 앱 이름은 아직 바꾸지 않았다
