@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from server.ai.analyzer import ImageAnalyzer
-from server.api import auth, clothes, products
+from server.api import auth, clothes, products, shops
 from server.auth import GoogleIdTokenVerifier, GoogleVerifier
 from server.config import Settings
 from server.db.database import connect, init_db
@@ -43,4 +43,5 @@ def create_app(
     app.include_router(auth.router)
     app.include_router(clothes.router)
     app.include_router(products.router)
+    app.include_router(shops.router)
     return app

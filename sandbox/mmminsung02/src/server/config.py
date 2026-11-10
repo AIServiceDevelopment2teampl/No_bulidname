@@ -7,6 +7,10 @@ def _default_data_dir() -> Path:
     return Path(os.environ.get("DATA_DIR", "data"))
 
 
+def _default_shops_file() -> Path:
+    return Path(os.environ.get("SHOPS_FILE", Path(__file__).parent / "shops.json"))
+
+
 def _default_google_client_id() -> str | None:
     # Google Cloud의 'Web' OAuth 클라이언트 ID. 앱의 serverClientId와 같은 값
     return os.environ.get("GOOGLE_CLIENT_ID") or None
@@ -24,6 +28,8 @@ class Settings:
     # 유사 의류 검색 단계 기준 (이미지 유사도). 초안 값이며 Recall@3 평가로 다시 정한다
     very_similar_score: float = 0.90  # 이상이면 '매우 비슷'
     similar_score: float = 0.80  # 이상이면 '비슷', 모두 미만이면 no_similar
+    # 쇼핑몰 기본 목록 (GET /v1/shops)
+    shops_file: Path = field(default_factory=_default_shops_file)
 
     @property
     def db_path(self) -> Path:

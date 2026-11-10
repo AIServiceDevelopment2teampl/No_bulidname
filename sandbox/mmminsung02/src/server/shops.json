@@ -1,0 +1,23 @@
+{
+  "_comment": "쇼핑몰 기본 목록 (shopping/shop-browser.md). 시안 docs/app-sitemap/index.html '11. 쇼핑몰 목록' 순서. region: domestic|overseas, lang: ko|en|ja, korean_page: 한국어 페이지가 따로 있는지, shipping: direct(배송 가능)|forwarding(배송대행 필요)|unknown(그 외). 고치면 앱 업데이트 없이 바뀐다",
+  "shops": [
+    {"id": "musinsa", "name": "무신사", "url": "https://www.musinsa.com/", "region": "domestic", "lang": "ko", "korean_page": true, "shipping": "direct"},
+    {"id": "29cm", "name": "29CM", "url": "https://www.29cm.co.kr/", "region": "domestic", "lang": "ko", "korean_page": true, "shipping": "direct"},
+    {"id": "wconcept", "name": "W컨셉", "url": "https://www.wconcept.co.kr/", "region": "domestic", "lang": "ko", "korean_page": true, "shipping": "direct"},
+    {"id": "amazon", "name": "Amazon", "url": "https://www.amazon.com/", "region": "overseas", "lang": "en", "korean_page": true, "shipping": "direct"},
+    {"id": "zara", "name": "ZARA", "url": "https://www.zara.com/kr/", "region": "overseas", "lang": "ko", "korean_page": true, "shipping": "direct"},
+    {"id": "hm", "name": "H&M", "url": "https://www2.hm.com/ko_kr/", "region": "overseas", "lang": "ko", "korean_page": true, "shipping": "direct"},
+    {"id": "ssense", "name": "SSENSE", "url": "https://www.ssense.com/", "region": "overseas", "lang": "en", "korean_page": true, "shipping": "direct"},
+    {"id": "asos", "name": "ASOS", "url": "https://www.asos.com/", "region": "overseas", "lang": "en", "korean_page": false, "shipping": "direct"},
+    {"id": "zozotown", "name": "ZOZOTOWN", "url": "https://zozo.jp/", "region": "overseas", "lang": "ja", "korean_page": false, "shipping": "forwarding"},
+    {"id": "uniqlo-jp", "name": "유니클로 일본", "url": "https://www.uniqlo.com/jp/ja/", "region": "overseas", "lang": "ja", "korean_page": false, "shipping": "forwarding"},
+    {"id": "gu-jp", "name": "GU 일본", "url": "https://www.gu-global.com/jp/ja/", "region": "overseas", "lang": "ja", "korean_page": false, "shipping": "forwarding"},
+    {"id": "uniqlo-us", "name": "유니클로 미국", "url": "https://www.uniqlo.com/us/en/", "region": "overseas", "lang": "en", "korean_page": false, "shipping": "forwarding"},
+    {"id": "jcrew", "name": "J.Crew", "url": "https://www.jcrew.com/", "region": "overseas", "lang": "en", "korean_page": false, "shipping": "unknown"},
+    {"id": "beams", "name": "BEAMS", "url": "https://www.beams.co.jp/", "region": "overseas", "lang": "ja", "korean_page": false, "shipping": "unknown"},
+    {"id": "urban-outfitters", "name": "Urban Outfitters", "url": "https://www.urbanoutfitters.com/", "region": "overseas", "lang": "en", "korean_page": false, "shipping": "unknown"},
+    {"id": "nordstrom", "name": "Nordstrom", "url": "https://www.nordstrom.com/", "region": "overseas", "lang": "en", "korean_page": false, "shipping": "unknown"},
+    {"id": "abercrombie", "name": "Abercrombie & Fitch", "url": "https://www.abercrombie.com/", "region": "overseas", "lang": "en", "korean_page": false, "shipping": "unknown"},
+    {"id": "end", "name": "END. Clothing", "url": "https://www.endclothing.com/", "region": "overseas", "lang": "en", "korean_page": false, "shipping": "unknown"}
+  ]
+}
