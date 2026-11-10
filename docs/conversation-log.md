@@ -300,6 +300,9 @@ moneyhipo가 집에서 찍은 실제 옷 사진 29장에 종류·색 라벨을 �
 3. **Google OAuth 클라이언트**: 사용자가 Google Cloud 프로젝트 `dupecheck-514310`에서 Android 클라이언트(패키지 `com.team12.closet`, 이 PC 디버그 SHA-1)를 만들었다. 내려받은 JSON이 `installed`(Android)라 Web 클라이언트를 따로 만들게 안내했고(원본·리디렉션 URI 비움), 그 ID를 progress.md와 README 요청에 적었다. `client_secret`은 쓰지 않아 기록하지 않았다
 4. **Play 출시 준비**: 사용자가 아버님 개인 개발자 계정으로 Play Console에 앱 DupeCheck(`com.dupecheck.app`, 한국어, 무료)을 만들었다. 대시보드에 12명·14일 비공개 테스트 조건이 떠 있어 필요한 계정으로 확인. '일단 해 달라'고 해서: 개인정보처리방침·계정 삭제 페이지(`docs/legal/`, 사용자 선택으로 GitHub Pages, 연락처 이메일은 OAuth 개발자 연락처), Play 설정 답안 문서, 스토어 아이콘·그래픽 초안을 만들고, 업로드 키(저장소 밖)와 첫 AAB를 만들었다
 
+5. Play Console 항목(콘텐츠 등급: 웹 브라우저 앱 아니요, 데이터 보안, 광고 ID 없음 등)을 사용자와 함께 채우고 첫 AAB를 비공개 테스트에 올렸다 → 같은 날 출시됨. 테스터 모집용 Google 설문지 문구를 만들어 줬다(한 사람이 계정 여러 개로 채우지 말 것)
+6. **SP2 발표 덱**: 다른 팀 자료(KNU Hub PDF, 4조 pptx)의 구성을 참고해 15장 덱을 claude.ai Slides 아티팩트로 만들었다. 화면은 `docs/app-sitemap` 시안을 캡처해 썼다
+
 ### 다음 세션 AI에게
 - applicationId는 아직 임시 `com.team12.closet`. 첫 비공개 테스트 전에 정해야 한다(Play에 올리면 못 바꿈). Play 스토어에 같은 이름이 있는지도 확인
 - 앱 화면 문구·시안(`docs/app-sitemap/index.html`)의 앱 이름은 아직 바꾸지 않았다
