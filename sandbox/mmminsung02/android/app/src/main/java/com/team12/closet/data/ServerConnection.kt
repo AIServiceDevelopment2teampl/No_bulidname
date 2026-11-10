@@ -14,6 +14,8 @@ class ServerConnection(
     baseUrl: String,
     sessionStore: SessionStore,
 ) {
+    val shopsApi: ShopsApi by lazy { retrofit.create(ShopsApi::class.java) }
+
     val sessions = SessionHolder(sessionStore)
 
     val httpClient: OkHttpClient =

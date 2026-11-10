@@ -7,7 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
+import com.team12.closet.data.AppDatabase
 import com.team12.closet.data.CredentialManagerGoogleSignIn
+import com.team12.closet.data.DefaultShopsRepository
 import com.team12.closet.data.KeystoreSessionStore
 import com.team12.closet.data.ServerConnection
 import com.team12.closet.ui.ClosetApp
@@ -17,6 +19,13 @@ class MainActivity : ComponentActivity() {
     private val server by lazy { ServerConnection(BuildConfig.SERVER_BASE_URL, KeystoreSessionStore(applicationContext)) }
     private val themeStore by lazy { SharedPrefsThemeStore(applicationContext) }
     private val googleSignIn by lazy { CredentialManagerGoogleSignIn(BuildConfig.GOOGLE_WEB_CLIENT_ID) }
+    private val shops by lazy {
+        DefaultShopsRepository(
+            api = server.shopsApi,
+            dao = AppDatabase.create(applicationContext).myShops(),
+            builtIn = DefaultShopsRepository.builtInFrom(applicationContext),
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +38,7 @@ class MainActivity : ComponentActivity() {
                     .components { add(OkHttpNetworkFetcherFactory(callFactory = { server.httpClient })) }
                     .build()
             }
-            ClosetApp(server.clothes, themeStore, server.auth, googleSignIn)
+            ClosetApp(server.clothes, themeStore, server.auth, googleSignIn, shops)
         }
     }
 }

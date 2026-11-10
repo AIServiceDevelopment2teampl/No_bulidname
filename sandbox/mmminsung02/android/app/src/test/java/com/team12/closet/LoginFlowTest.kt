@@ -29,7 +29,7 @@ class LoginFlowTest {
     private val google = FakeGoogleSignIn()
 
     private fun start(auth: FakeAuthRepository) {
-        composeRule.setContent { ClosetApp(clothes, InMemoryThemeStore(), auth, google) }
+        composeRule.setContent { ClosetApp(clothes, InMemoryThemeStore(), auth, google, FakeShopsRepository()) }
     }
 
     @Test

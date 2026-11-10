@@ -5,6 +5,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.hasAnyDescendant
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -31,7 +34,9 @@ class ClosetAppTest {
 
     @Test
     fun startsOnHomeAndShowsFourTabs() {
-        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn()) }
+        composeRule.setContent {
+            ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn(), FakeShopsRepository())
+        }
 
         MainTab.entries.forEach { composeRule.onNodeWithTag("tab_${it.name}").assertIsDisplayed() }
         composeRule.onNodeWithTag("screen_HOME").assertIsDisplayed()
@@ -39,7 +44,9 @@ class ClosetAppTest {
 
     @Test
     fun tappingTabSwitchesScreen() {
-        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn()) }
+        composeRule.setContent {
+            ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn(), FakeShopsRepository())
+        }
 
         composeRule.onNodeWithTag("tab_CLOSET").performClick()
 
@@ -48,7 +55,9 @@ class ClosetAppTest {
 
     @Test
     fun closetTabOpensPhotoRegisterScreen() {
-        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn()) }
+        composeRule.setContent {
+            ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn(), FakeShopsRepository())
+        }
         composeRule.onNodeWithTag("tab_CLOSET").performClick()
 
         composeRule.onNodeWithTag("open_register_photo").performClick()
@@ -67,9 +76,14 @@ class ClosetAppTest {
     // README 'AI에게 요청': 하단 탭은 홈 / 내 옷장 / 쇼핑 / 마이
     @Test
     fun tabLabelsMatchSitemap() {
-        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn()) }
+        composeRule.setContent {
+            ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn(), FakeShopsRepository())
+        }
 
-        listOf("홈", "내 옷장", "쇼핑", "마이").forEach { composeRule.onNodeWithText(it).assertIsDisplayed() }
+        // 홈 화면에도 '내 옷장' 글자가 있어서 탭 안에서만 찾는다
+        mapOf("HOME" to "홈", "CLOSET" to "내 옷장", "SHOPPING" to "쇼핑", "MY" to "마이").forEach { (tab, label) ->
+            composeRule.onNode(hasTestTag("tab_$tab") and hasAnyDescendant(hasText(label)), useUnmergedTree = true).assertIsDisplayed()
+        }
         composeRule.onNodeWithText("번역").assertDoesNotExist()
     }
 
@@ -85,7 +99,9 @@ class ClosetAppTest {
     @Test
     @Config(qualifiers = "night")
     fun withoutChoiceThemeFollowsDevice() {
-        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn()) }
+        composeRule.setContent {
+            ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn(), FakeShopsRepository())
+        }
 
         composeRule.onNodeWithTag("tab_MY").performClick()
 
@@ -95,7 +111,15 @@ class ClosetAppTest {
     @Test
     fun choosingThemeInMyTabIsSavedAndApplied() {
         val store = InMemoryThemeStore(AppTheme.LIGHT)
-        composeRule.setContent { ClosetApp(FakeClothesRepository(), store, FakeAuthRepository(), FakeGoogleSignIn()) }
+        composeRule.setContent {
+            ClosetApp(
+                FakeClothesRepository(),
+                store,
+                FakeAuthRepository(),
+                FakeGoogleSignIn(),
+                FakeShopsRepository(),
+            )
+        }
         composeRule.onNodeWithTag("tab_MY").performClick()
 
         composeRule.onNodeWithTag("theme_DARK").performClick()

@@ -27,6 +27,9 @@ interface MyShopDao {
     @Query("SELECT * FROM my_shops ORDER BY addedAt")
     fun observeAll(): Flow<List<MyShop>>
 
+    @Query("SELECT * FROM my_shops")
+    suspend fun all(): List<MyShop>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(shop: MyShop)
 

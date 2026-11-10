@@ -32,6 +32,8 @@ android {
     sourceSets {
         // 서버와 같은 쇼핑몰 기본 목록 파일을 앱에도 넣는다. 서버에 연결하지 못하면 이걸 쓴다
         getByName("main").assets.directories.add("../../src/server/shared")
+        // WebView에 넣을 스크립트 (src/inject/bootstrap.js)
+        getByName("main").assets.directories.add("../../src/inject")
     }
 
     buildFeatures {

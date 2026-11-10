@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.team12.closet.R
+import com.team12.closet.data.AddShopResult
 import com.team12.closet.data.ApiResult
 import com.team12.closet.data.AuthRepository
 import com.team12.closet.data.ClothFilter
@@ -32,8 +33,11 @@ import com.team12.closet.data.ClothesPage
 import com.team12.closet.data.ClothesRepository
 import com.team12.closet.data.GoogleSignIn
 import com.team12.closet.data.GoogleSignInResult
+import com.team12.closet.data.MyShop
 import com.team12.closet.data.PickedPhoto
 import com.team12.closet.data.Session
+import com.team12.closet.data.Shop
+import com.team12.closet.data.ShopsRepository
 import com.team12.closet.data.UploadOutcome
 import com.team12.closet.ui.account.LoginScreen
 import com.team12.closet.ui.account.MyScreen
@@ -42,12 +46,15 @@ import com.team12.closet.ui.closet.ClosetViewModel
 import com.team12.closet.ui.closet.ClothDetailScreen
 import com.team12.closet.ui.register.RegisterPhotoRoute
 import com.team12.closet.ui.register.RegisterPhotoViewModel
+import com.team12.closet.ui.shop.ShopTab
 import com.team12.closet.ui.theme.AppTheme
 import com.team12.closet.ui.theme.ClosetTheme
 import com.team12.closet.ui.theme.InMemoryThemeStore
 import com.team12.closet.ui.theme.ThemeStore
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 
 // 하단 탭 4개 (docs/00-overview.md 화면 구성). 각 화면은 기능을 구현하면서 채운다
 enum class MainTab(
@@ -67,6 +74,7 @@ fun ClosetApp(
     themeStore: ThemeStore,
     authRepository: AuthRepository,
     googleSignIn: GoogleSignIn,
+    shopsRepository: ShopsRepository,
 ) {
     var chosenTheme by remember { mutableStateOf(themeStore.load()) }
     val darkTheme = chosenTheme?.let { it == AppTheme.DARK } ?: isSystemInDarkTheme()
@@ -80,6 +88,7 @@ fun ClosetApp(
                 sessionKey = session!!.token,
                 clothesRepository = clothesRepository,
                 authRepository = authRepository,
+                shopsRepository = shopsRepository,
                 currentTheme = if (darkTheme) AppTheme.DARK else AppTheme.LIGHT,
                 onThemeChange = {
                     themeStore.save(it)
@@ -95,6 +104,7 @@ private fun MainTabs(
     sessionKey: String,
     clothesRepository: ClothesRepository,
     authRepository: AuthRepository,
+    shopsRepository: ShopsRepository,
     currentTheme: AppTheme,
     onThemeChange: (AppTheme) -> Unit,
 ) {
@@ -126,8 +136,9 @@ private fun MainTabs(
         ) {
             when (selected) {
                 MainTab.CLOSET -> ClosetTab(sessionKey, clothesRepository)
+                MainTab.HOME -> HomeScreen(onShop = { selected = MainTab.SHOPPING }, onCloset = { selected = MainTab.CLOSET })
+                MainTab.SHOPPING -> ShopTab(shopsRepository)
                 MainTab.MY -> MyScreen(currentTheme, onThemeChange, authRepository, clothesRepository)
-                else -> Text("${selected.label} 화면 (준비 중)")
             }
         }
     }
@@ -211,20 +222,52 @@ private class PreviewAuthRepository(
 
 private val previewSignIn = GoogleSignIn { GoogleSignInResult.NotConfigured }
 
+private object PreviewShopsRepository : ShopsRepository {
+    override suspend fun defaultShops() = emptyList<Shop>()
+
+    override val myShops: Flow<List<MyShop>> = flowOf(emptyList())
+
+    override suspend fun addMyShop(
+        name: String,
+        url: String,
+        shipping: String,
+    ) = AddShopResult.Rejected("미리보기")
+
+    override suspend fun removeMyShop(url: String) {}
+}
+
 @Preview(name = "라이트")
 @Composable
 private fun ClosetAppLightPreview() {
-    ClosetApp(PreviewClothesRepository, InMemoryThemeStore(AppTheme.LIGHT), PreviewAuthRepository(true), previewSignIn)
+    ClosetApp(
+        PreviewClothesRepository,
+        InMemoryThemeStore(AppTheme.LIGHT),
+        PreviewAuthRepository(true),
+        previewSignIn,
+        PreviewShopsRepository,
+    )
 }
 
 @Preview(name = "다크")
 @Composable
 private fun ClosetAppDarkPreview() {
-    ClosetApp(PreviewClothesRepository, InMemoryThemeStore(AppTheme.DARK), PreviewAuthRepository(true), previewSignIn)
+    ClosetApp(
+        PreviewClothesRepository,
+        InMemoryThemeStore(AppTheme.DARK),
+        PreviewAuthRepository(true),
+        previewSignIn,
+        PreviewShopsRepository,
+    )
 }
 
 @Preview(name = "로그인 전")
 @Composable
 private fun ClosetAppLoggedOutPreview() {
-    ClosetApp(PreviewClothesRepository, InMemoryThemeStore(AppTheme.LIGHT), PreviewAuthRepository(false), previewSignIn)
+    ClosetApp(
+        PreviewClothesRepository,
+        InMemoryThemeStore(AppTheme.LIGHT),
+        PreviewAuthRepository(false),
+        previewSignIn,
+        PreviewShopsRepository,
+    )
 }
