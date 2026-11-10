@@ -8,7 +8,7 @@ def _default_data_dir() -> Path:
 
 
 def _default_shops_file() -> Path:
-    return Path(os.environ.get("SHOPS_FILE", Path(__file__).parent / "shops.json"))
+    return Path(os.environ.get("SHOPS_FILE", Path(__file__).parent / "shared" / "shops.json"))
 
 
 def _default_google_client_id() -> str | None:

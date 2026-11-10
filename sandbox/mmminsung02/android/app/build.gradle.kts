@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -26,6 +27,11 @@ android {
         // Google Cloud의 'Web' OAuth 클라이언트 ID (서버 GOOGLE_CLIENT_ID와 같은 값). 비어 있으면 로그인 버튼이 안내만 한다
         val googleWebClientId = providers.gradleProperty("googleWebClientId").getOrElse("")
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
+    }
+
+    sourceSets {
+        // 서버와 같은 쇼핑몰 기본 목록 파일을 앱에도 넣는다. 서버에 연결하지 못하면 이걸 쓴다
+        getByName("main").assets.directories.add("../../src/server/shared")
     }
 
     buildFeatures {
@@ -63,6 +69,9 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services)
     implementation(libs.googleid)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
