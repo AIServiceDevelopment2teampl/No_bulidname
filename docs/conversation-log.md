@@ -306,6 +306,7 @@ moneyhipo가 집에서 찍은 실제 옷 사진 29장에 종류·색 라벨을 �
 ### 다음 세션 AI에게
 - applicationId는 아직 임시 `com.team12.closet`. 첫 비공개 테스트 전에 정해야 한다(Play에 올리면 못 바꿈). Play 스토어에 같은 이름이 있는지도 확인
 - 앱 화면 문구·시안(`docs/app-sitemap/index.html`)의 앱 이름은 아직 바꾸지 않았다
-- **이어서 할 일: 테스터 이메일 정리.** 설문 응답 시트를 Google Sheets 커넥터로 읽어 Play Console 업로드용 CSV와 OAuth 테스트 사용자 목록을 만든다. 시트 주소와 정리 규칙은 moneyhipo PC의 Claude 메모(`dupecheck-play-release`)에 있다. 테스터 이메일은 저장소에 올리지 않는다
+- 테스터 이메일 정리 끝(11-10 22시): 설문 응답 19개, 중복 1 → 18명. Play Console 업로드용 CSV·OAuth 쉼표 목록은 moneyhipo PC `Downloads\dupecheck-testers.csv`, `dupecheck-oauth-testers.txt`(저장소 밖). 관리형 게시가 켜져 있어 테스터 목록 저장 뒤 게시 개요에서 게시해야 적용된다. 테스터 이메일은 저장소에 올리지 않는다
+- SP2 덱 발표자 노트에 대본을 넣었다: 1~8장 윤재건, 9~15장 김민성(시연은 김민성 설명·윤재건 폰 조작). 표지 김민성 학번, 10장 테스터 수, 11장 현황, 12장 시연 3·4번은 발표 전에 채운다
 - Play: 답안은 `docs/features/release/play-console-setup.md`. 첫 AAB는 `C:\git_desk\dupecheck-0.1.3-vc4.aab`(저장소 밖, versionCode 4). 다음 업로드는 versionCode 5부터. 업로드 키·비밀번호는 moneyhipo PC `~/.android/dupecheck-upload.*`에만 있다. Android OAuth 클라이언트를 `com.dupecheck.app`으로 하나 더 만들어야 한다
 - Google OAuth: Web 클라이언트 `599165364681-s9frbpm05o8nko732c27715j557fuvni.apps.googleusercontent.com`, Android 클라이언트(moneyhipo PC 디버그 SHA-1만 등록). 실제 로그인은 기능 3 앱이 컴파일되면 확인. 다른 PC 빌드는 SHA-1을 더 등록해야 한다

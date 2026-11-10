@@ -1,7 +1,7 @@
 # 진행 상황
 
 ## 현재 상태 (2026-11-10)
-- 서비스 이름 **DupeCheck**, applicationId `com.dupecheck.app`. **Play 비공개 테스트(Alpha) 출시됨** (11-10 20:34 제출 → 같은 날 승인). 첫 빌드 versionCode 4는 로그인 없음·서버 주소가 개발용이라 옷장 기능은 동작하지 않는다. 지금은 **테스터 모집 중** (12명 이상 참여한 날부터 14일)
+- 서비스 이름 **DupeCheck**, applicationId `com.dupecheck.app`. **Play 비공개 테스트(Alpha) 출시됨** (11-10 20:34 제출 → 같은 날 승인). 첫 빌드 versionCode 4는 로그인 없음·서버 주소가 개발용이라 옷장 기능은 동작하지 않는다. 테스터 18명 신청(11-10), Play 목록에 등록 → 참여 링크 배포 중 (12명 이상 참여한 날부터 14일)
 - 구현(sandbox, 검수 전): 기능 1·2 서버+앱, 기능 3 서버(앱은 컴파일 안 되는 WIP), 기능 5. 구현 전: 기능 4·6·7 등
 - 다음: 11-18 SP2 MVP 발표·시연 (발표 덱은 claude.ai 아티팩트 'DupeCheck SP2 MVP 발표', moneyhipo 소유), 서버 HTTPS 배포, 기능 3 앱 마무리
 
@@ -15,7 +15,7 @@
 | 2026-11-10 | 서비스 이름 **DupeCheck** 잠정 결정 (moneyhipo) | CLAUDE.md·README·00-overview·결정 사항·미결정 사항에 반영. applicationId와 앱 화면 속 이름은 아직 그대로 |
 | 2026-11-10 | **Google OAuth 클라이언트 만듦** (moneyhipo, Google Cloud 프로젝트 `dupecheck-514310`) | Web 클라이언트 `599165364681-s9frbpm05o8nko732c27715j557fuvni.apps.googleusercontent.com`(앱 `-PgoogleWebClientId`, 서버 `GOOGLE_CLIENT_ID`), Android 클라이언트(패키지 `com.team12.closet`, moneyhipo PC 디버그 SHA-1). 실제 로그인은 아직 시험 안 함(기능 3 앱이 컴파일 안 되는 상태). 다음 할 일 0번에 자세히 |
 | 2026-11-10 | **Play 출시 준비** (moneyhipo) | Play Console에 앱 생성(`com.dupecheck.app`). 설정 답안 [play-console-setup.md](features/release/play-console-setup.md). 개인정보처리방침·계정 삭제 페이지 `docs/legal/` + GitHub Pages. 스토어 아이콘·그래픽 초안 `docs/legal/store/`. 업로드 키를 moneyhipo PC에 만들고(저장소 밖) **첫 AAB** `dupecheck-0.1.3-vc4.aab`(versionCode 4)를 `0b240cd`에서 applicationId·앱 이름만 바꿔 빌드·서명. 서버 주소가 개발용이라 이 빌드에서 옷장 기능은 동작하지 않는다. Play Console 입력·업로드는 사용자가 진행 |
-| 2026-11-10 | **Play 비공개 테스트(Alpha) 출시됨** + SP2 발표 덱 (moneyhipo) | 20:34 제출(비공개 테스트·스토어 등록정보·앱 콘텐츠) → 같은 날 '출시됨'. 관리형 게시가 켜져 있어 다음 업데이트는 승인 뒤 게시 개요에서 직접 게시해야 한다(끄면 자동). 테스터는 Google 설문지로 모집 중, 이메일은 저장소에 올리지 않는다. 11-18 발표 덱 15장 작성(시안 캡처 사용, 팀원 이름·11-17 진행 현황·시연 3·4번은 빈칸) |
+| 2026-11-10 | **Play 비공개 테스트(Alpha) 출시됨** + SP2 발표 덱 (moneyhipo) | 20:34 제출(비공개 테스트·스토어 등록정보·앱 콘텐츠) → 같은 날 '출시됨'. 관리형 게시가 켜져 있어 다음 업데이트는 승인 뒤 게시 개요에서 직접 게시해야 한다(끄면 자동). 테스터는 Google 설문지로 모집 중, 이메일은 저장소에 올리지 않는다. 11-18 발표 덱 15장 작성(시안 캡처 사용) + 발표자 노트 대본(1~8장 윤재건, 9~15장 김민성). 김민성 학번·11-17 진행 현황·시연 3·4번은 빈칸 |
 | 2026-11-07 | **CLIP 모델·종류 문장 비교** (DeepFashion 400장 + 100장, `sandbox/moneyhipo/eval/`) | 100장은 오차가 커서 종류마다 100장씩 400장 묶음(seed 400, 100장 묶음과 상품 8개 겹침)을 더 만듦. 400장 기준 종류 정확도(서버 규칙): **지금 서버 설정(일반 CLIP B/32 + 서버 문장) 79.8%** / FashionCLIP + 서버 문장 77.2% / CLIP B/16 + 서버 문장 82.2% / B/32 + v2 문장 84.0% / **FashionCLIP + v2 문장 88.0%** (100장 91%, 500장 전체 88.6%) / B/16 + v2 문장 86.8%. 문장 벡터를 종류별로 평균 내는 방식(v2-mean)은 더 나빴다(80.0~85.2%). v2 문장: 종류 기준대로 상의 8개(후드티·맨투맨 포함)·하의 5개·아우터 7개(가디건·후드 집업 포함)·기타 6개(원피스·점프수트 등), `eval_category.py` `PROMPTS_V2`. 속도(이 PC CPU, 장당): B/32 90ms, FashionCLIP 81ms, B/16 217ms. FashionCLIP(`patrickjohncyh/fashion-clip`)은 B/32와 같은 구조·크기라 메모리도 같고 라이선스 MIT. FashionCLIP + v2의 남은 오류는 원피스 → 하의 20장이 가장 많다. **주의**: v2 문장은 100장 결과를 본 뒤 만들었으므로, 최종 확인은 실제 옷장 사진으로 한다. 실행: `eval_category.py <묶음들> --model patrickjohncyh/fashion-clip --prompts v2` |
 | 2026-10-07 | 프로젝트 뼈대 생성 | CLAUDE.md, docs/ 템플릿 |
 | 2026-10-14 | 팀 프로젝트 기획서 제출 | `팀플기획서-12조 (1).pdf` |
