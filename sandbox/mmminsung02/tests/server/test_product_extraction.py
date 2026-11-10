@@ -305,3 +305,19 @@ def test_json_ld_block_that_is_an_array_is_accepted(wired, client, llm):
 
     assert product["fields"]["name"]["original"] == "ウールブレンド クルーネック カーディガン"
     assert product["fields"]["price"]["original"] == "8800"
+
+
+# 실제 Claude로 ZOZOTOWN 페이지를 돌려 보다 찾은 문제:
+# JSON-LD에 색이 있는데 LLM이 비우면 정보 없음이 됐다
+def test_color_comes_from_json_ld_when_llm_leaves_it_empty(wired, client, llm):
+    llm.result = GOOD.model_copy(update={"color": None})
+
+    product = extract(client, page())
+
+    assert product["fields"]["color"]["original"] == "チャコール"
+
+
+def test_llm_translation_of_json_ld_color_is_used(wired, client, llm):
+    product = extract(client, page())
+
+    assert product["fields"]["color"] == {"original": "チャコール", "ko": "차콜"}

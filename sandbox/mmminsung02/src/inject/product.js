@@ -56,7 +56,14 @@
     var copy = root.cloneNode(true);
     var drop = copy.querySelectorAll("script, style, noscript, nav, header, footer, svg, iframe");
     for (var i = 0; i < drop.length; i++) drop[i].remove();
-    return (copy.textContent || "").replace(/\s+/g, " ").trim().slice(0, MAX_TEXT);
+    // textContent는 칸과 칸을 붙여 버린다 ('UK 4UK 6'). 글자 조각마다 띄어 쓴다
+    var parts = [];
+    var walker = document.createTreeWalker(copy, 4 /* NodeFilter.SHOW_TEXT */);
+    while (walker.nextNode()) {
+      var piece = walker.currentNode.nodeValue.trim();
+      if (piece) parts.push(piece);
+    }
+    return parts.join(" ").replace(/\s+/g, " ").slice(0, MAX_TEXT);
   }
 
   function collect() {

@@ -77,3 +77,18 @@ test("깨진 JSON-LD가 있어도 멈추지 않는다", () => {
   dom.window.eval(script);
   assert.strictEqual(dom.window.__dupecheck.product.detect(), false);
 });
+
+// 실제 Claude로 ASOS 페이지를 돌려 보다 찾은 문제: 칸 사이에 띄어쓰기가 없어 'UK 4UK 6UK 8'처럼 붙었다
+test("붙어 있는 칸의 글자는 띄어쓰기로 나눈다", () => {
+  const dom = new JSDOM(
+    '<html><body><main><ul><li>UK 4</li><li>UK 6</li></ul><div><span>Colour:</span><span>Burgundy</span></div></main></body></html>',
+    { url: "https://shop.example/p/1", runScripts: "outside-only" },
+  );
+  dom.window.eval(script);
+
+  const text = dom.window.__dupecheck.product.collect().text;
+
+  assert.ok(text.includes("UK 4 UK 6"), text);
+  assert.ok(!text.includes("4UK"), text);
+  assert.ok(text.includes("Colour: Burgundy"), text);
+});

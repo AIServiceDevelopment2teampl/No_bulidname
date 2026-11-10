@@ -26,6 +26,8 @@ log = logging.getLogger(__name__)
 
 FIELDS = ("name", "color", "material", "fit", "size", "care", "price")
 LLM_FIELDS = ("name", "color", "material", "fit", "size", "care")
+# JSON-LD에 있으면 그 원문을 쓰는 칸 (LLM은 번역만)
+STRUCTURED_FIELDS = ("name", "color")
 MAX_TEXT_CHARS = 20_000
 MAX_IMAGE_BYTES = 10 * 1024 * 1024
 MOBILE_UA = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/131 Mobile Safari/537.36"
@@ -142,6 +144,9 @@ def extract_product(
     structured_name = (product or {}).get("name") or og.get("og:title")
     if isinstance(structured_name, str) and structured_name.strip():
         fields["name"] = {"original": structured_name.strip(), "ko": structured_name.strip()}
+    structured_color = (product or {}).get("color")
+    if isinstance(structured_color, str) and structured_color.strip():
+        fields["color"] = {"original": structured_color.strip(), "ko": structured_color.strip()}
     fields["price"] = _price_from(product, og)
     image_url = _image_from(product, og, page)
 
@@ -158,10 +163,10 @@ def extract_product(
             lang = extracted.lang
             for key in LLM_FIELDS:
                 found = grounded(getattr(extracted, key))
-                if key == "name" and fields["name"]:
-                    # 이름 원문은 구조화 데이터를 믿고, LLM에서는 번역만 받는다
-                    if found and _squash(found["original"]) == _squash(fields["name"]["original"]):
-                        fields["name"]["ko"] = found["ko"]
+                if key in STRUCTURED_FIELDS and fields[key]:
+                    # 이름·색 원문은 구조화 데이터를 믿고, LLM에서는 번역만 받는다
+                    if found and _squash(found["original"]) == _squash(fields[key]["original"]):
+                        fields[key]["ko"] = found["ko"]
                     continue
                 if found:
                     fields[key] = found
