@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -101,7 +102,7 @@ private fun LoginContent(
                 modifier = Modifier.size(36.dp),
             )
         }
-        Text("옷장 AI", fontSize = 26.sp, fontWeight = FontWeight.Black, modifier = Modifier.padding(top = 14.dp))
+        Text(stringResource(R.string.app_name), fontSize = 26.sp, fontWeight = FontWeight.Black, modifier = Modifier.padding(top = 14.dp))
         Text(
             "해외 쇼핑도, 내 옷장도\nAI와 함께",
             style = MaterialTheme.typography.bodySmall,
@@ -134,7 +135,11 @@ private fun LoginContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            Text("처음이면 Google 계정으로 바로 가입돼요.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                "처음이면 Google 계정으로 바로 가입돼요.",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             // TODO(기능 9 출시): 이용약관·개인정보처리방침 페이지 주소가 생기면 링크로 바꾼다
             Text(
                 "계속하면 이용약관과 개인정보처리방침에 동의하게 돼요.",

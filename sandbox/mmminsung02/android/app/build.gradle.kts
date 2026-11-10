@@ -6,12 +6,13 @@ plugins {
 }
 
 android {
-    // TODO: applicationId는 Play에 올린 뒤 바꿀 수 없다. 서비스 이름이 정해지면 확정한다
+    // 코드 패키지 이름. applicationId와 달라도 된다
     namespace = "com.team12.closet"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.team12.closet"
+        // Play Console에 이 값으로 앱을 만들었다 (2026-11-10). 바꿀 수 없다
+        applicationId = "com.dupecheck.app"
         minSdk = 26
         targetSdk = 36
         // 시험용 APK 버전은 -PversionCode=2 -PversionName=0.1.1 처럼 넘긴다 (README 'AI에게 요청')

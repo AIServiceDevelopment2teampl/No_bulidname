@@ -9,6 +9,7 @@ import com.team12.closet.data.ClothesRepository
 import com.team12.closet.data.PickedPhoto
 import com.team12.closet.data.RegisteredCloth
 import com.team12.closet.data.UploadOutcome
+import kotlinx.coroutines.CompletableDeferred
 
 /** 서버 대신 쓰는 가짜 저장소. 옷장은 메모리 목록이고, 필터·수정·삭제를 서버처럼 처리한다 */
 class FakeClothesRepository(
@@ -20,6 +21,9 @@ class FakeClothesRepository(
     val listRequests = mutableListOf<ClothFilter>()
     var deleteAllCalls = 0
     var failNextList: String? = null
+
+    /** 설정하면 다음 목록 요청이 이 값이 완료될 때까지 기다린다 (불러오는 중 화면 확인용) */
+    var holdNextList: CompletableDeferred<Unit>? = null
 
     fun willReturn(
         name: String,
@@ -35,6 +39,10 @@ class FakeClothesRepository(
 
     override suspend fun listClothes(filter: ClothFilter): ApiResult<ClothesPage> {
         listRequests += filter
+        holdNextList?.let {
+            holdNextList = null
+            it.await()
+        }
         failNextList?.let {
             failNextList = null
             return ApiResult.Error(it)

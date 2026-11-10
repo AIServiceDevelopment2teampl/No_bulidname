@@ -4,7 +4,10 @@ import com.team12.closet.FakeClothesRepository.Companion.photo
 import com.team12.closet.data.ApiResult
 import com.team12.closet.data.ClothFilter
 import com.team12.closet.data.ClothUpdate
+import com.team12.closet.data.InMemorySessionStore
 import com.team12.closet.data.NetworkClothesRepository
+import com.team12.closet.data.ServerConnection
+import com.team12.closet.data.Session
 import com.team12.closet.data.UploadOutcome
 import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockResponse
@@ -25,7 +28,7 @@ class NetworkClothesRepositoryTest {
     fun setUp() {
         server = MockWebServer()
         server.start()
-        repository = NetworkClothesRepository.create(server.url("/").toString())
+        repository = ServerConnection(server.url("/").toString(), InMemorySessionStore(Session("test-token"))).clothes
     }
 
     @After

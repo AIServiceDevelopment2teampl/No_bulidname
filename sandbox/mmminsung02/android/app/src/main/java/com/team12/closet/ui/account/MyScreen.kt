@@ -195,7 +195,12 @@ private fun MenuRow(
     Text(
         label,
         color = color,
-        modifier = Modifier.fillMaxWidth().clickable(enabled = enabled, onClick = onClick).padding(vertical = 14.dp).testTag(tag),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(enabled = enabled, onClick = onClick)
+                .padding(vertical = 14.dp)
+                .testTag(tag),
     )
 }
 

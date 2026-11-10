@@ -31,7 +31,7 @@ class ClosetAppTest {
 
     @Test
     fun startsOnHomeAndShowsFourTabs() {
-        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore()) }
+        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn()) }
 
         MainTab.entries.forEach { composeRule.onNodeWithTag("tab_${it.name}").assertIsDisplayed() }
         composeRule.onNodeWithTag("screen_HOME").assertIsDisplayed()
@@ -39,7 +39,7 @@ class ClosetAppTest {
 
     @Test
     fun tappingTabSwitchesScreen() {
-        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore()) }
+        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn()) }
 
         composeRule.onNodeWithTag("tab_CLOSET").performClick()
 
@@ -48,7 +48,7 @@ class ClosetAppTest {
 
     @Test
     fun closetTabOpensPhotoRegisterScreen() {
-        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore()) }
+        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn()) }
         composeRule.onNodeWithTag("tab_CLOSET").performClick()
 
         composeRule.onNodeWithTag("open_register_photo").performClick()
@@ -67,7 +67,7 @@ class ClosetAppTest {
     // README 'AI에게 요청': 하단 탭은 홈 / 내 옷장 / 쇼핑 / 마이
     @Test
     fun tabLabelsMatchSitemap() {
-        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore()) }
+        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn()) }
 
         listOf("홈", "내 옷장", "쇼핑", "마이").forEach { composeRule.onNodeWithText(it).assertIsDisplayed() }
         composeRule.onNodeWithText("번역").assertDoesNotExist()
@@ -85,7 +85,7 @@ class ClosetAppTest {
     @Test
     @Config(qualifiers = "night")
     fun withoutChoiceThemeFollowsDevice() {
-        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore()) }
+        composeRule.setContent { ClosetApp(FakeClothesRepository(), InMemoryThemeStore(), FakeAuthRepository(), FakeGoogleSignIn()) }
 
         composeRule.onNodeWithTag("tab_MY").performClick()
 
@@ -95,7 +95,7 @@ class ClosetAppTest {
     @Test
     fun choosingThemeInMyTabIsSavedAndApplied() {
         val store = InMemoryThemeStore(AppTheme.LIGHT)
-        composeRule.setContent { ClosetApp(FakeClothesRepository(), store) }
+        composeRule.setContent { ClosetApp(FakeClothesRepository(), store, FakeAuthRepository(), FakeGoogleSignIn()) }
         composeRule.onNodeWithTag("tab_MY").performClick()
 
         composeRule.onNodeWithTag("theme_DARK").performClick()

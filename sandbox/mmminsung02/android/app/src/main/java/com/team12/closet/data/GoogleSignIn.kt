@@ -48,7 +48,7 @@ class CredentialManagerGoogleSignIn(
             val credential = CredentialManager.create(activityContext).getCredential(activityContext, request).credential
             if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                 val google = GoogleIdTokenCredential.createFrom(credential.data)
-                GoogleSignInResult.Success(google.idToken, google.displayName, google.id)
+                GoogleSignInResult.Success(google.idToken, google.displayName, google.email)
             } else {
                 GoogleSignInResult.Failed("Google 계정 정보를 받지 못했어요")
             }
