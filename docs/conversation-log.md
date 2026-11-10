@@ -322,6 +322,7 @@ moneyhipo가 집에서 찍은 실제 옷 사진 29장에 종류·색 라벨을 �
 1. **"이제 다시 가보자"**: 11-06~11-10 moneyhipo 작업 확인(서비스 이름 DupeCheck, Play 비공개 테스트 출시, Google 로그인 ID 생성, 기능 1 평가, 기능 5). README에 mmminsung02 요청 3개(applicationId, 로그인 ID 확인·SHA-1, CLIP 모델은 보류)
 2. **기능 3 앱 마무리**: 로그인 화면 연결, 마이 화면 교체, 테스트 18개 추가. applicationId `com.dupecheck.app`, 앱 이름 DupeCheck. 앱 테스트 58개 통과
 3. **검수**: 다음 사람이 로그인하면 앞사람 옷이 잠깐 보이는 문제 → 재현 테스트가 실패하는 것 확인 → ViewModel을 세션마다 새로 만들어 고침 → 59개 통과
+4. **Vultr 결제 아직** → 기능 4로. FAISS 대신 numpy로 전부 비교(사용자 선택). 시안 7번에 맞춰 단계를 3개(매우 비슷/비슷/조금 다름)로. 서버 87개, 앱 65개 통과. 단계 기준 점수는 초안, Recall@3 정답 세트를 moneyhipo에게 요청(README)
 
 ### 다음 세션 AI에게
 - 실제 Google 로그인은 아직 못 해 봤다. Android 클라이언트를 `com.dupecheck.app`으로 다시 등록해야 하고(README 요청 표), 폰에서 닿는 서버가 필요하다
