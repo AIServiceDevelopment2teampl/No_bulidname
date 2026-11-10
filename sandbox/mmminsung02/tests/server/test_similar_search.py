@@ -160,32 +160,42 @@ def test_response_never_says_probability(client, analyzer, settings, me):
     assert "probability" not in text.lower()
 
 
-# 단계 (매우 비슷 / 비슷) 와 no_similar. 기준 점수는 초안이라 Settings 값을 기준으로 확인한다
+# 단계 (매우 비슷 / 비슷 / 조금 다름, 시안 7번) 와 no_similar.
+# 기준 점수는 초안이라 Settings 값을 기준으로 확인한다
+
+
+def expected_level(score, settings):
+    if score >= settings.very_similar_score:
+        return "very_similar"
+    if score >= settings.similar_score:
+        return "similar"
+    return "different"
 
 
 def test_levels_follow_threshold_settings(client, analyzer, settings, me):
     near = add_cloth(client, analyzer, "top", NEAR_BLACK)
-    gray = add_cloth(client, analyzer, "top", DARK_GRAY)
+    add_cloth(client, analyzer, "top", DARK_GRAY)
+    white = add_cloth(client, analyzer, "top", WHITE)
 
-    items = similar(client, add_product(settings, me, BLACK)).json()["items"]
-    by_id = {i["cloth"]["id"]: i for i in items}
+    body = similar(client, add_product(settings, me, BLACK)).json()
+    by_id = {i["cloth"]["id"]: i for i in body["items"]}
 
-    for cloth_id in (near, gray):
-        score = by_id[cloth_id]["image_similarity"]
-        expected = "very_similar" if score >= settings.very_similar_score else "similar"
-        assert score >= settings.similar_score
-        assert by_id[cloth_id]["level"] == expected
+    assert body["status"] == "ok"
+    for item in body["items"]:
+        assert item["level"] == expected_level(item["image_similarity"], settings)
     assert by_id[near]["level"] == "very_similar"
+    assert by_id[white]["level"] == "different"
 
 
-def test_all_below_threshold_is_no_similar(client, analyzer, settings, me):
-    add_cloth(client, analyzer, "top", WHITE)
-    black, white = color_embedding(BLACK), color_embedding(WHITE)
-    assert float(np.dot(black, white)) < settings.similar_score
+def test_all_below_threshold_is_no_similar_but_still_lists(client, analyzer, settings, me):
+    white = add_cloth(client, analyzer, "top", WHITE)
+    black_vec, white_vec = color_embedding(BLACK), color_embedding(WHITE)
+    assert float(np.dot(black_vec, white_vec)) < settings.similar_score
 
     body = similar(client, add_product(settings, me, BLACK)).json()
 
-    assert body == {"status": "no_similar", "items": []}
+    assert body["status"] == "no_similar"
+    assert [(i["cloth"]["id"], i["level"]) for i in body["items"]] == [(white, "different")]
 
 
 # 예외

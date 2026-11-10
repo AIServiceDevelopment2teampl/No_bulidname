@@ -29,7 +29,12 @@ def _unit(vectors: np.ndarray) -> np.ndarray:
 
 
 def _level(score: float, settings: Settings) -> str:
-    return "very_similar" if score >= settings.very_similar_score else "similar"
+    """시안 '7. AI 점원 패널'의 매우 비슷 / 비슷 / 조금 다름"""
+    if score >= settings.very_similar_score:
+        return "very_similar"
+    if score >= settings.similar_score:
+        return "similar"
+    return "different"
 
 
 def find_similar(
@@ -77,8 +82,8 @@ def find_similar(
             "level": _level(float(scores[i]), settings),
         }
         for i in order[:MAX_RESULTS]
-        if scores[i] >= settings.similar_score
     ]
-    if not items:
-        return {"status": "no_similar", "items": []}
+    # 기준 미만도 '조금 다름'으로 보여 주되, 비슷한 옷이 하나도 없으면 no_similar
+    if all(item["level"] == "different" for item in items):
+        return {"status": "no_similar", "items": items}
     return {"status": "ok", "items": items}
