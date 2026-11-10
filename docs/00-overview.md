@@ -80,7 +80,7 @@
 | 4 | 비교·AI | 유사 의류 검색 | [compare/similar-search.md](features/compare/similar-search.md) | 10주 | 구현했지만 미검증 (sandbox/mmminsung02, 자동 테스트만 통과, Recall@3 미측정) |
 | 5 | 번역 | 단위·사이즈 변환 | [translation/unit-conversion.md](features/translation/unit-conversion.md) | 10주 | 구현했지만 미검증 (sandbox/moneyhipo/units, 자동 테스트만 통과, 사이즈 환산표는 초안) |
 | 6 | 번역 | 페이지 그 자리 번역 | [translation/page-translation.md](features/translation/page-translation.md) | 10~11주 | 구현 전 |
-| 7 | 번역 | 상품 정보 구조화 | [translation/product-extraction.md](features/translation/product-extraction.md) | 11주 | 구현 전 |
+| 7 | 번역 | 상품 정보 구조화 | [translation/product-extraction.md](features/translation/product-extraction.md) | 11주 | 구현했지만 미검증 (sandbox/mmminsung02, 자동 테스트만 통과, 실제 Claude 호출·정확도 미측정) |
 | 8 | 쇼핑 | 홈·쇼핑몰 목록·인앱 브라우저 | [shopping/shop-browser.md](features/shopping/shop-browser.md) | 11주 | 구현했지만 미검증 (sandbox/mmminsung02, 자동 테스트만 통과, 실제 폰 미확인) |
 | 9 | 출시 | Google Play 출시 | [release/play-store-release.md](features/release/play-store-release.md) | 계정은 지금, 비공개 테스트는 11주, 출시는 15주 | 구현 전 |
 | 10 | 쇼핑 | 공유하기로 상품 받기 | [shopping/share-intake.md](features/shopping/share-intake.md) | 12주 | 구현 전 |
