@@ -11,8 +11,15 @@ from server.config import Settings
 from server.main import create_app
 
 
+def color_embedding(rgb) -> np.ndarray:
+    """사진 색으로 만든 가짜 임베딩 (길이 1). 같은 색이면 유사도 1.0, 색이 멀수록 낮다"""
+    r, g, b = (float(c) for c in rgb[:3])
+    v = np.array([r, g, b, 255 - r, 255 - g, 255 - b, 0, 0], dtype=np.float32)
+    return v / np.linalg.norm(v)
+
+
 class FakeAnalyzer:
-    """CLIP 대신 쓰는 가짜 분석기. 테스트마다 결과를 바꿀 수 있다."""
+    """CLIP 대신 쓰는 가짜 분석기. 종류·색은 테스트마다 정하고, 임베딩은 사진 색으로 만든다"""
 
     model_name = "fake-clip"
     dim = 8
@@ -27,7 +34,7 @@ class FakeAnalyzer:
             category=self.category,
             category_confidence=self.category_confidence,
             color=self.color,
-            embedding=np.ones(self.dim, dtype=np.float32),
+            embedding=color_embedding(image.convert("RGB").getpixel((0, 0))),
         )
 
 

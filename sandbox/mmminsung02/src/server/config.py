@@ -21,6 +21,9 @@ class Settings:
     google_client_id: str | None = field(default_factory=_default_google_client_id)
     # 로그인 유지 기간. 지나면 앱에서 다시 로그인한다
     session_days: int = 30
+    # 유사 의류 검색 단계 기준 (이미지 유사도). 초안 값이며 Recall@3 평가로 다시 정한다
+    very_similar_score: float = 0.90  # 이상이면 '매우 비슷'
+    similar_score: float = 0.80  # 이상이면 '비슷', 모두 미만이면 no_similar
 
     @property
     def db_path(self) -> Path:
