@@ -336,3 +336,7 @@ moneyhipo가 집에서 찍은 실제 옷 사진 29장에 종류·색 라벨을 �
 - 실제 Google 로그인은 아직 못 해 봤다. Android 클라이언트를 `com.dupecheck.app`으로 다시 등록해야 하고(README 요청 표), 폰에서 닿는 서버가 필요하다
 - 앱 빌드·테스트는 `sandbox/mmminsung02/tools/run-gradle.ps1`로 (진행 창)
 
+## 2026-11-11 (moneyhipo)
+1. mmminsung02 진척 확인: 11-10~11 기능 3 앱 마무리, 4·6·7·8·10·11·12 서버+앱 (sandbox, 검수 전)
+2. 최신 커밋 `ee08037`로 시험용 APK v0.1.3 빌드 → `sandbox/mmminsung02/dist/` (Git 제외). 드라이브에는 아직 안 올림
+3. README 'AI에게 요청'에 mmminsung02 AI용 전체 테스트 방식 추가: Haiku 5.5 max 수집 → Sonnet 5.5 high 검수 → Fable 5.2 수정 계획서 → Opus 5.5 high 반영. 전체 테스트는 mmminsung02 허락을 받고만 한다
