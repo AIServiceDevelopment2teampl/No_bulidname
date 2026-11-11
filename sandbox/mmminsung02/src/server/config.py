@@ -38,6 +38,9 @@ class Settings:
     # 스크린샷 읽기(Claude가 사진을 읽음)는 사용자당 1분에 10장까지
     screenshot_window_seconds: int = 60
     screenshot_requests_per_window: int = 10
+    # AI 점원(질문·어울리는 옷)은 사용자당 1분에 20번까지
+    clerk_window_seconds: int = 60
+    clerk_requests_per_window: int = 20
     # 쇼핑몰 기본 목록 (GET /v1/shops)
     shops_file: Path = field(default_factory=_default_shops_file)
 

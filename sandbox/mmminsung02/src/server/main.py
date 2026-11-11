@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from server.ai.analyzer import ImageAnalyzer
 from server.ai.product_llm import ProductLLM
 from server.ai.units import load_convert_text
-from server.api import auth, clothes, products, shops, translate
+from server.api import auth, clerk, clothes, products, shops, translate
 from server.auth import GoogleIdTokenVerifier, GoogleVerifier
 from server.config import Settings
 from server.db.database import connect, init_db
@@ -41,6 +41,15 @@ def _default_screenshot_reader():
     from server.ai.screenshot_reader import ClaudeScreenshotReader
 
     return ClaudeScreenshotReader()
+
+
+def _default_clerk():
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        log.warning("ANTHROPIC_API_KEY가 없어 AI 점원을 끕니다")
+        return None
+    from server.ai.clerk_llm import ClaudeClerk
+
+    return ClaudeClerk()
 
 
 def _default_llm() -> ProductLLM | None:
@@ -80,6 +89,7 @@ def create_app(
         )
         app.state.convert_units = load_convert_text()
         app.state.translator = getattr(app.state, "test_translator", None) or _default_translator()
+        app.state.clerk_llm = getattr(app.state, "test_clerk_llm", None) or _default_clerk()
         app.state.screenshot_reader = (
             getattr(app.state, "test_screenshot_reader", None) or _default_screenshot_reader()
         )
@@ -106,4 +116,5 @@ def create_app(
     app.include_router(products.router)
     app.include_router(shops.router)
     app.include_router(translate.router)
+    app.include_router(clerk.router)
     return app
