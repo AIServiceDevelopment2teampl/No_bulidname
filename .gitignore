@@ -16,3 +16,13 @@ DeepFashin_dataset/
 
 # 팀이 찍은 실제 옷장 사진 원본: 개인 사진이라 올리지 않는다. 평가용 사본은 DeepFashin_dataset/eval/closet/
 옷 사진/
+
+# IDE 설정
+.idea/
+
+# 다른 팀 발표 자료: 남의 자료라 올리지 않는다
+다른 팀들 발표자료/
+
+# 폰 스크린샷 중 개인 이메일이 보이는 것: 공개 저장소라 올리지 않는다
+Screenshot_20261111_115623_Google Play services.jpg
+Screenshot_20261111_121145_DupeCheck.jpg

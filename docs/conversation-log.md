@@ -342,3 +342,8 @@ moneyhipo가 집에서 찍은 실제 옷 사진 29장에 종류·색 라벨을 �
 3. README 'AI에게 요청'에 mmminsung02 AI용 전체 테스트 방식 추가: Haiku 5.5 max 수집 → Sonnet 5.5 high 검수 → Fable 5.2 수정 계획서 → Opus 5.5 high 반영. 전체 테스트는 mmminsung02 허락을 받고만 한다
 4. 폰 시험: 계정을 눌러도 안 넘어감 → Google Cloud에 `com.dupecheck.app` Android 클라이언트(이 PC SHA-1) 등록 → 계정 선택은 통과, '서버에 연결하지 못했어요'(서버 없음). 이 PC에 서버를 켜고 LAN 주소로 APK 빌드
 5. Vultr API 키를 교수님이 아직 안 줌 → **게스트로 둘러보기** (사용자 선택: 서버 없이 앱만). mmminsung02 sandbox를 moneyhipo가 직접 고침(사용자 선택), README로 알림. APK v0.1.4
+
+## 2026-11-12 (moneyhipo)
+1. 교수님이 공지로 올려 줄 **비공개 테스터 모집 글**을 다듬었다. 폼 링크가 편집자용(`/edit`, `/preview`)이라 학생이 못 연다 → 보내기 → 링크 주소로 바꾸기. '이메일' → 'Google 계정(Gmail)', '설치 안 해도 됨' 대신 '설치해서 한 번 열어 보기'(Play가 테스트 참여도를 물어봄), '14일 동안 나가지 않기' 추가. 신청 기간 ~11-18
+2. 등록된 테스터에게 보낼 **참여 안내 메일** 초안: 참여 링크 `https://play.google.com/apps/testing/com.dupecheck.app`, 게스트로 둘러보기, 계정이 다르면 오류가 난다는 안내. 숨은참조로 보내고 Play 테스터 목록에 먼저 저장하기
+3. 저장소 정리: `.idea/`, `다른 팀들 발표자료/`(다른 팀 자료)를 `.gitignore`에 넣음. 11-11 폰 스크린샷 2장(계정 선택 화면 = 개인 Gmail 여러 개, 마이 화면 = 이메일)은 공개 저장소라 올리지 않고 로컬에만 둠
