@@ -85,7 +85,7 @@
 | 9 | 출시 | Google Play 출시 | [release/play-store-release.md](features/release/play-store-release.md) | 계정은 지금, 비공개 테스트는 11주, 출시는 15주 | 구현 전 |
 | 10 | 쇼핑 | 공유하기로 상품 받기 | [shopping/share-intake.md](features/shopping/share-intake.md) | 12주 | 구현했지만 미검증 (sandbox/mmminsung02, 실제 Claude로 합성 스크린샷 2장 확인, 실제 폰 미확인) |
 | 11 | 비교·AI | 구매 전 비교 리포트 | [compare/purchase-report.md](features/compare/purchase-report.md) | 12주 | 구현했지만 미검증 (sandbox/mmminsung02, 실제 Claude로 문장 확인, 실제 폰 미확인) |
-| 12 | 비교·AI | AI 점원 | [compare/ai-clerk.md](features/compare/ai-clerk.md) | 13주 | 구현 전 |
+| 12 | 비교·AI | AI 점원 | [compare/ai-clerk.md](features/compare/ai-clerk.md) | 13주 | 구현했지만 미검증 (sandbox/mmminsung02, 실제 Claude로 답 없는 질문 20개 예비 확인, 실제 폰 미확인) |
 | 13 | 자동 등록 | 주문내역 캡처로 일괄 등록 | [auto-register/order-capture.md](features/auto-register/order-capture.md) | 13주 | 구현 전 |
 | 14 | 자동 등록 | 앱에서 산 옷 자동 등록 | [auto-register/in-app.md](features/auto-register/in-app.md) | 14주 | 구현 전 |
 | 15 | 자동 등록 | 영수증 사진 등록 | [auto-register/receipt.md](features/auto-register/receipt.md) | 14주 (시간 부족하면 후속) | 구현 전 |

@@ -93,6 +93,8 @@
 | POST | `/v1/products/{id}/similar` | 유사 의류 TOP 3 |
 | POST | `/v1/products/{id}/report` | 비교 리포트 |
 | POST | `/v1/clerk/messages` | AI 점원 대화 |
+| GET | `/v1/clerk/messages?product_id=` | AI 점원 대화 기록 (상품 주소별) |
+| POST | `/v1/products/{id}/matching` | 이 상품과 어울리는 내 옷 (최대 3벌) |
 | POST | `/v1/fitting` | (도전 목표) 옷 최대 3벌 + 마네킹 체형 → 가상 피팅 이미지. 외부 서비스로 중계만 하고 저장하지 않는다. 하루 횟수 제한 |
 | POST | `/v1/imports` | 주문내역 캡처·영수증·앱 내 구매 → 등록 후보 |
 | POST | `/v1/imports/{id}/confirm` | 사용자가 고른 후보만 옷장에 저장 |
