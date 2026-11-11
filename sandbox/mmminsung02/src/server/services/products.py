@@ -119,7 +119,16 @@ def extract_product(
     convert_units: Callable[[str], str],
     user_id: str,
     page: ProductPage,
+    *,
+    source: str = "page",
+    image_bytes: bytes | None = None,
+    uncertain: list[str] | None = None,
 ) -> dict:
+    """source: page(인앱 브라우저) / screenshot(공유받은 스크린샷).
+
+    image_bytes를 주면 이미지 주소에서 받지 않고 그 사진을 쓴다 (스크린샷에서 잘라 낸 옷 사진).
+    uncertain: 흐려서 확실히 읽지 못한 글자 조각. 겹치는 칸에 uncertain 표시를 붙인다
+    """
     product = _find_product(page.json_ld)
     og = page.og
 
@@ -180,16 +189,24 @@ def extract_product(
         if converted != fields["size"]["ko"]:
             fields["size"]["converted"] = converted
 
-    image_path = _save_image(settings, fetch_image, user_id, image_url)
+    for key, value in fields.items():
+        if value and key != "price" and _overlaps(value["original"], uncertain or []):
+            value["uncertain"] = True
+
+    if image_bytes is not None:
+        image_path = _store_image(settings, user_id, image_bytes)
+    else:
+        image_path = _save_image(settings, fetch_image, user_id, image_url)
     with conn:
         cur = conn.execute(
             "INSERT INTO products"
             " (user_id, source, site, url, image_url, image_path, category, fields, lang)"
-            " VALUES (?, 'page', ?, ?, ?, ?, ?, ?, ?)",
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 user_id,
-                urlparse(page.url).hostname,
-                page.url,
+                source,
+                urlparse(page.url).hostname if page.url else None,
+                page.url or None,
                 image_url,
                 image_path,
                 category,
@@ -200,6 +217,15 @@ def extract_product(
     return product_row_to_dict(
         conn.execute("SELECT * FROM products WHERE id = ?", (cur.lastrowid,)).fetchone()
     )
+
+
+def _overlaps(original: str, pieces: list[str]) -> bool:
+    text = _squash(original)
+    for piece in pieces:
+        p = _squash(piece)
+        if p and (p in text or text in p):
+            return True
+    return False
 
 
 def _llm_text(page: ProductPage, product: dict | None) -> str:
@@ -230,6 +256,10 @@ def _save_image(
     except Exception:
         log.exception("상품 이미지를 받지 못했어요: %s", url)
         return None
+    return _store_image(settings, user_id, data)
+
+
+def _store_image(settings: Settings, user_id: str, data: bytes | None) -> str | None:
     if not data or len(data) > MAX_IMAGE_BYTES:
         return None
     try:
@@ -250,12 +280,15 @@ def _save_image(
 def product_row_to_dict(row: sqlite3.Row) -> dict:
     return {
         "id": row["id"],
+        "source": row["source"],
         "url": row["url"],
         "site": row["site"],
         "lang": row["lang"],
         "category": row["category"],
         "image_url": row["image_url"],
         "has_image": row["image_path"] is not None,
+        # 서버에 저장한 상품 사진 (스크린샷에서 잘라 낸 것 등). 로그인한 주인만 받는다
+        "image_path": f"/v1/products/{row['id']}/image" if row["image_path"] else None,
         "fields": json.loads(row["fields"]),
     }
 

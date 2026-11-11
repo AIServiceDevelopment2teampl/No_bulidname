@@ -47,6 +47,9 @@ SYSTEM = "\n".join(
         "- Never guess from images, the product type, or what such products usually are. "
         "A field the text does not state is null (material, fit, size, care are often missing).",
         "- `ko` is a natural Korean translation of `original`. Keep numbers and units as written.",
+        "- `ko` must be Korean for every field, size included: translate measurement words "
+        "(着丈 → 총장, 身幅 → 가슴너비, Length → 총장, Chest → 가슴). Only brand names, "
+        "size letters (S, M, UK 8) and numbers stay as written.",
         "- name: the product name. color: the selected color, or the list of offered colors "
         "as written. material: fabric composition. fit: fit or silhouette words "
         "(e.g. Regular fit, oversized). size: offered sizes and any measurements. "

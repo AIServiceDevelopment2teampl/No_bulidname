@@ -35,6 +35,9 @@ class Settings:
     # 비교 리포트 문장(Claude)은 사용자당 1분에 20번까지. 넘으면 비교표만
     report_window_seconds: int = 60
     report_llm_per_window: int = 20
+    # 스크린샷 읽기(Claude가 사진을 읽음)는 사용자당 1분에 10장까지
+    screenshot_window_seconds: int = 60
+    screenshot_requests_per_window: int = 10
     # 쇼핑몰 기본 목록 (GET /v1/shops)
     shops_file: Path = field(default_factory=_default_shops_file)
 

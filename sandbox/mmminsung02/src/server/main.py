@@ -34,6 +34,15 @@ def _default_report_writer():
     return ClaudeReportWriter()
 
 
+def _default_screenshot_reader():
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        log.warning("ANTHROPIC_API_KEY가 없어 공유받은 스크린샷 읽기를 끕니다")
+        return None
+    from server.ai.screenshot_reader import ClaudeScreenshotReader
+
+    return ClaudeScreenshotReader()
+
+
 def _default_llm() -> ProductLLM | None:
     # ANTHROPIC_API_KEY가 없으면 LLM 없이 구조화 데이터(JSON-LD·OG)만 쓴다
     if not os.environ.get("ANTHROPIC_API_KEY"):
@@ -71,6 +80,9 @@ def create_app(
         )
         app.state.convert_units = load_convert_text()
         app.state.translator = getattr(app.state, "test_translator", None) or _default_translator()
+        app.state.screenshot_reader = (
+            getattr(app.state, "test_screenshot_reader", None) or _default_screenshot_reader()
+        )
         app.state.report_writer = (
             getattr(app.state, "test_report_writer", None) or _default_report_writer()
         )
