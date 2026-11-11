@@ -38,4 +38,5 @@ class ServerConnection(
     val auth = NetworkAuthRepository(retrofit.create(AuthApi::class.java), sessions)
     val products = NetworkProductsRepository(retrofit.create(ProductsApi::class.java))
     val translate = NetworkTranslateRepository(retrofit.create(TranslateApi::class.java))
+    val clerk = NetworkClerkRepository(retrofit.create(ClerkApi::class.java))
 }

@@ -31,6 +31,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.team12.closet.data.ApiResult
+import com.team12.closet.data.ClerkRepository
 import com.team12.closet.data.Cloth
 import com.team12.closet.data.ShopUrls
 import com.team12.closet.data.TranslateRepository
@@ -129,6 +131,8 @@ fun BrowserScreen(
     imageUrl: (Cloth) -> String? = { null },
     translator: TranslateRepository? = null,
     translation: TranslationUi = remember { TranslationUi() },
+    // AI 점원 (compare/ai-clerk.md). 없으면 대화·어울리는 옷 없이 상품 정보만
+    clerk: ClerkRepository? = null,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -215,20 +219,27 @@ fun BrowserScreen(
                 )
             }
             val product = lookup?.state
-            if (product != null && !state.loadFailed) {
+            val productId = ((product as? ProductState.Ready)?.product)?.id
+            // 상품마다 대화가 따로다. 상품 페이지가 아니면 일반 대화(productId = null)
+            val clerkSession = remember(productId, clerk) { clerk?.let { ClerkSession(it, productId) } }
+            LaunchedEffect(panelOpen, clerkSession) { if (panelOpen) clerkSession?.open() }
+            if ((product != null || clerkSession != null) && !state.loadFailed) {
                 if (panelOpen) {
                     ProductPanel(
                         state = product,
                         imageUrl = imageUrl,
                         onClose = { panelOpen = false },
+                        clerk = clerkSession,
                         modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.6f),
                     )
-                } else {
+                } else if (product != null) {
                     ProductBubble(
                         state = product,
                         onClick = { panelOpen = true },
                         modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
                     )
+                } else {
+                    ClerkBubble(onClick = { panelOpen = true }, modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp))
                 }
             }
         }

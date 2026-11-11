@@ -66,6 +66,7 @@ class MainActivity : ComponentActivity() {
                 shared = shared,
                 onSharedHandled = { shared = null },
                 photoLoader = photoLoader,
+                clerkRepository = server.clerk,
             )
         }
     }

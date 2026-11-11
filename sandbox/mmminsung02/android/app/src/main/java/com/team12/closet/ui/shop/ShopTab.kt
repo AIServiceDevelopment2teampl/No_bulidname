@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import com.team12.closet.data.ClerkRepository
 import com.team12.closet.data.Cloth
 import com.team12.closet.data.ProductsRepository
 import com.team12.closet.data.ShopUrls
@@ -24,6 +25,7 @@ fun ShopTab(
     // 다른 앱에서 공유받은 상품 주소 (shopping/share-intake.md). 열고 나면 onOpenRequestHandled
     openRequest: String? = null,
     onOpenRequestHandled: () -> Unit = {},
+    clerk: ClerkRepository? = null,
 ) {
     val context = LocalContext.current
     var openUrl by rememberSaveable { mutableStateOf<String?>(openRequest) }
@@ -64,6 +66,7 @@ fun ShopTab(
             lookup = lookup,
             imageUrl = imageUrl,
             translator = translator,
+            clerk = clerk,
         )
     }
 }

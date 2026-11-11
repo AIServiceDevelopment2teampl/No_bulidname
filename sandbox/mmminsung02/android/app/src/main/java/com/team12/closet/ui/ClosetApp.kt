@@ -30,6 +30,7 @@ import com.team12.closet.R
 import com.team12.closet.data.AddShopResult
 import com.team12.closet.data.ApiResult
 import com.team12.closet.data.AuthRepository
+import com.team12.closet.data.ClerkRepository
 import com.team12.closet.data.ClothFilter
 import com.team12.closet.data.ClothUpdate
 import com.team12.closet.data.ClothesPage
@@ -90,6 +91,8 @@ fun ClosetApp(
     shared: SharedItem? = null,
     onSharedHandled: () -> Unit = {},
     photoLoader: PhotoLoader = PhotoLoader { null },
+    // 없으면 AI 점원 대화·어울리는 옷 없이 상품 정보만 (테스트·미리보기)
+    clerkRepository: ClerkRepository? = null,
 ) {
     var chosenTheme by remember { mutableStateOf(themeStore.load()) }
     val darkTheme = chosenTheme?.let { it == AppTheme.DARK } ?: isSystemInDarkTheme()
@@ -109,6 +112,7 @@ fun ClosetApp(
                 shared = shared,
                 onSharedHandled = onSharedHandled,
                 photoLoader = photoLoader,
+                clerkRepository = clerkRepository,
                 currentTheme = if (darkTheme) AppTheme.DARK else AppTheme.LIGHT,
                 onThemeChange = {
                     themeStore.save(it)
@@ -130,6 +134,7 @@ private fun MainTabs(
     shared: SharedItem?,
     onSharedHandled: () -> Unit,
     photoLoader: PhotoLoader,
+    clerkRepository: ClerkRepository?,
     currentTheme: AppTheme,
     onThemeChange: (AppTheme) -> Unit,
 ) {
@@ -208,6 +213,7 @@ private fun MainTabs(
                         translator = translateRepository,
                         openRequest = openLink,
                         onOpenRequestHandled = { openLink = null },
+                        clerk = clerkRepository,
                     )
                 MainTab.MY -> MyScreen(currentTheme, onThemeChange, authRepository, clothesRepository)
             }
