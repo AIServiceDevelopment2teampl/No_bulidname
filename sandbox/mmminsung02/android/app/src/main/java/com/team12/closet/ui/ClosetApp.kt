@@ -8,9 +8,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,9 +37,11 @@ import com.team12.closet.data.ClothesRepository
 import com.team12.closet.data.GoogleSignIn
 import com.team12.closet.data.GoogleSignInResult
 import com.team12.closet.data.MyShop
+import com.team12.closet.data.PhotoLoader
 import com.team12.closet.data.PickedPhoto
 import com.team12.closet.data.ProductsRepository
 import com.team12.closet.data.Session
+import com.team12.closet.data.SharedItem
 import com.team12.closet.data.Shop
 import com.team12.closet.data.ShopsRepository
 import com.team12.closet.data.TranslateRepository
@@ -48,6 +53,7 @@ import com.team12.closet.ui.closet.ClosetViewModel
 import com.team12.closet.ui.closet.ClothDetailScreen
 import com.team12.closet.ui.register.RegisterPhotoRoute
 import com.team12.closet.ui.register.RegisterPhotoViewModel
+import com.team12.closet.ui.share.ShareResultScreen
 import com.team12.closet.ui.shop.ShopTab
 import com.team12.closet.ui.theme.AppTheme
 import com.team12.closet.ui.theme.ClosetTheme
@@ -80,6 +86,10 @@ fun ClosetApp(
     productsRepository: ProductsRepository,
     // 없으면 페이지 번역이 '번역하지 못했어요'로 끝난다 (테스트·미리보기)
     translateRepository: TranslateRepository? = null,
+    // 다른 앱에서 공유로 받은 것. 로그인 전이면 로그인한 뒤에 연다
+    shared: SharedItem? = null,
+    onSharedHandled: () -> Unit = {},
+    photoLoader: PhotoLoader = PhotoLoader { null },
 ) {
     var chosenTheme by remember { mutableStateOf(themeStore.load()) }
     val darkTheme = chosenTheme?.let { it == AppTheme.DARK } ?: isSystemInDarkTheme()
@@ -96,6 +106,9 @@ fun ClosetApp(
                 shopsRepository = shopsRepository,
                 productsRepository = productsRepository,
                 translateRepository = translateRepository,
+                shared = shared,
+                onSharedHandled = onSharedHandled,
+                photoLoader = photoLoader,
                 currentTheme = if (darkTheme) AppTheme.DARK else AppTheme.LIGHT,
                 onThemeChange = {
                     themeStore.save(it)
@@ -114,13 +127,54 @@ private fun MainTabs(
     shopsRepository: ShopsRepository,
     productsRepository: ProductsRepository,
     translateRepository: TranslateRepository?,
+    shared: SharedItem?,
+    onSharedHandled: () -> Unit,
+    photoLoader: PhotoLoader,
     currentTheme: AppTheme,
     onThemeChange: (AppTheme) -> Unit,
 ) {
     // 로그아웃하면 이 화면이 사라지므로 다시 로그인하면 홈 탭부터 시작한다
     var selected by rememberSaveable { mutableStateOf(MainTab.HOME) }
+    var openLink by remember { mutableStateOf<String?>(null) }
+    var screenshot by remember { mutableStateOf<SharedItem.Screenshot?>(null) }
+    val snackbar = remember { SnackbarHostState() }
+    var problem by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(shared) {
+        when (shared) {
+            null -> return@LaunchedEffect
+            is SharedItem.Link -> {
+                openLink = shared.url
+                selected = MainTab.SHOPPING
+            }
+            is SharedItem.Screenshot -> screenshot = shared
+            is SharedItem.Problem -> problem = shared.message
+        }
+        // shared가 null로 바뀌면 이 효과는 취소된다. 안내 문구는 아래에서 따로 띄운다
+        onSharedHandled()
+    }
+    LaunchedEffect(problem) {
+        problem?.let {
+            snackbar.showSnackbar(it)
+            problem = null
+        }
+    }
+
+    screenshot?.let { item ->
+        ShareResultScreen(
+            shared = item,
+            products = productsRepository,
+            photoLoader = photoLoader,
+            imageUrl = { clothesRepository.imageUrl(it) },
+            onBack = {
+                screenshot = null
+                selected = MainTab.HOME
+            },
+        )
+        return
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbar) },
         bottomBar = {
             NavigationBar {
                 MainTab.entries.forEach { tab ->
@@ -152,6 +206,8 @@ private fun MainTabs(
                         productsRepository,
                         imageUrl = { clothesRepository.imageUrl(it.imageUrl) },
                         translator = translateRepository,
+                        openRequest = openLink,
+                        onOpenRequestHandled = { openLink = null },
                     )
                 MainTab.MY -> MyScreen(currentTheme, onThemeChange, authRepository, clothesRepository)
             }
@@ -243,6 +299,8 @@ private object PreviewProductsRepository : ProductsRepository {
     override suspend fun findSimilar(productId: Long) = ApiResult.Error("미리보기")
 
     override suspend fun report(productId: Long) = ApiResult.Error("미리보기")
+
+    override suspend fun fromScreenshot(photo: PickedPhoto) = ApiResult.Error("미리보기")
 }
 
 private object PreviewShopsRepository : ShopsRepository {

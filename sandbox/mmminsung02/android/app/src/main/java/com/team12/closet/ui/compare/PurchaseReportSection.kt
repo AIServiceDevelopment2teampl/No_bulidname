@@ -62,6 +62,8 @@ fun tableLine(
 fun PurchaseReportSection(
     state: ReportState,
     modifier: Modifier = Modifier,
+    // 시안 19(공유로 받은 상품)는 처음부터 펼쳐 보여 준다
+    startExpanded: Boolean = false,
 ) {
     when (state) {
         ReportState.None -> {}
@@ -79,7 +81,7 @@ fun PurchaseReportSection(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = modifier,
             )
-        is ReportState.Ready -> ReportCard(state.report, modifier)
+        is ReportState.Ready -> ReportCard(state.report, modifier, startExpanded)
     }
 }
 
@@ -87,9 +89,10 @@ fun PurchaseReportSection(
 private fun ReportCard(
     report: PurchaseReport,
     modifier: Modifier,
+    startExpanded: Boolean,
 ) {
     val summary = report.summary
-    var expanded by rememberSaveable(report.id) { mutableStateOf(summary == null) }
+    var expanded by rememberSaveable(report.id) { mutableStateOf(startExpanded || summary == null) }
     val compared = report.cloth != null
     Surface(
         shape = RoundedCornerShape(12.dp),

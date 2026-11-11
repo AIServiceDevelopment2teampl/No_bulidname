@@ -143,7 +143,23 @@ private fun FieldRow(
             Text("정보 없음", color = MaterialTheme.colorScheme.outline)
             return@Column
         }
-        Text(field.converted ?: field.ko)
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(field.converted ?: field.ko, modifier = Modifier.weight(1f, fill = false))
+            if (field.uncertain) {
+                // 시안 19: 흐린 글자는 원문과 함께 '불확실'
+                Text(
+                    "불확실",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                    modifier =
+                        Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(MaterialTheme.colorScheme.tertiaryContainer)
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                            .testTag("uncertain_$key"),
+                )
+            }
+        }
         if (field.original != field.ko) {
             if (showOriginal) {
                 Box(

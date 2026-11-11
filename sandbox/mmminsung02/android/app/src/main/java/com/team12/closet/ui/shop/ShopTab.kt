@@ -1,6 +1,7 @@
 package com.team12.closet.ui.shop
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,9 +21,18 @@ fun ShopTab(
     products: ProductsRepository,
     imageUrl: (Cloth) -> String?,
     translator: TranslateRepository?,
+    // 다른 앱에서 공유받은 상품 주소 (shopping/share-intake.md). 열고 나면 onOpenRequestHandled
+    openRequest: String? = null,
+    onOpenRequestHandled: () -> Unit = {},
 ) {
     val context = LocalContext.current
-    var openUrl by rememberSaveable { mutableStateOf<String?>(null) }
+    var openUrl by rememberSaveable { mutableStateOf<String?>(openRequest) }
+    LaunchedEffect(openRequest) {
+        if (openRequest != null) {
+            openUrl = openRequest
+            onOpenRequestHandled()
+        }
+    }
     var addFromBrowser by remember { mutableStateOf<Pair<String, String>?>(null) }
     // 진입점 + 상품 감지 스크립트를 한 번에 넣는다
     val script =

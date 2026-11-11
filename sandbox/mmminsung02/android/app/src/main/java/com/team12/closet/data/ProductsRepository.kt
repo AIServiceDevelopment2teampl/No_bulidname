@@ -2,12 +2,16 @@ package com.team12.closet.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import java.io.IOException
 
@@ -34,18 +38,23 @@ data class ProductField(
     val ko: String,
     /** 치수에 단위 변환을 붙인 값 (예: 81.3 cm (32 in)) */
     val converted: String? = null,
+    /** 스크린샷에서 흐려서 확실히 읽지 못한 글자 (화면에 '불확실') */
+    val uncertain: Boolean = false,
 )
 
 /** 서버 POST /v1/products/extract 결과 */
 @Serializable
 data class ProductInfo(
     val id: Long,
-    val url: String,
+    /** 공유받은 스크린샷 상품은 주소가 없다 */
+    val url: String? = null,
     val site: String? = null,
     val lang: String,
     val category: String? = null,
     @SerialName("image_url") val imageUrl: String? = null,
     @SerialName("has_image") val hasImage: Boolean,
+    /** 서버에 저장한 상품 사진 (스크린샷에서 잘라 낸 것) */
+    @SerialName("image_path") val imagePath: String? = null,
     val fields: Map<String, ProductField?>,
 ) {
     fun field(key: String): ProductField? = fields[key]
@@ -80,6 +89,16 @@ data class PurchaseReport(
     val unknown: List<ReportItem> = emptyList(),
 )
 
+/** 서버 POST /v1/products/from-screenshot 결과 (shopping/share-intake.md) */
+@Serializable
+data class ScreenshotResult(
+    val product: ProductInfo,
+    /** 옷 사진을 찾지 못하면 null (notice에 이유) */
+    val similar: SimilarResult? = null,
+    val report: PurchaseReport? = null,
+    val notice: String? = null,
+)
+
 interface ProductsApi {
     @POST("v1/products/extract")
     suspend fun extract(
@@ -90,6 +109,12 @@ interface ProductsApi {
     suspend fun similar(
         @Path("id") productId: Long,
     ): Response<SimilarResult>
+
+    @Multipart
+    @POST("v1/products/from-screenshot")
+    suspend fun fromScreenshot(
+        @Part image: MultipartBody.Part,
+    ): Response<ScreenshotResult>
 
     @POST("v1/products/{id}/report")
     suspend fun report(
@@ -104,6 +129,9 @@ interface ProductsRepository {
     suspend fun findSimilar(productId: Long): ApiResult<SimilarResult>
 
     suspend fun report(productId: Long): ApiResult<PurchaseReport>
+
+    /** 공유받은 스크린샷 한 장 → 상품 정보 + 비슷한 옷 + 리포트 */
+    suspend fun fromScreenshot(photo: PickedPhoto): ApiResult<ScreenshotResult>
 }
 
 class NetworkProductsRepository(
@@ -150,5 +178,30 @@ class NetworkProductsRepository(
         val body = response.body()
         if (response.isSuccessful && body != null) return ApiResult.Ok(body)
         return ApiResult.Error("비교 리포트를 만들지 못했어요")
+    }
+
+    override suspend fun fromScreenshot(photo: PickedPhoto): ApiResult<ScreenshotResult> {
+        val part = MultipartBody.Part.createFormData("image", photo.name, photo.bytes.toRequestBody(photo.mimeType.toMediaType()))
+        val response =
+            try {
+                api.fromScreenshot(part)
+            } catch (e: IOException) {
+                return ApiResult.Error(NetworkClothesRepository.NO_CONNECTION)
+            }
+        val body = response.body()
+        if (response.isSuccessful && body != null) return ApiResult.Ok(body)
+        // 400·413·422·429는 서버가 사용자에게 보여 줄 문장을 준다
+        val detail =
+            if (response.code() in setOf(400, 413, 422, 429)) {
+                runCatching { errorJson.decodeFromString<ErrorResponse>(response.errorBody()!!.string()).detail }.getOrNull()
+            } else {
+                null
+            }
+        return ApiResult.Error(detail ?: SCREENSHOT_FAILED)
+    }
+
+    companion object {
+        const val SCREENSHOT_FAILED = "스크린샷을 읽지 못했어요. 잠시 후 다시 시도해 주세요"
+        private val errorJson = Json { ignoreUnknownKeys = true }
     }
 }

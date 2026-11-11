@@ -2,6 +2,7 @@ package com.team12.closet
 
 import com.team12.closet.data.ApiResult
 import com.team12.closet.data.InMemorySessionStore
+import com.team12.closet.data.PickedPhoto
 import com.team12.closet.data.ServerConnection
 import com.team12.closet.data.Session
 import kotlinx.coroutines.test.runTest
@@ -137,5 +138,42 @@ class NetworkProductsRepositoryTest {
             respond(500, "{}")
 
             assertEquals(ApiResult.Error("비교 리포트를 만들지 못했어요"), repository().report(12))
+        }
+
+    // shopping/share-intake.md: 공유받은 스크린샷을 올리면 상품·비슷한 옷·리포트가 한 번에 온다
+    @Test
+    fun uploadsScreenshotAndParsesAllThreeParts() =
+        runTest {
+            respond(
+                201,
+                """{"product":{"id":9,"source":"screenshot","url":null,"site":null,"lang":"ja","category":"top",""" +
+                    """"image_url":null,"has_image":true,"image_path":"/v1/products/9/image",""" +
+                    """"fields":{"name":{"original":"カーディガン","ko":"카디건"},""" +
+                    """"material":{"original":"ウール50%","ko":"울 50%","uncertain":true},"fit":null}},""" +
+                    """"similar":{"status":"empty_closet","items":[]},"report":null,"notice":null}""",
+            )
+
+            val result = (repository().fromScreenshot(PickedPhoto("shot.png", "image/png", byteArrayOf(1, 2))) as ApiResult.Ok).value
+
+            assertEquals(9L, result.product.id)
+            assertEquals("/v1/products/9/image", result.product.imagePath)
+            assertEquals(true, result.product.field("material")?.uncertain)
+            assertEquals(false, result.product.field("name")?.uncertain)
+            assertEquals("empty_closet", result.similar?.status)
+            assertEquals(null, result.report)
+            val request = server.takeRequest()
+            assertEquals("/v1/products/from-screenshot", request.url.encodedPath)
+            assertEquals(true, request.headers["Content-Type"]?.startsWith("multipart/form-data"))
+        }
+
+    @Test
+    fun screenshotErrorsShowServerMessage() =
+        runTest {
+            respond(422, """{"detail":"글자를 읽지 못했어요. 상품 설명이 보이게 다시 캡처해 주세요"}""")
+            respond(500, "{}")
+
+            val photo = PickedPhoto("shot.png", "image/png", byteArrayOf(1))
+            assertEquals(ApiResult.Error("글자를 읽지 못했어요. 상품 설명이 보이게 다시 캡처해 주세요"), repository().fromScreenshot(photo))
+            assertEquals(ApiResult.Error("스크린샷을 읽지 못했어요. 잠시 후 다시 시도해 주세요"), repository().fromScreenshot(photo))
         }
 }

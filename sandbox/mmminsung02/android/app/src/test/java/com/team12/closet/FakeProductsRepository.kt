@@ -2,11 +2,13 @@ package com.team12.closet
 
 import com.team12.closet.FakeClothesRepository.Companion.cloth
 import com.team12.closet.data.ApiResult
+import com.team12.closet.data.PickedPhoto
 import com.team12.closet.data.ProductField
 import com.team12.closet.data.ProductInfo
 import com.team12.closet.data.ProductsRepository
 import com.team12.closet.data.PurchaseReport
 import com.team12.closet.data.ReportItem
+import com.team12.closet.data.ScreenshotResult
 import com.team12.closet.data.SimilarCloth
 import com.team12.closet.data.SimilarResult
 import kotlinx.coroutines.CompletableDeferred
@@ -15,10 +17,12 @@ class FakeProductsRepository(
     var extractResult: ApiResult<ProductInfo> = ApiResult.Ok(SAMPLE_PRODUCT),
     var similarResult: ApiResult<SimilarResult> = ApiResult.Ok(SAMPLE_SIMILAR),
     var reportResult: ApiResult<PurchaseReport> = ApiResult.Ok(SAMPLE_REPORT),
+    var screenshotResult: ApiResult<ScreenshotResult> = ApiResult.Ok(SAMPLE_SCREENSHOT),
 ) : ProductsRepository {
     val extracted = mutableListOf<String>()
     val similarFor = mutableListOf<Long>()
     val reportFor = mutableListOf<Long>()
+    val screenshots = mutableListOf<PickedPhoto>()
 
     /** 설정하면 다음 extract가 이 값이 완료될 때까지 기다린다 */
     var holdExtract: CompletableDeferred<Unit>? = null
@@ -40,6 +44,11 @@ class FakeProductsRepository(
     override suspend fun report(productId: Long): ApiResult<PurchaseReport> {
         reportFor += productId
         return reportResult
+    }
+
+    override suspend fun fromScreenshot(photo: PickedPhoto): ApiResult<ScreenshotResult> {
+        screenshots += photo
+        return screenshotResult
     }
 
     companion object {
@@ -87,6 +96,13 @@ class FakeProductsRepository(
                         ReportItem("color", "색", "차콜", "그레이", "page", "둘 다 그레이 계열이에요."),
                     ),
                 unknown = listOf(ReportItem("material", "소재", "울 50%, 아크릴 50%", null, text = "내 옷의 소재 정보가 없어요.")),
+            )
+
+        val SAMPLE_SCREENSHOT =
+            ScreenshotResult(
+                product = SAMPLE_PRODUCT.copy(id = 42, url = null, imagePath = "/v1/products/42/image"),
+                similar = SAMPLE_SIMILAR,
+                report = SAMPLE_REPORT.copy(productId = 42),
             )
     }
 }
