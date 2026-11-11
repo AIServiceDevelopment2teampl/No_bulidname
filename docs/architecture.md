@@ -44,7 +44,7 @@
 | 서버 | Python + FastAPI | 확정 |
 | 이미지 임베딩·분류 | CLIP (사전학습 모델, 미세조정 없음). 모델 종류는 평가 후 결정 (후보: 일반 CLIP, 패션 특화 CLIP) | 모델 미결정 |
 | 유사 검색 | FAISS | 확정 (제출 기획서) |
-| OCR | EasyOCR(서버) 또는 Google ML Kit(기기 안) | 미결정 |
+| OCR | Claude Haiku 5.5가 사진을 직접 읽음 (글자·상품 칸·옷 사진 위치를 한 번에) | 2026-11-11 결정 |
 | 번역 | LLM API로 전부 하거나, 페이지 문장은 번역 API로 하고 상품 구조화만 LLM으로 | 미결정 |
 | LLM API | Claude API, 우선 Claude Haiku 5.5 (`claude-haiku-5-5`). 공식 `anthropic` Python SDK. 키는 서버에만 둔다 | 확정 (모델은 AI 점원 품질 보고 바꿀 수 있음) |
 | DB | 서버 SQLite | 확정 |
@@ -149,7 +149,7 @@
 |------|------|------|
 | CLIP 사전학습 모델 | 이미지 임베딩, 종류·색 분류 | 라이선스·출처 표기 |
 | FAISS | 벡터 검색 | |
-| EasyOCR 또는 ML Kit | 캡처·영수증 글자 인식 | 미결정 |
+| (OCR은 Claude API로) | 캡처·영수증 글자 인식 | 2026-11-11 결정, 별도 서비스 없음 |
 | Claude API (Anthropic) | 번역, 구조화, 리포트, 점원 | 선불 크레딧, 학교 지원금. 사용료 발생 |
 | Vultr | AI 서버 | 선불 크레딧(약 $40 신청 예정), 학교 지원금. 해외 업체라 인보이스만 나오고 세금계산서는 없음 |
 | Google Play Console | 앱 배포 | 개인 개발자 계정 등록비 있음 |

@@ -11,7 +11,7 @@
 ## 기술 스택
 - 언어: Kotlin (앱), Python (서버)
 - 프레임워크: Jetpack Compose (Android Studio, targetSdk 36 이상), FastAPI, Retrofit
-- AI: CLIP, FAISS, OCR(미결정), Claude API (우선 Claude Haiku 5.5)
+- AI: CLIP, FAISS, Claude API (우선 Claude Haiku 5.5). OCR(캡처 글자 읽기)도 Claude가 사진을 직접 읽는다 (2026-11-11 결정)
 - DB: 서버 SQLite, 앱 Room
 - 테스트: pytest (서버), Node + jsdom (WebView 주입 JS), JUnit·Compose UI 테스트 (앱)
 - 배포: Google Play (비공개 테스트 → 프로덕션), 서버는 Vultr (서울 리전, 선불 크레딧)
