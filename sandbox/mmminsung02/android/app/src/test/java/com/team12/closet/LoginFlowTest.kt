@@ -1,6 +1,7 @@
 package com.team12.closet
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -44,6 +45,25 @@ class LoginFlowTest {
         assertEquals(listOf("google-id-token"), auth.loginTokens)
         composeRule.onNodeWithTag("login_screen").assertDoesNotExist()
         composeRule.onNodeWithTag("screen_HOME").assertIsDisplayed()
+    }
+
+    @Test
+    fun guestButtonGoesHomeWithoutGoogle() {
+        val auth = FakeAuthRepository(loggedIn = false)
+        start(auth)
+
+        composeRule.onNodeWithTag("login_guest").performClick()
+
+        assertEquals(0, google.calls)
+        composeRule.onNodeWithTag("screen_HOME").assertIsDisplayed()
+        composeRule.onNodeWithTag("tab_MY").performClick()
+        composeRule.onNodeWithTag("my_name").assertTextEquals("게스트")
+        composeRule.onNodeWithTag("delete_account").assertDoesNotExist()
+        composeRule.onNodeWithTag("delete_all_data").assertDoesNotExist()
+
+        composeRule.onNodeWithTag("my_logout").performScrollTo().performClick()
+
+        composeRule.onNodeWithTag("login_screen").assertIsDisplayed()
     }
 
     @Test

@@ -18,7 +18,12 @@ data class Session(
     val token: String,
     val displayName: String? = null,
     val email: String? = null,
+    /** 로그인 없이 둘러보기. 서버 계정이 없어 요청에 세션 토큰을 붙이지 않는다 */
+    val guest: Boolean = false,
 )
+
+/** 게스트 세션의 자리표시 토큰. 서버로 보내지 않는다 */
+const val GUEST_TOKEN = "guest"
 
 interface SessionStore {
     fun load(): Session?
@@ -56,7 +61,7 @@ class KeystoreSessionStore(
             clear()
             return null
         }
-        return Session(token, prefs.getString(KEY_NAME, null), prefs.getString(KEY_EMAIL, null))
+        return Session(token, prefs.getString(KEY_NAME, null), prefs.getString(KEY_EMAIL, null), prefs.getBoolean(KEY_GUEST, false))
     }
 
     override fun save(session: Session) {
@@ -65,6 +70,7 @@ class KeystoreSessionStore(
             .putString(KEY_TOKEN, encrypt(session.token))
             .putString(KEY_NAME, session.displayName)
             .putString(KEY_EMAIL, session.email)
+            .putBoolean(KEY_GUEST, session.guest)
             .apply()
     }
 
@@ -107,5 +113,6 @@ class KeystoreSessionStore(
         const val KEY_TOKEN = "token"
         const val KEY_NAME = "name"
         const val KEY_EMAIL = "email"
+        const val KEY_GUEST = "guest"
     }
 }

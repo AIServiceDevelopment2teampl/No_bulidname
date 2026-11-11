@@ -46,6 +46,9 @@ interface AuthRepository {
         email: String?,
     ): ApiResult<Unit>
 
+    /** 서버 없이 이 폰에서만 게스트 세션을 만든다. 서버 기능은 Google 로그인 전까지 쓸 수 없다 */
+    fun loginAsGuest()
+
     suspend fun logout()
 
     suspend fun deleteAccount(): ApiResult<Unit>
@@ -61,7 +64,8 @@ class SessionHolder(
     private val _session = MutableStateFlow(store.load())
     val session: StateFlow<Session?> = _session.asStateFlow()
 
-    val token: String? get() = _session.value?.token
+    /** 서버로 보낼 세션 토큰. 게스트는 서버 계정이 없어 null */
+    val token: String? get() = _session.value?.takeUnless { it.guest }?.token
 
     fun set(session: Session) {
         store.save(session)
@@ -129,13 +133,21 @@ class NetworkAuthRepository(
         )
     }
 
-    /** 서버에 알리지 못해도(오프라인) 이 폰에서는 로그아웃한다 */
+    override fun loginAsGuest() {
+        holder.set(Session(GUEST_TOKEN, guest = true))
+    }
+
+    /** 서버에 알리지 못해도(오프라인) 이 폰에서는 로그아웃한다. 게스트는 서버에 알릴 게 없다 */
     override suspend fun logout() {
-        runCatching { api.logout() }
+        if (holder.session.value?.guest != true) runCatching { api.logout() }
         holder.expire()
     }
 
     override suspend fun deleteAccount(): ApiResult<Unit> {
+        if (holder.session.value?.guest == true) {
+            holder.expire()
+            return ApiResult.Ok(Unit)
+        }
         val response =
             try {
                 api.deleteAccount()

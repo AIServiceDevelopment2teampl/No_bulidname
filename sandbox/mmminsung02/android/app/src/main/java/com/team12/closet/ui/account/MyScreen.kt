@@ -72,9 +72,14 @@ fun MyScreen(
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
             Box(Modifier.size(48.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant))
             Column(modifier = Modifier.padding(start = 12.dp)) {
-                Text(session?.displayName ?: "Google 계정", fontWeight = FontWeight.Bold, modifier = Modifier.testTag("my_name"))
+                val guest = session?.guest == true
                 Text(
-                    listOfNotNull(session?.email, "Google 계정").joinToString(" · "),
+                    if (guest) "게스트" else session?.displayName ?: "Google 계정",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.testTag("my_name"),
+                )
+                Text(
+                    if (guest) "로그인하지 않고 둘러보는 중" else listOfNotNull(session?.email, "Google 계정").joinToString(" · "),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -103,9 +108,14 @@ fun MyScreen(
         Section("내 정보")
         // TODO(기능 9 출시): 개인정보처리방침 페이지 주소가 생기면 연다
         MenuRow("개인정보처리방침 (준비 중)", tag = "my_privacy", enabled = false) {}
-        MenuRow("로그아웃", tag = "my_logout") { askLogout = true }
-        MenuRow("내 데이터 전체 삭제", tag = "delete_all_data", danger = true) { confirm = Confirm.DELETE_DATA }
-        MenuRow("계정 삭제", tag = "delete_account", danger = true) { confirm = Confirm.DELETE_ACCOUNT }
+        if (session?.guest == true) {
+            // 게스트는 지울 서버 데이터가 없다. 로그인 화면으로 돌아가 Google로 로그인한다
+            MenuRow("Google로 로그인하기", tag = "my_logout") { scope.launch { authRepository.logout() } }
+        } else {
+            MenuRow("로그아웃", tag = "my_logout") { askLogout = true }
+            MenuRow("내 데이터 전체 삭제", tag = "delete_all_data", danger = true) { confirm = Confirm.DELETE_DATA }
+            MenuRow("계정 삭제", tag = "delete_account", danger = true) { confirm = Confirm.DELETE_ACCOUNT }
+        }
         message?.let { Text(it, modifier = Modifier.padding(top = 12.dp).testTag("my_message")) }
     }
 

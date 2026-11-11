@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -77,6 +78,7 @@ fun LoginScreen(
                 busy = false
             }
         },
+        onGuest = { authRepository.loginAsGuest() },
     )
 }
 
@@ -85,6 +87,7 @@ private fun LoginContent(
     busy: Boolean,
     message: String?,
     onGoogle: () -> Unit,
+    onGuest: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp).testTag("login_screen"),
@@ -130,6 +133,14 @@ private fun LoginContent(
                 Text("Google로 계속하기", fontWeight = FontWeight.SemiBold)
             }
         }
+        // 서버(Vultr) 배포 전 시연용. 서버 기능은 Google 로그인 전까지 쓸 수 없다
+        TextButton(
+            onClick = onGuest,
+            enabled = !busy,
+            modifier = Modifier.padding(top = 4.dp).testTag("login_guest"),
+        ) {
+            Text("게스트로 둘러보기")
+        }
         Column(
             modifier = Modifier.padding(top = 12.dp, bottom = 60.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -153,5 +164,5 @@ private fun LoginContent(
 @Preview(name = "로그인", showBackground = true, heightDp = 700)
 @Composable
 private fun LoginPreview() {
-    ClosetTheme(darkTheme = false) { Surface { LoginContent(busy = false, message = null, onGoogle = {}) } }
+    ClosetTheme(darkTheme = false) { Surface { LoginContent(busy = false, message = null, onGoogle = {}, onGuest = {}) } }
 }

@@ -3,6 +3,7 @@ package com.team12.closet
 import android.content.Context
 import com.team12.closet.data.ApiResult
 import com.team12.closet.data.AuthRepository
+import com.team12.closet.data.GUEST_TOKEN
 import com.team12.closet.data.GoogleSignIn
 import com.team12.closet.data.GoogleSignInResult
 import com.team12.closet.data.Session
@@ -30,6 +31,10 @@ class FakeAuthRepository(
         loginTokens += idToken
         if (loginResult is ApiResult.Ok) _session.value = Session("session-for-$idToken", displayName, email)
         return loginResult
+    }
+
+    override fun loginAsGuest() {
+        _session.value = Session(GUEST_TOKEN, guest = true)
     }
 
     override suspend fun logout() {

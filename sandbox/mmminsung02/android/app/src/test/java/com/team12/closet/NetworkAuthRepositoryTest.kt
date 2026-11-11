@@ -148,6 +148,37 @@ class NetworkAuthRepositoryTest {
         }
 
     @Test
+    fun guestSessionNeedsNoServerAndSendsNoAuthorizationHeader() =
+        runTest {
+            val conn = connection()
+
+            conn.auth.loginAsGuest()
+
+            assertEquals(
+                true,
+                conn.auth.session.value
+                    ?.guest,
+            )
+            assertEquals(true, store.load()?.guest)
+            assertEquals(0, server.requestCount)
+            respond(200, """{"items":[],"total":0}""")
+            conn.clothes.listClothes(ClothFilter())
+            assertNull(server.takeRequest().headers["Authorization"])
+        }
+
+    @Test
+    fun guestLogoutDoesNotCallServer() =
+        runTest {
+            val conn = connection()
+            conn.auth.loginAsGuest()
+
+            conn.auth.logout()
+
+            assertNull(conn.auth.session.value)
+            assertEquals(0, server.requestCount)
+        }
+
+    @Test
     fun logoutClearsSessionEvenWhenServerIsDown() =
         runTest {
             store.save(Session("s-1"))

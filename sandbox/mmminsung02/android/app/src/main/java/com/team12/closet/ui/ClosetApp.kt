@@ -292,6 +292,8 @@ private class PreviewAuthRepository(
         email: String?,
     ) = ApiResult.Error("미리보기")
 
+    override fun loginAsGuest() {}
+
     override suspend fun logout() {}
 
     override suspend fun deleteAccount() = ApiResult.Error("미리보기")

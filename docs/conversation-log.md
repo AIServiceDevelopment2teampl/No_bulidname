@@ -340,3 +340,5 @@ moneyhipo가 집에서 찍은 실제 옷 사진 29장에 종류·색 라벨을 �
 1. mmminsung02 진척 확인: 11-10~11 기능 3 앱 마무리, 4·6·7·8·10·11·12 서버+앱 (sandbox, 검수 전)
 2. 최신 커밋 `ee08037`로 시험용 APK v0.1.3 빌드 → `sandbox/mmminsung02/dist/` (Git 제외). 드라이브에는 아직 안 올림
 3. README 'AI에게 요청'에 mmminsung02 AI용 전체 테스트 방식 추가: Haiku 5.5 max 수집 → Sonnet 5.5 high 검수 → Fable 5.2 수정 계획서 → Opus 5.5 high 반영. 전체 테스트는 mmminsung02 허락을 받고만 한다
+4. 폰 시험: 계정을 눌러도 안 넘어감 → Google Cloud에 `com.dupecheck.app` Android 클라이언트(이 PC SHA-1) 등록 → 계정 선택은 통과, '서버에 연결하지 못했어요'(서버 없음). 이 PC에 서버를 켜고 LAN 주소로 APK 빌드
+5. Vultr API 키를 교수님이 아직 안 줌 → **게스트로 둘러보기** (사용자 선택: 서버 없이 앱만). mmminsung02 sandbox를 moneyhipo가 직접 고침(사용자 선택), README로 알림. APK v0.1.4
