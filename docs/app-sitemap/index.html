@@ -278,10 +278,12 @@
   .switch { width: 34px; height: 20px; border-radius: 999px; background: var(--p); position: relative; flex: none; }
   .switch::after { content: ""; position: absolute; right: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--on-p); }
   .page { flex: 1; overflow: hidden; padding: 4px 16px; position: relative; }
-  .toolbar { height: 52px; border-top: 1px solid var(--line); display: flex; justify-content: space-around; align-items: center; color: var(--sub); flex: none; background: var(--card); }
-  .toolbar .i { width: 20px; height: 20px; }
-  .clerk-fab { position: absolute; right: 14px; bottom: 66px; display: flex; align-items: center; gap: 8px; z-index: 3; }
-  .clerk-fab .bubble { font-size: 11.5px; padding: 7px 11px; color: var(--p); font-weight: 700; }
+  /* 2026-11-16: 아래 버튼 줄·하단 탭 없이 떠 있는 버블 하나 (☰ 메뉴 + 상품 말풍선/AI 점원), 끌어서 옮길 수 있음 */
+  .dock { position: absolute; right: 14px; bottom: 16px; display: flex; align-items: center; border-radius: 22px; background: var(--p); color: var(--on-p); box-shadow: 0 4px 14px rgba(90, 92, 235, .3); z-index: 3; font-size: 11.5px; font-weight: 700; }
+  .dock > span { padding: 9px 12px; }
+  .dock .sep { width: 1px; height: 18px; padding: 0; background: var(--on-p); opacity: .4; }
+  .dock-menu { position: absolute; right: 14px; bottom: 58px; background: var(--card); border-radius: 12px; box-shadow: var(--shadow-up); padding: 4px 0; z-index: 3; font-size: 12.5px; min-width: 120px; }
+  .dock-menu div { padding: 8px 14px; }
   .size-t { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 8px; }
   .size-t th, .size-t td { border: 1px solid var(--line); padding: 4px 6px; text-align: center; }
   .size-t th { background: var(--surface2); color: var(--sub); font-weight: 600; }
@@ -445,7 +447,7 @@
             <ul>
               <li data-go="shop-list"><span class="n">쇼핑하기 → 쇼핑몰 목록</span> <span class="d">국내 + 해외 쇼핑몰(번역 필요 표시) + 배송 태그, 주소 입력, 내 쇼핑몰</span><span class="tag has">시안 있음</span>
                 <ul>
-                  <li data-go="browser"><span class="n">인앱 브라우저</span> <span class="d">한국어가 아닌 페이지만 자동 번역 (부가 기능), 켜기/끄기, 원문 보기</span><span class="tag has">시안 있음</span>
+                  <li data-go="browser"><span class="n">인앱 브라우저</span> <span class="d">한국어가 아닌 페이지만 자동 번역 (부가 기능), 켜기/끄기, 원문 보기. 하단 탭 없음: 떠 있는 버블(☰ 메뉴 + 상품 말풍선)로 다른 화면에 가고, 다녀와도 보던 페이지 유지</span><span class="tag has">시안 있음</span>
                     <ul>
                       <li data-go="clerk"><span class="n">AI 점원 패널</span> <span class="d">TOP 3 · 비교 리포트 · 어울리는 내 옷 · 질문</span><span class="tag has">시안 있음</span>
                         <ul><li data-go="fitting"><span class="n">미리 입어보기</span> <span class="d">이 상품 + 고른 내 옷</span><span class="tag chal">도전 목표</span></li></ul>
@@ -810,7 +812,10 @@
       <div class="webbar">
         <svg class="i" style="width:20px;height:20px" data-go="shop-list"><use href="#x"/></svg>
         <div class="url"><svg class="i"><use href="#lock"/></svg>zozo.jp/shop/beams/goods/7781</div>
-        <svg class="i" style="width:20px;height:20px"><use href="#more"/></svg>
+        <svg class="i" style="width:18px;height:18px"><use href="#back"/></svg>
+        <svg class="i" style="width:18px;height:18px"><use href="#fwd"/></svg>
+        <svg class="i" style="width:18px;height:18px"><use href="#refresh"/></svg>
+        <svg class="i" style="width:20px;height:20px" title="☆ 내 쇼핑몰에 추가 · ↗ 외부 브라우저로 열기"><use href="#more"/></svg>
       </div>
       <div class="trbar"><svg class="i"><use href="#translate"/></svg><div class="grow">일본어 → 한국어로 바꿨어요 · <u>원문 보기</u></div><span class="switch" title="번역 켜기/끄기"></span></div>
       <div class="page">
@@ -823,8 +828,8 @@
         <table class="size-t"><tr><th>사이즈</th><th>총장</th><th>가슴너비</th><th>소매길이</th></tr><tr><td>M</td><td>64cm</td><td>54cm</td><td>60cm</td></tr><tr><td>L</td><td>67cm</td><td>57cm</td><td>62cm</td></tr></table>
         <div style="font-size:11.5px;margin-top:8px;line-height:1.65"><b>소재</b> 겉감: 울 50%, 아크릴 50%<br><b>세탁</b> 손세탁 가능</div>
       </div>
-      <div class="clerk-fab" data-go="clerk"><div class="bubble">비슷한 옷 2벌 있어요</div><div class="robot" style="transform:scale(.8)"><div class="face"><i></i></div></div></div>
-      <div class="toolbar"><svg class="i"><use href="#back"/></svg><svg class="i"><use href="#fwd"/></svg><svg class="i"><use href="#refresh"/></svg><svg class="i" title="내 쇼핑몰에 추가"><use href="#star"/></svg><svg class="i" title="외부 브라우저로 열기"><use href="#ext"/></svg></div>
+      <div class="dock-menu"><div>홈</div><div>내 옷장</div><div>쇼핑몰 목록</div><div>마이</div></div>
+      <div class="dock"><span title="누르면 위 메뉴">☰</span><span class="sep"></span><span data-go="clerk">비슷한 옷 2벌 있어요</span></div>
     </div>
   </section>
 
