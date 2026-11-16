@@ -13,7 +13,6 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +20,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -45,14 +43,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -64,7 +58,6 @@ import com.team12.closet.data.TranslateRepository
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
-import kotlin.math.roundToInt
 
 /** 브라우저 화면 상태. 테스트에서 직접 만들어 넘길 수 있다 */
 @Stable
@@ -151,17 +144,12 @@ fun BrowserScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val density = LocalDensity.current
     var webView by remember { mutableStateOf<WebView?>(null) }
     var panelOpen by rememberSaveable { mutableStateOf(false) }
     var moreOpen by remember { mutableStateOf(false) }
     var areaSize by remember { mutableStateOf(IntSize.Zero) }
-    var dockSize by remember { mutableStateOf(IntSize.Zero) }
-    var dockOffset by remember { mutableStateOf(Offset.Zero) }
-    var dockDragging by remember { mutableStateOf(false) }
-    var dockTucked by remember { mutableStateOf<DockEdge?>(null) }
-    val margin = 16.dp
-    val marginPx = with(density) { margin.toPx() }
+    // 떠 있는 버블 위치·숨김. 패널을 열었다 닫아도 남는다
+    val dock = remember { DockState() }
     val onProduct: (String) -> Unit = { json -> scope.launch { lookup?.onProductPage(json) } }
     // 페이지 하나가 보낼 수 있는 번역 요청 수. 악성 페이지가 끝없이 요청해 비용을 쓰지 못하게 (서버에도 상한)
     val translateRequests = remember { intArrayOf(0) }
@@ -289,59 +277,21 @@ fun BrowserScreen(
                     clerk = clerkSession,
                     modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.6f),
                 )
-            } else if (dockTucked != null) {
-                // 화면 밖으로 밀어 숨긴 버블: 가장자리 손잡이만 남는다. 누르면 같은 높이로 다시 나온다
-                val edge = dockTucked!!
-                DockHandle(
-                    edge = edge,
-                    hasNews = product is ProductState.Ready && !state.loadFailed,
-                    onClick = {
-                        dockOffset = untuckedOffset(edge, dockOffset.y, areaSize, dockSize, marginPx)
-                        dockTucked = null
-                    },
-                    modifier =
-                        Modifier
-                            .align(if (edge == DockEdge.RIGHT) Alignment.BottomEnd else Alignment.BottomStart)
-                            .padding(bottom = margin)
-                            .offset { IntOffset(0, clampDock(dockOffset, areaSize, dockSize, marginPx).y.roundToInt()) },
-                )
             } else {
                 // 다른 화면으로 가는 길 + 상품 말풍선/AI 점원을 버블 하나에 (하단 탭 대신).
-                // 끌어서 옮기고, 양옆 화면 밖으로 밀면 가장자리에 숨는다 (2026-11-16)
-                BrowserDock(
+                // 끌어서 옮기고, 양옆 화면 밖으로 밀면 가장자리에 숨는다. 물방울처럼 움직인다 (2026-11-16)
+                FloatingDock(
+                    state = dock,
+                    area = areaSize,
+                    margin = 16.dp,
                     product = product.takeIf { !state.loadFailed },
                     hasClerk = clerkSession != null && !state.loadFailed,
+                    hasNews = product is ProductState.Ready && !state.loadFailed,
                     destinations = if (onGoElsewhere == null) listOf(DockDestination.SHOPS) else DockDestination.entries,
                     onOpenPanel = { panelOpen = true },
                     onGo = { destination ->
                         if (destination == DockDestination.SHOPS) onClose() else onGoElsewhere?.invoke(destination)
                     },
-                    modifier =
-                        Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(margin)
-                            .offset {
-                                // 끄는 동안은 화면 밖까지, 놓으면 영역 안으로 맞춘다
-                                val o = if (dockDragging) dockOffset else clampDock(dockOffset, areaSize, dockSize, marginPx)
-                                IntOffset(o.x.roundToInt(), o.y.roundToInt())
-                            }.onSizeChanged { dockSize = it }
-                            .pointerInput(Unit) {
-                                detectDragGestures(
-                                    onDragStart = { dockDragging = true },
-                                    onDragEnd = {
-                                        dockDragging = false
-                                        dockTucked = tuckEdge(dockOffset, areaSize, dockSize, marginPx)
-                                        dockOffset = clampDock(dockOffset, areaSize, dockSize, marginPx)
-                                    },
-                                    onDragCancel = {
-                                        dockDragging = false
-                                        dockOffset = clampDock(dockOffset, areaSize, dockSize, marginPx)
-                                    },
-                                ) { change, drag ->
-                                    change.consume()
-                                    dockOffset = dragDock(dockOffset + drag, areaSize, dockSize, marginPx)
-                                }
-                            },
                 )
             }
         }

@@ -6,6 +6,7 @@ import com.team12.closet.ui.shop.DockEdge
 import com.team12.closet.ui.shop.clampDock
 import com.team12.closet.ui.shop.dragDock
 import com.team12.closet.ui.shop.tuckEdge
+import com.team12.closet.ui.shop.tuckedOffset
 import com.team12.closet.ui.shop.untuckedOffset
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -48,5 +49,11 @@ class BrowserDockTest {
     fun handleBringsItBackOnTheSameSideAndHeight() {
         assertEquals(Offset(0f, -300f), untuckedOffset(DockEdge.RIGHT, -300f, area, dock, 40f))
         assertEquals(Offset(-620f, -300f), untuckedOffset(DockEdge.LEFT, -300f, area, dock, 40f))
+    }
+
+    @Test
+    fun tuckingSlidesItOneDockWidthPastThatEdge() {
+        assertEquals(Offset(340f, -300f), tuckedOffset(DockEdge.RIGHT, -300f, area, dock, 40f))
+        assertEquals(Offset(-960f, -300f), tuckedOffset(DockEdge.LEFT, -300f, area, dock, 40f))
     }
 }
