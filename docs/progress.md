@@ -1,9 +1,11 @@
 # 진행 상황
 
-## 현재 상태 (2026-11-10)
-- 서비스 이름 **DupeCheck**, applicationId `com.dupecheck.app`. **Play 비공개 테스트(Alpha) 출시됨** (11-10 20:34 제출 → 같은 날 승인). 첫 빌드 versionCode 4는 로그인 없음·서버 주소가 개발용이라 옷장 기능은 동작하지 않는다. 테스터 18명 신청(11-10), Play 목록에 등록 → 참여 링크 배포 중 (12명 이상 참여한 날부터 14일)
-- 구현(sandbox, 검수 전): 기능 1·2 서버+앱, 기능 3 서버(앱은 컴파일 안 되는 WIP), 기능 5. 구현 전: 기능 4·6·7 등
-- 다음: 11-18 SP2 MVP 발표·시연 (발표 덱은 claude.ai 아티팩트 'DupeCheck SP2 MVP 발표', moneyhipo 소유), 서버 HTTPS 배포, 기능 3 앱 마무리
+## 현재 상태 (2026-11-16)
+- **DupeCheck** (`com.dupecheck.app`), Play **비공개 테스트(Alpha) 중**. 최신 Play 빌드는 AAB v0.1.5 (versionCode 6). 서버가 없어 **게스트로 화면만** 볼 수 있다
+- 끝남: 11-18 SP2 MVP 발표·시연 건, 비공개 테스터 2차 모집 (11-16 사용자 확인)
+- 구현(sandbox, 검수 전): 기능 1~8, 10~12 서버+앱. 구현 전: 기능 13~15(자동 등록), 정식 출시
+- 막힌 것: **Vultr HTTPS 서버 없음**(교수님 API 키 대기) → 로그인·옷장·AI 기능을 실제 폰에서 못 씀
+- 지금 하는 것: 인앱 브라우저 화면 넓히기 (mmminsung02 일을 moneyhipo가 가져옴, 11-16). 그다음은 아래 '다음 할 일'
 
 ## 작업 로그
 | 날짜 | 작업 | 비고 |
@@ -60,6 +62,7 @@
 | 2026-11-11 | 기능 11 구매 전 비교 리포트 **서버+앱** (mmminsung02, `sandbox/mmminsung02/`, 검수 전) | 서버 `POST /v1/products/{id}/report`: 유사 검색 TOP 3 중 **가장 비슷한 1벌**과 비교. 비슷한 점·다른 점·확인 안 된 점은 규칙으로만 정한다 (한쪽이라도 값 없음 → 확인 안 됨, 같음 → 비슷한 점, 다름 → 다른 점). 종류, 색(쇼핑몰 색 이름을 옷장 15색 표로, 표에 없거나 두 색이면 상품 사진 색 · `basis` page/photo), 소재(섬유 이름 울·면·폴리에스터… 를 한국어·영어·일본어로 뽑아 종류 비교, 비율은 안 봄), 핏(내 옷에 칸이 없어 상품에 있을 때만 확인 안 됨). 사이즈는 비교하지 않음(사이즈표와 한 칸은 기준이 다름). Claude Haiku 5.5는 정해진 사실을 문장으로만 옮기고, 서버가 다시 검사한다: 구매 권유·만류·확률 표현이 있는 문장, 데이터에 없는 숫자가 있는 문장은 뺀다(로그). LLM 실패·키 없음·사용자당 1분 20회 초과면 문장 없이 비교표만. 비슷한 옷이 없으면 '옷장에 비슷한 옷이 없어요' + 상품 정보만. `reports` 표에 저장. 앱: 상품 패널 TOP 3 아래 요약 + '리포트 전체 보기'(시안 7번), 펼치면 세 부분 + '구매는 직접 판단해 주세요…'(시안 공유 결과 화면). 문장이 없으면 비교표 줄('소재: 새 상품 울 100% · 내 옷 면 100%')을 바로 펼침. 옷장이 비면 요청 안 함. 번역 요청 상한 코드를 `api/limits.py`로 옮겨 같이 씀. 테스트: 서버 176(완료 조건 [서버] 6개 포함) + 실제 Claude 2(slow), 앱 116. **실제 Claude로 확인**: 문장 1.4~3.3초. 처음 프롬프트에서 쇼핑몰 색인데 '사진 기준'이라 쓰고, '코디에 활용하기 좋아요' 같은 조언을 붙이고, 비슷한 옷이 없는데 '내 옷 정보가 없어요'라고 씀 → 프롬프트와 `product_info` 구분으로 고침. 실제 폰 미확인 |
 | 2026-11-11 | 기능 6 페이지 그 자리 번역 **주입JS+서버+앱** (mmminsung02, `sandbox/mmminsung02/`, 검수 전) | `src/inject/translate.js`: 텍스트 노드 수집(script·style·textarea·input·`translate=no`·숨김은 제외, 숫자·가격·한국어는 안 보냄) → 앱 다리 `DupeCheckBridge.translate(id, 문장들)` → 앱이 서버 번역 후 `apply()`로 돌려주면 그 자리에서 바꿈(앞뒤 공백 유지). 원문 보기/다시 번역, MutationObserver로 나중에 생긴 글자, 결제·로그인 주소(한 화면 안에서 주소만 바뀌어도)에서는 0건, 한국어 페이지는 `korean` 상태만. 보낼 순서: 화면에 보임 → 본문(main·h1·상품) → 그 밖 → 숨김, 40문장씩. 서버 `POST /v1/translate`: 캐시(`translation_cache`, 사용자끼리 공유)에 없는 것만 Claude Haiku 5.5로, 단위 변환 붙임, 로그인 필요, 사용자당 1분 60회 상한(429). Claude 응답은 문장마다 번호(id)로 맞추고 빠진 것만 한 번 더, 그래도 없으면 원문. 앱: 번역 막대(시안 12번: '일본어 → 한국어로 바꿨어요 · 원문 보기' + 켜기/끄기, 한국어 페이지예요, 번역하지 못했어요), 한 페이지 번역 요청 30회 상한. 테스트: 서버 157, 주입 JS 28(완료 조건 [주입JS] 5개 포함), 앱 108. **실제 Claude로 잼**(저장 페이지, 요청 여러 개 동시, 첫 호출 준비 시간 뺌): ZOZOTOWN 첫 묶음 2.4초·전체 4.4초, ASOS(577문장) 첫 묶음 4.6초·전체 18.7초. 처음엔 200문장씩 문서 순서로 보내 ASOS 첫 요청 16.7초·ZOZOTOWN 11.1초였다(숨은 쿠키 안내문부터 번역) → 순서·크기·동시 번역으로 줄임. 그 과정에서 Claude가 40개에 41개로 답해 요청 전체가 실패하는 문제 → 번호로 맞추게 고침. 검수에서 찾은 비용 문제: 아무 페이지나 번역 요청을 끝없이 보낼 수 있었음 → 앱·서버 양쪽 상한. **[평가] 첫 화면 번역 시간은 실제 폰에서 영어·일본어 각 10개 이상으로 다시 잰다**(jsdom은 화면 위치를 몰라 '보이는 글자 먼저'가 안 됨). 실제 폰 미확인 |
 | 2026-11-12 | 비공개 테스터 2차 모집 글 + 참여 안내 메일 초안 (moneyhipo) | 교수님이 수업 공지로 올려 주기로 함. 신청은 Google 설문지(Gmail 주소만), **11-18까지**. 글에 적은 것: 12명·14일 조건, 14일 동안 나가지 않기, 안드로이드면 설치해서 게스트로 한 번 열어 보기, 이메일은 등록에만 쓰고 끝나면 삭제. 폼은 편집자용 `/edit` 주소가 아니라 보내기 → 링크 주소를 써야 한다. 참여 안내 메일은 참여 링크 `https://play.google.com/apps/testing/com.dupecheck.app`, 받는 사람은 **숨은참조**, Play 테스터 목록에 먼저 저장한 뒤 보낸다. 11-18에 들어온 사람부터 세면 프로덕션 신청은 12-02쯤부터 |
+| 2026-11-16 | 문서 정리 (moneyhipo) | progress.md 현재 상태·다음 할 일을 지금에 맞게 다시 씀(지난 내용은 `docs/old/progress-status-history.md`). README '지금 요청'에서 끝난 7줄을 `docs/old/readme-requests-done.md`로 옮김. 인앱 브라우저 화면 넓히기는 mmminsung02 대신 moneyhipo가 하기로 함 |
 | 2026-10-21 | 대화 기록 저장, 문서 커밋·푸시 | [conversation-log.md](conversation-log.md). 제출 기획서 PDF는 팀원 이름·학번이 있어 공개 저장소에 올리지 않음 (`.gitignore`) |
 
 ## 결정 사항
@@ -135,13 +138,13 @@
 | 지원 쇼핑몰 목록 | **2026-11-04부터 기준이 바뀜: 한국어 지원 여부와 상관없이 많이 쓰는 해외 쇼핑몰을 넣는다** (결정 사항 참고). 시안 기본 목록(초안): 국내 무신사·29CM·W컨셉, 해외 Amazon·ZARA·H&M·SSENSE + 아래 후보. 국내 쇼핑몰도 WebView 열림·상품 정보 읽기를 확인해야 한다(앱 설치 유도 화면이 있을 수 있음). 아래는 10-28 조사 기록이다. 처음 기준: 많이 쓰이는 해외 쇼핑몰 중 한국어를 지원하지 않는 곳. 2026-10-28 직접 확인 결과 한국어 미지원 후보: 영어 **ASOS** (https://www.asos.com/women/), **Urban Outfitters** (https://www.urbanoutfitters.com/), **Abercrombie & Fitch** (https://www.abercrombie.com/, Hollister는 같은 회사라 하나만), **END. Clothing** (https://www.endclothing.com/), **J.Crew** (https://www.jcrew.com/), **Nordstrom** (https://www.nordstrom.com/), **유니클로 미국** (https://www.uniqlo.com/us/en/) / 일본어 **ZOZOTOWN** (https://zozo.jp/), **유니클로 일본** (https://www.uniqlo.com/jp/ja/), **GU 일본** (https://www.gu-global.com/jp/ja/), **BEAMS** (https://www.beams.co.jp/). 한국 직배송(웹 검색, 확인 필요): ASOS 있음(공식 배송 페이지), J.Crew 있음 가능성 높음(한국용 `/kr` 스토어), Urban Outfitters·A&F·END.·Nordstrom 불확실, 유니클로 미국·ZOZOTOWN·유니클로 일본·GU 일본 없음(국내 전용, 배송대행지 필요), BEAMS 자료가 엇갈림. **배송 태그로 표시하고 후보에서 빼지는 않는다** (2026-10-28 결정, [shop-browser.md](features/shopping/shop-browser.md)): `배송 가능` ASOS / `배송대행 필요` 유니클로 미국·ZOZOTOWN·유니클로 일본·GU 일본 / `그 외`(확인 전) J.Crew·Urban Outfitters·A&F·Nordstrom·END.·BEAMS. `그 외`는 결제 화면에서 배송 국가를 한국으로 바꿔 확인하면 옮긴다. Amazon 일본은 한국어 미지원이지만 종합몰이라 기본 목록에서는 빼고 사용자가 직접 추가하게 둔다(초안). 한국어를 지원해서 처음엔 뺐던 곳(11-04부터 다시 후보): Amazon(미국), SSENSE, 라쿠텐, UNITED ARROWS, ZARA, H&M. 이들의 배송 태그는 확인 전 | 상품 페이지 구조 확인 완료: ASOS·ZOZOTOWN(JSON-LD 있음), 유니클로 일본(페이지 데이터). 나머지는 앱이 생기면 실제 폰 WebView에서 열림·상품 정보 읽기를 확인하고 기본 목록을 정한다 |
 
 ## 다음 할 일 (순서대로)
-0. **기능 3 Google 로그인 실제 확인** (앱·서버 모두 sandbox에서 완료, 자동 테스트만 통과). 필요한 것: ① Google Cloud에 Android 클라이언트를 패키지 `com.dupecheck.app` + 빌드하는 PC의 디버그 SHA-1로 다시 등록 (mmminsung02 PC `42:B6:6F:0A:35:B8:A5:4D:ED:67:58:DB:B9:FA:2A:FD:C3:CB:2A:F2`, moneyhipo PC는 progress.md 위쪽 값) ② 폰에서 닿는 서버에 `GOOGLE_CLIENT_ID` 설정(Vultr HTTPS 배포) ③ `-PgoogleWebClientId=599165364681-s9frbpm05o8nko732c27715j557fuvni.apps.googleusercontent.com -PserverBaseUrl=https://...`로 빌드해 폰에서 로그인 → 옷 등록 → 로그아웃 → 계정 삭제. `KeystoreSessionStore`(토큰 암호화 저장)는 Robolectric에서 못 돌려서 이때 처음 확인된다
-1. **Play Console 개인 개발자 계정 만들기**, 비공개 테스트 테스터 15명 정도 모으기 시작 (14일 테스트가 일정의 병목)
-2. 미결정 사항 중 OCR·지원 쇼핑몰 정하기
-3. **기술 검증**: 후보 쇼핑몰마다 WebView에서 열림, 로그인·장바구니·결제 화면 진입, JS 주입으로 글자 읽기·바꾸기, JSON-LD Product 유무를 확인하고 결과를 여기에 기록
-4. 안드로이드 프로젝트 뼈대 검수 후 `src/android/`로 옮기기 (sandbox에서 생성 완료). 옮기기 전에 3번째 탭 이름을 `번역`에서 `쇼핑`으로 바꾼다 (`ClosetApp.kt`의 `SHOPPING("번역", ...)`, 테스트에 탭 이름이 있으면 같이). **applicationId 정하기** (Play에 올리면 바꿀 수 없음, 서비스 이름과 함께 첫 비공개 테스트 전까지)
-5. 평가 데이터 준비 시작: 의류 사진 100~200장 라벨링, 영어·일본어 상품 페이지·캡처 30~50개
-6. 기능 1번 [wardrobe/photo-register.md](features/wardrobe/photo-register.md): 서버는 sandbox에서 완료(검수 전). 앱 화면도 sandbox에서 완료(검수 전, 실제 폰 미확인). 남은 것: **[평가]** DeepFashion으로 쟀다(2026-11-07): 지금 서버 설정 79.8%(400장), FashionCLIP + v2 문장이면 88.0%. 실제 옷장 사진 29장(2026-11-08): 지금 서버 설정 82.8%(색 65.5%), FashionCLIP + v2 75.9%(색 44.8%)로 순위가 반대. **옷장 사진을 더 찍어(특히 상의, 팀원 옷도) 모델을 정하기**, 색 정확도 올릴 방법 찾기 (`sandbox/moneyhipo/eval/README.md`). 기능 2번은 sandbox에서 완료(검수 전, 오프라인 캐시 남음). 기능 3은 sandbox에서 완료(실제 로그인 미확인, 0번). 기능 4는 sandbox에서 완료, 남은 것: **[평가] Recall@3 정답 세트**(상품 사진 + 사람이 고른 비슷한 내 옷)와 단계 기준 점수. 그다음 기능 6번부터 순서대로
+1. **인앱 브라우저 화면 넓히기** (moneyhipo가 가져옴, 11-16). README 요청 그대로: 브라우저가 열려 있으면 우리 하단 탭을 숨기고, 홈·내 옷장·쇼핑몰 목록·마이와 AI 점원은 떠 있는 버튼 메뉴로
+2. **기능 3 Google 로그인 실제 확인**. 남은 것: ① Google Cloud에 Android 클라이언트(`com.dupecheck.app`)를 mmminsung02 PC SHA-1 `42:B6:6F:0A:35:B8:A5:4D:ED:67:58:DB:B9:FA:2A:FD:C3:CB:2A:F2`와 Play 앱 서명 키 SHA-1로 등록 (moneyhipo PC SHA-1은 11-11에 등록함) ② Vultr HTTPS 배포 + `GOOGLE_CLIENT_ID` 설정 ③ `-PgoogleWebClientId=599165364681-s9frbpm05o8nko732c27715j557fuvni.apps.googleusercontent.com -PserverBaseUrl=https://...`로 빌드해 폰에서 로그인 → 옷 등록 → 로그아웃 → 계정 삭제. `KeystoreSessionStore`(토큰 암호화 저장)는 Robolectric에서 못 돌려서 이때 처음 확인된다
+3. **평가**: 기능 1은 옷장 사진을 더 찍어(특히 상의, 팀원 옷도) CLIP 모델 정하기 + 색 정확도 올릴 방법 (DeepFashion 400장은 FashionCLIP + v2가 88.0%, 실제 옷장 29장은 지금 설정이 82.8%로 순위가 반대, `sandbox/moneyhipo/eval/README.md`). 기능 4는 Recall@3 정답 세트와 단계 기준 점수
+4. 지원 쇼핑몰 정하기 + **기술 검증**: 후보 쇼핑몰마다 WebView에서 열림, 로그인·장바구니·결제 화면 진입, JS 주입으로 글자 읽기·바꾸기, JSON-LD Product 유무를 확인하고 결과를 여기에 기록
+5. sandbox 검수 후 `src/`·`tests/`로 옮기기 (앱·서버)
+6. 기능 13~15 자동 등록 (구현 전, 13~14주)
+7. 정식 출시: 비공개 테스트 14일이 끝나면 프로덕션 신청. 그 직전에 release 빌드 R8·디버그 기호 켜기 (README 요청)
 
 ## 알려진 위험
 [architecture.md](architecture.md)의 '주요 위험' 참고. 가장 큰 두 가지:
