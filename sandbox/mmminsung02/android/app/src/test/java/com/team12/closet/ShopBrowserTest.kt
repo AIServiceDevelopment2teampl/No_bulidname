@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasTestTag
@@ -15,6 +16,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipe
 import com.team12.closet.ui.ClosetApp
 import com.team12.closet.ui.shop.BrowserScreen
 import com.team12.closet.ui.shop.BrowserState
@@ -193,6 +196,22 @@ class ShopBrowserTest {
 
         composeRule.onNodeWithTag("shop_list").assertIsDisplayed()
         composeRule.onNodeWithTag("tab_HOME").assertIsDisplayed()
+    }
+
+    @Test
+    fun pushingDockOffTheEdgeTucksItAndHandleBringsItBack() {
+        openShoppingTab()
+        composeRule.onNodeWithTag("shop_https://zozo.jp/").performClick()
+        composeRule.onNodeWithTag("browser").assertIsDisplayed()
+
+        composeRule.onNodeWithTag("browser_dock").performTouchInput {
+            swipe(start = center, end = Offset(center.x + 2000f, center.y), durationMillis = 300)
+        }
+
+        composeRule.onNodeWithTag("browser_dock").assertDoesNotExist()
+        composeRule.onNodeWithTag("browser_dock_handle").performClick()
+        composeRule.onNodeWithTag("browser_dock").assertIsDisplayed()
+        composeRule.onNodeWithTag("browser_dock_handle").assertDoesNotExist()
     }
 
     @Test

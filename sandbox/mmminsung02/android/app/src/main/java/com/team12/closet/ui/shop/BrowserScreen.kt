@@ -158,6 +158,10 @@ fun BrowserScreen(
     var areaSize by remember { mutableStateOf(IntSize.Zero) }
     var dockSize by remember { mutableStateOf(IntSize.Zero) }
     var dockOffset by remember { mutableStateOf(Offset.Zero) }
+    var dockDragging by remember { mutableStateOf(false) }
+    var dockTucked by remember { mutableStateOf<DockEdge?>(null) }
+    val margin = 16.dp
+    val marginPx = with(density) { margin.toPx() }
     val onProduct: (String) -> Unit = { json -> scope.launch { lookup?.onProductPage(json) } }
     // 페이지 하나가 보낼 수 있는 번역 요청 수. 악성 페이지가 끝없이 요청해 비용을 쓰지 못하게 (서버에도 상한)
     val translateRequests = remember { intArrayOf(0) }
@@ -285,10 +289,25 @@ fun BrowserScreen(
                     clerk = clerkSession,
                     modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.6f),
                 )
+            } else if (dockTucked != null) {
+                // 화면 밖으로 밀어 숨긴 버블: 가장자리 손잡이만 남는다. 누르면 같은 높이로 다시 나온다
+                val edge = dockTucked!!
+                DockHandle(
+                    edge = edge,
+                    hasNews = product is ProductState.Ready && !state.loadFailed,
+                    onClick = {
+                        dockOffset = untuckedOffset(edge, dockOffset.y, areaSize, dockSize, marginPx)
+                        dockTucked = null
+                    },
+                    modifier =
+                        Modifier
+                            .align(if (edge == DockEdge.RIGHT) Alignment.BottomEnd else Alignment.BottomStart)
+                            .padding(bottom = margin)
+                            .offset { IntOffset(0, clampDock(dockOffset, areaSize, dockSize, marginPx).y.roundToInt()) },
+                )
             } else {
-                // 다른 화면으로 가는 길 + 상품 말풍선/AI 점원을 버블 하나에 (하단 탭 대신). 끌어서 옮길 수 있다
-                val margin = 16.dp
-                val marginPx = with(density) { margin.toPx() }
+                // 다른 화면으로 가는 길 + 상품 말풍선/AI 점원을 버블 하나에 (하단 탭 대신).
+                // 끌어서 옮기고, 양옆 화면 밖으로 밀면 가장자리에 숨는다 (2026-11-16)
                 BrowserDock(
                     product = product.takeIf { !state.loadFailed },
                     hasClerk = clerkSession != null && !state.loadFailed,
@@ -302,13 +321,25 @@ fun BrowserScreen(
                             .align(Alignment.BottomEnd)
                             .padding(margin)
                             .offset {
-                                val o = clampDock(dockOffset, areaSize, dockSize, marginPx)
+                                // 끄는 동안은 화면 밖까지, 놓으면 영역 안으로 맞춘다
+                                val o = if (dockDragging) dockOffset else clampDock(dockOffset, areaSize, dockSize, marginPx)
                                 IntOffset(o.x.roundToInt(), o.y.roundToInt())
                             }.onSizeChanged { dockSize = it }
                             .pointerInput(Unit) {
-                                detectDragGestures { change, drag ->
+                                detectDragGestures(
+                                    onDragStart = { dockDragging = true },
+                                    onDragEnd = {
+                                        dockDragging = false
+                                        dockTucked = tuckEdge(dockOffset, areaSize, dockSize, marginPx)
+                                        dockOffset = clampDock(dockOffset, areaSize, dockSize, marginPx)
+                                    },
+                                    onDragCancel = {
+                                        dockDragging = false
+                                        dockOffset = clampDock(dockOffset, areaSize, dockSize, marginPx)
+                                    },
+                                ) { change, drag ->
                                     change.consume()
-                                    dockOffset = clampDock(dockOffset + drag, areaSize, dockSize, marginPx)
+                                    dockOffset = dragDock(dockOffset + drag, areaSize, dockSize, marginPx)
                                 }
                             },
                 )
