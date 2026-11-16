@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -55,6 +56,7 @@ import com.team12.closet.ui.closet.ClothDetailScreen
 import com.team12.closet.ui.register.RegisterPhotoRoute
 import com.team12.closet.ui.register.RegisterPhotoViewModel
 import com.team12.closet.ui.share.ShareResultScreen
+import com.team12.closet.ui.shop.DockDestination
 import com.team12.closet.ui.shop.ShopTab
 import com.team12.closet.ui.theme.AppTheme
 import com.team12.closet.ui.theme.ClosetTheme
@@ -178,9 +180,15 @@ private fun MainTabs(
         return
     }
 
+    // 인앱 브라우저가 열려 있는지. 열린 브라우저는 다른 탭에 다녀와도 그대로 둔다 (2026-11-16)
+    var browserOpen by remember { mutableStateOf(false) }
+    val browserShowing = browserOpen && selected == MainTab.SHOPPING
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbar) },
         bottomBar = {
+            // 브라우저를 보는 동안은 하단 탭을 숨기고 화면을 웹페이지에 내준다. 다른 곳은 브라우저 버블 메뉴로 간다
+            if (browserShowing) return@Scaffold
             NavigationBar {
                 MainTab.entries.forEach { tab ->
                     NavigationBarItem(
@@ -202,20 +210,42 @@ private fun MainTabs(
                     .testTag("screen_${selected.name}"),
             contentAlignment = Alignment.Center,
         ) {
-            when (selected) {
-                MainTab.CLOSET -> ClosetTab(sessionKey, clothesRepository)
-                MainTab.HOME -> HomeScreen(onShop = { selected = MainTab.SHOPPING }, onCloset = { selected = MainTab.CLOSET })
-                MainTab.SHOPPING ->
-                    ShopTab(
-                        shopsRepository,
-                        productsRepository,
-                        imageUrl = { clothesRepository.imageUrl(it.imageUrl) },
-                        translator = translateRepository,
-                        openRequest = openLink,
-                        onOpenRequestHandled = { openLink = null },
-                        clerk = clerkRepository,
-                    )
-                MainTab.MY -> MyScreen(currentTheme, onThemeChange, authRepository, clothesRepository)
+            // 쇼핑 탭은 브라우저가 열려 있으면 다른 탭을 보는 동안에도 뒤에 남겨 둔다 (WebView·보던 페이지 유지)
+            if (selected == MainTab.SHOPPING || browserOpen) {
+                ShopTab(
+                    shopsRepository,
+                    productsRepository,
+                    imageUrl = { clothesRepository.imageUrl(it.imageUrl) },
+                    translator = translateRepository,
+                    openRequest = openLink,
+                    onOpenRequestHandled = { openLink = null },
+                    clerk = clerkRepository,
+                    active = selected == MainTab.SHOPPING,
+                    onBrowserOpenChange = { browserOpen = it },
+                    onGoElsewhere = { destination ->
+                        selected =
+                            when (destination) {
+                                DockDestination.HOME -> MainTab.HOME
+                                DockDestination.CLOSET -> MainTab.CLOSET
+                                DockDestination.SHOPS -> MainTab.SHOPPING
+                                DockDestination.MY -> MainTab.MY
+                            }
+                    },
+                )
+            }
+            if (selected != MainTab.SHOPPING) {
+                // 뒤에 남겨 둔 브라우저를 가리고 터치도 막는다 (Surface가 터치를 받는다)
+                Surface(color = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        when (selected) {
+                            MainTab.CLOSET -> ClosetTab(sessionKey, clothesRepository)
+                            MainTab.HOME ->
+                                HomeScreen(onShop = { selected = MainTab.SHOPPING }, onCloset = { selected = MainTab.CLOSET })
+                            MainTab.MY -> MyScreen(currentTheme, onThemeChange, authRepository, clothesRepository)
+                            MainTab.SHOPPING -> Unit
+                        }
+                    }
+                }
             }
         }
     }

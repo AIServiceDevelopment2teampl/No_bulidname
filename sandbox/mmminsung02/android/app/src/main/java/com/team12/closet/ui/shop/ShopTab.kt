@@ -1,6 +1,7 @@
 package com.team12.closet.ui.shop
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +27,12 @@ fun ShopTab(
     openRequest: String? = null,
     onOpenRequestHandled: () -> Unit = {},
     clerk: ClerkRepository? = null,
+    // 다른 탭 화면 뒤에 살려 둔 동안은 false (보던 페이지를 그대로 두려고, 2026-11-16)
+    active: Boolean = true,
+    // 브라우저가 열렸는지 알린다. 열려 있으면 하단 탭을 숨긴다
+    onBrowserOpenChange: (Boolean) -> Unit = {},
+    // 브라우저 버블 메뉴의 홈·내 옷장·마이
+    onGoElsewhere: ((DockDestination) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     var openUrl by rememberSaveable { mutableStateOf<String?>(openRequest) }
@@ -48,6 +55,9 @@ fun ShopTab(
     // 추가 화면에 다녀와도 보던 페이지로 돌아오도록 브라우저 상태는 여기서 들고 있는다
     val browserState = remember(openUrl) { openUrl?.let { BrowserState(it) } }
     val lookup = remember(openUrl) { ProductLookup(products) }
+    val browserOpen = browserState != null
+    LaunchedEffect(browserOpen) { onBrowserOpenChange(browserOpen) }
+    DisposableEffect(Unit) { onDispose { onBrowserOpenChange(false) } }
 
     addFromBrowser?.let { (name, siteUrl) ->
         AddShopScreen(repository = repository, initialName = name, initialUrl = siteUrl, onDone = { addFromBrowser = null })
@@ -67,6 +77,8 @@ fun ShopTab(
             imageUrl = imageUrl,
             translator = translator,
             clerk = clerk,
+            onGoElsewhere = onGoElsewhere,
+            active = active,
         )
     }
 }

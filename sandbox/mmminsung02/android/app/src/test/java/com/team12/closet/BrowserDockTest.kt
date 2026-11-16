@@ -1,0 +1,26 @@
+package com.team12.closet
+
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.IntSize
+import com.team12.closet.ui.shop.clampDock
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+/** 떠 있는 버블은 웹페이지 영역 안에서만 움직인다 */
+class BrowserDockTest {
+    private val area = IntSize(1000, 2000)
+    private val dock = IntSize(300, 100)
+
+    @Test
+    fun staysInsideTheArea() {
+        // 왼쪽 끝: -(1000 - 300 - 2*40) = -620, 위쪽 끝: -(2000 - 100 - 80) = -1820
+        assertEquals(Offset(-620f, -1820f), clampDock(Offset(-5000f, -5000f), area, dock, 40f))
+        assertEquals(Offset(0f, 0f), clampDock(Offset(50f, 50f), area, dock, 40f))
+        assertEquals(Offset(-100f, -200f), clampDock(Offset(-100f, -200f), area, dock, 40f))
+    }
+
+    @Test
+    fun areaNotMeasuredYetKeepsItInTheCorner() {
+        assertEquals(Offset(0f, 0f), clampDock(Offset(-100f, -100f), IntSize.Zero, dock, 40f))
+    }
+}

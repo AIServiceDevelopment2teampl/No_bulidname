@@ -61,28 +61,25 @@ private val CARD_FIELDS =
         "care" to "세탁",
     )
 
-/** 상품 페이지가 아닐 때의 AI 점원 버튼 (일반 쇼핑 질문) */
+/** 상품 페이지가 아닐 때의 AI 점원 버튼 (일반 쇼핑 질문). 떠 있는 버블(BrowserDock) 오른쪽 칸 */
 @Composable
 fun ClerkBubble(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.primary,
-        shadowElevation = 6.dp,
-        modifier = modifier.clickable(onClick = onClick).testTag("clerk_bubble"),
-    ) {
-        Text(
-            "AI 점원",
-            color = MaterialTheme.colorScheme.onPrimary,
-            style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-        )
-    }
+    Text(
+        "AI 점원",
+        color = MaterialTheme.colorScheme.onPrimary,
+        style = MaterialTheme.typography.labelLarge,
+        modifier =
+            modifier
+                .clickable(onClick = onClick)
+                .testTag("clerk_bubble")
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+    )
 }
 
-/** 시안 '12. 인앱 브라우저'의 오른쪽 아래 말풍선. 누르면 패널이 열린다 */
+/** 시안 '12. 인앱 브라우저'의 상품 말풍선. 떠 있는 버블(BrowserDock) 오른쪽 칸이고 누르면 패널이 열린다 */
 @Composable
 fun ProductBubble(
     state: ProductState,
@@ -95,22 +92,22 @@ fun ProductBubble(
             is ProductState.Failed -> "상품 정보를 읽지 못했어요"
             is ProductState.Ready -> state.similar?.let { headline(it) } ?: "상품 정보 보기"
         }
-    Surface(
-        shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.primary,
-        shadowElevation = 6.dp,
-        modifier = modifier.clickable(onClick = onClick).testTag("product_bubble"),
+    Row(
+        modifier =
+            modifier
+                .clickable(onClick = onClick)
+                .testTag("product_bubble")
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (state == ProductState.Loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.padding(end = 8.dp).heightIn(max = 16.dp),
-                    strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                )
-            }
-            Text(text, color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.labelLarge)
+        if (state == ProductState.Loading) {
+            CircularProgressIndicator(
+                modifier = Modifier.padding(end = 8.dp).heightIn(max = 16.dp),
+                strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.onPrimary,
+            )
         }
+        Text(text, color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.labelLarge)
     }
 }
 

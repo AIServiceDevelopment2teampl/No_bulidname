@@ -21,6 +21,8 @@ import com.team12.closet.ui.shop.BrowserState
 import com.team12.closet.ui.theme.ClosetTheme
 import com.team12.closet.ui.theme.InMemoryThemeStore
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -120,12 +122,77 @@ class ShopBrowserTest {
             shadowOf(webView).webViewClient.onPageStarted(webView, "https://zozo.jp/shop/beams/goods/7781/", null)
         }
 
+        composeRule.onNodeWithTag("browser_more").performClick()
         composeRule.onNodeWithTag("browser_add_shop").performClick()
         composeRule.onNodeWithTag("add_shop_screen").assertIsDisplayed()
         composeRule.onNodeWithTag("add_shop_cancel").performClick()
 
         composeRule.onNodeWithTag("browser").assertIsDisplayed()
         assertEquals("https://zozo.jp/shop/beams/goods/7781/", shadowOf(findWebView()!!).lastLoadedUrl)
+    }
+
+    // 2026-11-16 인앱 브라우저 화면 넓히기: 하단 탭을 숨기고 버블 메뉴로 다른 화면에 간다
+    @Test
+    fun browserHidesBottomTabsAndClosingBringsThemBack() {
+        openShoppingTab()
+        composeRule.onNodeWithTag("tab_HOME").assertIsDisplayed()
+
+        composeRule.onNodeWithTag("shop_https://zozo.jp/").performClick()
+
+        composeRule.onNodeWithTag("tab_HOME").assertDoesNotExist()
+        // 아래 버튼 줄은 위 주소 줄로 올라갔다
+        composeRule.onNodeWithTag("browser_back").assertIsDisplayed()
+        composeRule.onNodeWithTag("browser_reload").assertIsDisplayed()
+        composeRule.onNodeWithTag("browser_dock").assertIsDisplayed()
+
+        composeRule.onNodeWithTag("browser_close").performClick()
+
+        composeRule.onNodeWithTag("shop_list").assertIsDisplayed()
+        composeRule.onNodeWithTag("tab_HOME").assertIsDisplayed()
+    }
+
+    @Test
+    fun dockMenuGoesToClosetAndShoppingTabReturnsToTheSamePage() {
+        openShoppingTab()
+        composeRule.onNodeWithTag("shop_https://zozo.jp/").performClick()
+        composeRule.onNodeWithTag("browser").assertIsDisplayed()
+        val webView = findWebView()!!
+        composeRule.runOnIdle {
+            shadowOf(webView).webViewClient.onPageStarted(webView, "https://zozo.jp/shop/beams/goods/7781/", null)
+        }
+
+        composeRule.onNodeWithTag("browser_menu").performClick()
+        composeRule.onNodeWithTag("dock_CLOSET").performClick()
+
+        composeRule.onNodeWithTag("screen_CLOSET").assertIsDisplayed()
+        composeRule.onNodeWithTag("tab_SHOPPING").assertIsDisplayed()
+        // 뒤에 남은 브라우저가 내 옷장의 뒤로 가기를 가로채지 않는다
+        composeRule.runOnIdle { assertFalse(composeRule.activity.onBackPressedDispatcher.hasEnabledCallbacks()) }
+
+        composeRule.onNodeWithTag("tab_SHOPPING").performClick()
+
+        composeRule.onNodeWithTag("browser").assertIsDisplayed()
+        composeRule.onNodeWithTag("tab_HOME").assertDoesNotExist()
+        // 새로 만든 WebView가 아니라 보던 것 그대로 (다시 불러오지 않음)
+        assertSame(webView, findWebView())
+        assertEquals("https://zozo.jp/", shadowOf(webView).lastLoadedUrl)
+    }
+
+    @Test
+    fun dockMenuHomeAndShopListWork() {
+        openShoppingTab()
+        composeRule.onNodeWithTag("shop_https://zozo.jp/").performClick()
+
+        composeRule.onNodeWithTag("browser_menu").performClick()
+        composeRule.onNodeWithTag("dock_HOME").performClick()
+        composeRule.onNodeWithTag("screen_HOME").assertIsDisplayed()
+
+        composeRule.onNodeWithTag("tab_SHOPPING").performClick()
+        composeRule.onNodeWithTag("browser_menu").performClick()
+        composeRule.onNodeWithTag("dock_SHOPS").performClick()
+
+        composeRule.onNodeWithTag("shop_list").assertIsDisplayed()
+        composeRule.onNodeWithTag("tab_HOME").assertIsDisplayed()
     }
 
     @Test

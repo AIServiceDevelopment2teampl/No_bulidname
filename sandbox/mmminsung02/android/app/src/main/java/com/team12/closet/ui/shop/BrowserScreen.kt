@@ -13,6 +13,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,10 +21,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -41,9 +45,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.team12.closet.data.ApiResult
@@ -54,6 +64,7 @@ import com.team12.closet.data.TranslateRepository
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
+import kotlin.math.roundToInt
 
 /** 브라우저 화면 상태. 테스트에서 직접 만들어 넘길 수 있다 */
 @Stable
@@ -133,11 +144,20 @@ fun BrowserScreen(
     translation: TranslationUi = remember { TranslationUi() },
     // AI 점원 (compare/ai-clerk.md). 없으면 대화·어울리는 옷 없이 상품 정보만
     clerk: ClerkRepository? = null,
+    // 버블 메뉴의 홈·내 옷장·마이. 없으면 버블 메뉴에 쇼핑몰 목록만 (테스트)
+    onGoElsewhere: ((DockDestination) -> Unit)? = null,
+    // 다른 탭 화면 뒤에 살려 둔 동안(false)은 뒤로 버튼을 가로채지 않는다
+    active: Boolean = true,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val density = LocalDensity.current
     var webView by remember { mutableStateOf<WebView?>(null) }
     var panelOpen by rememberSaveable { mutableStateOf(false) }
+    var moreOpen by remember { mutableStateOf(false) }
+    var areaSize by remember { mutableStateOf(IntSize.Zero) }
+    var dockSize by remember { mutableStateOf(IntSize.Zero) }
+    var dockOffset by remember { mutableStateOf(Offset.Zero) }
     val onProduct: (String) -> Unit = { json -> scope.launch { lookup?.onProductPage(json) } }
     // 페이지 하나가 보낼 수 있는 번역 요청 수. 악성 페이지가 끝없이 요청해 비용을 쓰지 못하게 (서버에도 상한)
     val translateRequests = remember { intArrayOf(0) }
@@ -179,17 +199,18 @@ fun BrowserScreen(
             "\n;if(!window.__dupecheckTranslateOff&&window.__dupecheck&&window.__dupecheck.translate)window.__dupecheck.translate.start();"
     }
 
-    BackHandler {
+    BackHandler(enabled = active) {
         val view = webView
         if (view != null && view.canGoBack()) view.goBack() else onClose()
     }
 
     Column(modifier = Modifier.fillMaxSize().testTag("browser")) {
+        // 아래 버튼 줄을 없애고 위 주소 줄에 모았다 (2026-11-16). ☆·↗는 ⋮ 안에
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 2.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TextButton(onClick = onClose, modifier = Modifier.testTag("browser_close")) { Text("✕") }
+            IconButton(onClick = onClose, modifier = Modifier.testTag("browser_close")) { Text("✕") }
             Text(
                 (if (state.currentUrl.startsWith("https://")) "🔒 " else "") + ShopUrls.host(state.currentUrl),
                 style = MaterialTheme.typography.bodySmall,
@@ -197,6 +218,38 @@ fun BrowserScreen(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f).testTag("browser_url"),
             )
+            IconButton(
+                onClick = { webView?.goBack() },
+                enabled = state.canGoBack,
+                modifier = Modifier.testTag("browser_back"),
+            ) { Text("〈") }
+            IconButton(
+                onClick = { webView?.goForward() },
+                enabled = state.canGoForward,
+                modifier = Modifier.testTag("browser_forward"),
+            ) { Text("〉") }
+            IconButton(onClick = { webView?.reload() }, modifier = Modifier.testTag("browser_reload")) { Text("↻") }
+            Box {
+                IconButton(onClick = { moreOpen = true }, modifier = Modifier.testTag("browser_more")) { Text("⋮") }
+                DropdownMenu(expanded = moreOpen, onDismissRequest = { moreOpen = false }) {
+                    DropdownMenuItem(
+                        text = { Text("☆ 내 쇼핑몰에 추가") },
+                        onClick = {
+                            moreOpen = false
+                            onAddToMyShops(state.title ?: ShopUrls.host(state.currentUrl), state.currentUrl)
+                        },
+                        modifier = Modifier.testTag("browser_add_shop"),
+                    )
+                    DropdownMenuItem(
+                        text = { Text("↗ 외부 브라우저로 열기") },
+                        onClick = {
+                            moreOpen = false
+                            openExternally(context, state.currentUrl)
+                        },
+                        modifier = Modifier.testTag("browser_external"),
+                    )
+                }
+            }
         }
         TranslationBar(translation) { on ->
             translation.enabled = on
@@ -204,7 +257,7 @@ fun BrowserScreen(
         }
         if (state.loading) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
 
-        Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+        Box(modifier = Modifier.weight(1f).fillMaxWidth().onSizeChanged { areaSize = it }) {
             AndroidView(
                 factory = { ctx -> createWebView(ctx, state, pageScript, bridge, onNewPage).also { webView = it } },
                 modifier = Modifier.fillMaxSize().testTag("browser_web"),
@@ -223,48 +276,43 @@ fun BrowserScreen(
             // 상품마다 대화가 따로다. 상품 페이지가 아니면 일반 대화(productId = null)
             val clerkSession = remember(productId, clerk) { clerk?.let { ClerkSession(it, productId) } }
             LaunchedEffect(panelOpen, clerkSession) { if (panelOpen) clerkSession?.open() }
-            if ((product != null || clerkSession != null) && !state.loadFailed) {
-                if (panelOpen) {
-                    ProductPanel(
-                        state = product,
-                        imageUrl = imageUrl,
-                        onClose = { panelOpen = false },
-                        clerk = clerkSession,
-                        modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.6f),
-                    )
-                } else if (product != null) {
-                    ProductBubble(
-                        state = product,
-                        onClick = { panelOpen = true },
-                        modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
-                    )
-                } else {
-                    ClerkBubble(onClick = { panelOpen = true }, modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp))
-                }
+            val panelAvailable = (product != null || clerkSession != null) && !state.loadFailed
+            if (panelOpen && panelAvailable) {
+                ProductPanel(
+                    state = product,
+                    imageUrl = imageUrl,
+                    onClose = { panelOpen = false },
+                    clerk = clerkSession,
+                    modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.6f),
+                )
+            } else {
+                // 다른 화면으로 가는 길 + 상품 말풍선/AI 점원을 버블 하나에 (하단 탭 대신). 끌어서 옮길 수 있다
+                val margin = 16.dp
+                val marginPx = with(density) { margin.toPx() }
+                BrowserDock(
+                    product = product.takeIf { !state.loadFailed },
+                    hasClerk = clerkSession != null && !state.loadFailed,
+                    destinations = if (onGoElsewhere == null) listOf(DockDestination.SHOPS) else DockDestination.entries,
+                    onOpenPanel = { panelOpen = true },
+                    onGo = { destination ->
+                        if (destination == DockDestination.SHOPS) onClose() else onGoElsewhere?.invoke(destination)
+                    },
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(margin)
+                            .offset {
+                                val o = clampDock(dockOffset, areaSize, dockSize, marginPx)
+                                IntOffset(o.x.roundToInt(), o.y.roundToInt())
+                            }.onSizeChanged { dockSize = it }
+                            .pointerInput(Unit) {
+                                detectDragGestures { change, drag ->
+                                    change.consume()
+                                    dockOffset = clampDock(dockOffset + drag, areaSize, dockSize, marginPx)
+                                }
+                            },
+                )
             }
-        }
-
-        HorizontalDivider()
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            TextButton(
-                onClick = { webView?.goBack() },
-                enabled = state.canGoBack,
-                modifier = Modifier.testTag("browser_back"),
-            ) { Text("〈") }
-            TextButton(
-                onClick = { webView?.goForward() },
-                enabled = state.canGoForward,
-                modifier = Modifier.testTag("browser_forward"),
-            ) { Text("〉") }
-            TextButton(onClick = { webView?.reload() }, modifier = Modifier.testTag("browser_reload")) { Text("↻") }
-            TextButton(
-                onClick = { onAddToMyShops(state.title ?: ShopUrls.host(state.currentUrl), state.currentUrl) },
-                modifier = Modifier.testTag("browser_add_shop"),
-            ) { Text("☆") }
-            TextButton(
-                onClick = { openExternally(context, state.currentUrl) },
-                modifier = Modifier.testTag("browser_external"),
-            ) { Text("↗") }
         }
     }
 
