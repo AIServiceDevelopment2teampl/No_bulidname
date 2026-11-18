@@ -106,6 +106,54 @@ def register_photo(
     return RegisterResult(cloth_row_to_dict(row), duplicate=False)
 
 
+class DuplicatePhoto(Exception):
+    """다른 옷에 이미 쓴 사진"""
+
+
+def attach_photo(
+    conn: sqlite3.Connection,
+    settings: Settings,
+    analyzer: ImageAnalyzer,
+    user_id: str,
+    cloth_id: int,
+    data: bytes,
+) -> dict | None:
+    """사진 없이 등록한 옷(영수증 등)에 나중에 사진을 붙인다 → 임베딩이 생겨 유사 검색 대상이 된다.
+
+    이미 사진이 있으면 바꾼다. 없는 옷이면 None
+    """
+    row = get_cloth_row(conn, user_id, cloth_id)
+    if row is None:
+        return None
+    image_hash = hashlib.sha256(data).hexdigest()
+    other = conn.execute(
+        "SELECT id FROM clothes WHERE user_id = ? AND image_hash = ? AND id != ?",
+        (user_id, image_hash, cloth_id),
+    ).fetchone()
+    if other is not None:
+        raise DuplicatePhoto
+    image = _open_image(data)
+    analysis = analyzer.analyze(image)
+    relative_path = f"images/{user_id}/{image_hash}.{ALLOWED_FORMATS[image.format]}"
+    file_path = settings.data_dir / relative_path
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    file_path.write_bytes(data)
+    old_path = row["image_path"]
+    with conn:
+        conn.execute(
+            "UPDATE clothes SET image_path = ?, image_hash = ?, updated_at = CURRENT_TIMESTAMP"
+            " WHERE id = ?",
+            (relative_path, image_hash, cloth_id),
+        )
+        conn.execute(
+            "INSERT OR REPLACE INTO clothes_embeddings (cloth_id, model, vector) VALUES (?, ?, ?)",
+            (cloth_id, analyzer.model_name, analysis.embedding.astype("float32").tobytes()),
+        )
+    if old_path and old_path != relative_path:
+        (settings.data_dir / old_path).unlink(missing_ok=True)
+    return cloth_row_to_dict(get_cloth_row(conn, user_id, cloth_id))
+
+
 def validate_category_color(category: str | None, color: str | None) -> None:
     if category is not None and category not in CATEGORIES:
         raise InvalidValueError(f"알 수 없는 종류예요: {category}")
@@ -190,4 +238,5 @@ def delete_user_data(conn: sqlite3.Connection, settings: Settings, user_id: str)
         conn.execute("DELETE FROM imports WHERE user_id = ?", (user_id,))
         conn.execute("DELETE FROM products WHERE user_id = ?", (user_id,))  # 리포트는 CASCADE
         conn.execute("DELETE FROM clothes WHERE user_id = ?", (user_id,))  # 임베딩은 CASCADE
-    shutil.rmtree(settings.image_dir / user_id, ignore_errors=True)
+    for folder in ("images", "products", "imports"):
+        shutil.rmtree(settings.data_dir / folder / user_id, ignore_errors=True)

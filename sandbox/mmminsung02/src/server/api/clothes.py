@@ -7,8 +7,10 @@ from pydantic import BaseModel
 
 from server.api.deps import get_conn, get_current_user_id
 from server.services.clothes import (
+    DuplicatePhoto,
     InvalidImageError,
     InvalidValueError,
+    attach_photo,
     cloth_row_to_dict,
     delete_cloth,
     delete_user_data,
@@ -89,6 +91,30 @@ def get_cloth_image(cloth_id: int, request: Request, conn: Conn, user_id: UserId
     if row is None or row["image_path"] is None:
         raise HTTPException(status_code=404, detail=NOT_FOUND)
     return FileResponse(request.app.state.settings.data_dir / row["image_path"])
+
+
+@router.put("/v1/clothes/{cloth_id}/image")
+async def put_cloth_photo(
+    cloth_id: int,
+    request: Request,
+    image: Annotated[UploadFile, File()],
+    conn: Conn,
+    user_id: UserId,
+):
+    """사진 없는 옷에 사진 붙이기 (auto-register/receipt.md)"""
+    settings = request.app.state.settings
+    data = await image.read(settings.max_upload_bytes + 1)
+    if len(data) > settings.max_upload_bytes:
+        raise HTTPException(status_code=413, detail="사진 용량이 너무 커요")
+    try:
+        cloth = attach_photo(conn, settings, request.app.state.analyzer, user_id, cloth_id, data)
+    except InvalidImageError:
+        raise HTTPException(status_code=400, detail="이미지를 읽을 수 없어요") from None
+    except DuplicatePhoto:
+        raise HTTPException(status_code=409, detail="다른 옷에 이미 등록된 사진이에요") from None
+    if cloth is None:
+        raise HTTPException(status_code=404, detail=NOT_FOUND)
+    return cloth
 
 
 @router.patch("/v1/clothes/{cloth_id}")

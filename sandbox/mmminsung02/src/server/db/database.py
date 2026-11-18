@@ -38,6 +38,10 @@ CREATE TABLE IF NOT EXISTS clothes (
 CREATE UNIQUE INDEX IF NOT EXISTS clothes_user_hash
     ON clothes(user_id, image_hash) WHERE image_hash IS NOT NULL;
 
+-- 자동 등록(주문내역·영수증·앱 구매)으로 같은 옷이 두 번 생기지 않게 한다
+CREATE UNIQUE INDEX IF NOT EXISTS clothes_user_source_ref
+    ON clothes(user_id, source, source_ref) WHERE source_ref IS NOT NULL;
+
 CREATE TABLE IF NOT EXISTS clothes_embeddings (
     cloth_id INTEGER PRIMARY KEY REFERENCES clothes(id) ON DELETE CASCADE,
     model TEXT NOT NULL,
@@ -84,6 +88,8 @@ CREATE TABLE IF NOT EXISTS imports (
     image_path TEXT,
     status TEXT NOT NULL,
     candidates TEXT NOT NULL,
+    -- 앱에서 산 옷: 쇼핑몰#주문번호 (같은 주문 페이지를 다시 봐도 새로 만들지 않음)
+    ref TEXT,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -108,3 +114,7 @@ def init_db(db_path: Path) -> None:
     db_path.parent.mkdir(parents=True, exist_ok=True)
     with connect(db_path) as conn:
         conn.executescript(SCHEMA)
+        # 11-19 이전에 만든 DB에는 imports.ref가 없다
+        columns = {row["name"] for row in conn.execute("PRAGMA table_info(imports)")}
+        if "ref" not in columns:
+            conn.execute("ALTER TABLE imports ADD COLUMN ref TEXT")

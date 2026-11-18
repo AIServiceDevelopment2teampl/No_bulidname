@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from server.ai.analyzer import ImageAnalyzer
 from server.ai.product_llm import ProductLLM
 from server.ai.units import load_convert_text
-from server.api import auth, clerk, clothes, products, shops, translate
+from server.api import auth, clerk, clothes, imports, products, shops, translate
 from server.auth import GoogleIdTokenVerifier, GoogleVerifier
 from server.config import Settings
 from server.db.database import connect, init_db
@@ -52,6 +52,15 @@ def _default_clerk():
     return ClaudeClerk()
 
 
+def _default_import_reader():
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        log.warning("ANTHROPIC_API_KEY가 없어 주문내역 캡처·영수증 등록을 끕니다")
+        return None
+    from server.ai.import_reader import ClaudeImportReader
+
+    return ClaudeImportReader()
+
+
 def _default_llm() -> ProductLLM | None:
     # ANTHROPIC_API_KEY가 없으면 LLM 없이 구조화 데이터(JSON-LD·OG)만 쓴다
     if not os.environ.get("ANTHROPIC_API_KEY"):
@@ -93,6 +102,9 @@ def create_app(
         app.state.screenshot_reader = (
             getattr(app.state, "test_screenshot_reader", None) or _default_screenshot_reader()
         )
+        app.state.import_reader = (
+            getattr(app.state, "test_import_reader", None) or _default_import_reader()
+        )
         app.state.report_writer = (
             getattr(app.state, "test_report_writer", None) or _default_report_writer()
         )
@@ -117,4 +129,5 @@ def create_app(
     app.include_router(shops.router)
     app.include_router(translate.router)
     app.include_router(clerk.router)
+    app.include_router(imports.router)
     return app
