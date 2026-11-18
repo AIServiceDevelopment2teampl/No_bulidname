@@ -96,8 +96,13 @@
 | GET | `/v1/clerk/messages?product_id=` | AI 점원 대화 기록 (상품 주소별) |
 | POST | `/v1/products/{id}/matching` | 이 상품과 어울리는 내 옷 (최대 3벌) |
 | POST | `/v1/fitting` | (도전 목표) 옷 최대 3벌 + 마네킹 체형 → 가상 피팅 이미지. 외부 서비스로 중계만 하고 저장하지 않는다. 하루 횟수 제한 |
-| POST | `/v1/imports` | 주문내역 캡처·영수증·앱 내 구매 → 등록 후보 |
-| POST | `/v1/imports/{id}/confirm` | 사용자가 고른 후보만 옷장에 저장 |
+| POST | `/v1/imports` | 주문내역 캡처(최대 5장)·영수증(1장) 사진 → 등록 후보 (multipart `type`, `images`) |
+| POST | `/v1/imports/in-app` | `order.js`가 읽은 주문 완료 페이지 상품 → 등록 후보. 같은 쇼핑몰·주문번호면 앞서 만든 등록을 돌려준다 |
+| GET | `/v1/imports/{id}` | 등록 후보 다시 보기 |
+| GET | `/v1/imports/{id}/candidates/{index}/image` | 후보 썸네일 (주문내역 캡처에서 잘라 낸 것) |
+| POST | `/v1/imports/{id}/confirm` | 사용자가 고른 후보만 옷장에 저장 (고친 종류·색·이름 포함) |
+| DELETE | `/v1/imports/{id}` | 확인 화면·카드를 닫음: 저장하지 않고 후보 사진을 지운다 |
+| PUT | `/v1/clothes/{id}/image` | 사진 없는 옷(영수증 등록 등)에 사진 붙이기 → 임베딩이 생겨 유사 검색 대상 |
 | GET | `/v1/shops` | 쇼핑몰 목록 (서버 설정 파일) |
 
 ## 데이터 / DB 설계
@@ -141,7 +146,7 @@
 
 **reports**: id, product_id, similar(JSON: cloth_id·점수), body(JSON: `similar[]`, `different[]`, `unknown[]`), created_at
 **clerk_messages**: id, user_id, product_id NULL, role, content, created_at
-**imports**: id, user_id, type(`order_capture`/`receipt`/`in_app`), image_path NULL, status(`pending`/`confirmed`/`discarded`), candidates(JSON), created_at
+**imports**: id, user_id, type(`order_capture`/`receipt`/`in_app`), image_path NULL, status(`pending`/`confirmed`/`discarded`), candidates(JSON), ref(앱에서 산 옷: `쇼핑몰#주문번호`), created_at. 사진에서 읽은 글자 전체는 저장하지 않는다. clothes는 `(user_id, source, source_ref)` 고유 색인으로 같은 옷이 두 번 생기지 않게 막는다
 **translation_cache**: key(PK: 원문+대상 언어 해시), src_lang, text_ko, created_at
 
 **색 목록 (초안):** 블랙, 화이트, 그레이, 네이비, 블루, 베이지, 브라운, 카키, 그린, 레드, 핑크, 퍼플, 옐로, 오렌지, 멀티(패턴)

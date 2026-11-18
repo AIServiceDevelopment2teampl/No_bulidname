@@ -359,3 +359,14 @@ moneyhipo가 집에서 찍은 실제 옷 사진 29장에 종류·색 라벨을 �
 
 ## 2026-11-17 (moneyhipo)
 1. 다음에 할 만한 것으로 **유사 검색을 폰 안에서 하기**(온디바이스 임베딩)를 아이디어로 적어 둠: [on-device-similar.md](features/compare/on-device-similar.md), progress.md 미결정 사항에 한 줄. 하기로 정한 건 아니다. DeepFashion은 평가에만 쓴다는 결정을 지키도록 문서에 적음
+
+## 2026-11-19 (moneyhipo)
+1. **"새 버전 낼 거 있나"**: Play는 AAB v0.1.5, 그 뒤 앱 변경은 인앱 브라우저 버블 3커밋(시험 APK v0.1.8에 이미 있음)
+2. **"한 달 무료 서버 없냐"** → Google Cloud 무료 체험($300, 90일)으로 결정(Oracle 무료는 2026-06에 2코어·12GB로 줄고 한국 리전 자리 부족, HF Spaces는 디스크가 안 남음). 사용자가 체험 시작(₩402,977, 2027-02-18 만료) → VM `dupecheck-server`(서울, e2-medium) → `setup.sh`로 설치 → `https://34-64-87-151.sslip.io/`
+3. AAB v0.1.9(versionCode 10, 서버 주소 포함) 빌드·서명 → 사용자가 업로드(versionCode 10이 이미 있어 라이브러리에서 추가). Play 앱 서명 키 SHA-1 두 개(지금 키, 이전 키의 RSA 키)로 Android OAuth 클라이언트 등록 → **실제 폰에서 로그인·옷 등록·로그아웃·계정 삭제 모두 됨**
+4. **"옷장 사진 평가는 빼고 나머지 기능 전부 구현"** → 기능 13~15 자동 등록을 서버·order.js·앱까지 구현(mmminsung02 sandbox, 지난번처럼 moneyhipo가 직접 고치고 README로 알림). 미리 입어보기(도전 목표)는 외부 서비스·하루 횟수가 미결정이라 하지 않음
+
+### 다음 세션 AI에게
+- 자동 등록은 아직 서버에 안 올렸다. progress.md 다음 할 일 1번
+- 이 PC(.venv)에는 `anthropic` SDK와 키가 없어 실제 Claude로 캡처를 읽어 보지 못했다
+

@@ -86,9 +86,9 @@
 | 10 | 쇼핑 | 공유하기로 상품 받기 | [shopping/share-intake.md](features/shopping/share-intake.md) | 12주 | 구현했지만 미검증 (sandbox/mmminsung02, 실제 Claude로 합성 스크린샷 2장 확인, 실제 폰 미확인) |
 | 11 | 비교·AI | 구매 전 비교 리포트 | [compare/purchase-report.md](features/compare/purchase-report.md) | 12주 | 구현했지만 미검증 (sandbox/mmminsung02, 실제 Claude로 문장 확인, 실제 폰 미확인) |
 | 12 | 비교·AI | AI 점원 | [compare/ai-clerk.md](features/compare/ai-clerk.md) | 13주 | 구현했지만 미검증 (sandbox/mmminsung02, 실제 Claude로 답 없는 질문 20개 예비 확인, 실제 폰 미확인) |
-| 13 | 자동 등록 | 주문내역 캡처로 일괄 등록 | [auto-register/order-capture.md](features/auto-register/order-capture.md) | 13주 | 구현 전 |
-| 14 | 자동 등록 | 앱에서 산 옷 자동 등록 | [auto-register/in-app.md](features/auto-register/in-app.md) | 14주 | 구현 전 |
-| 15 | 자동 등록 | 영수증 사진 등록 | [auto-register/receipt.md](features/auto-register/receipt.md) | 14주 (시간 부족하면 후속) | 구현 전 |
+| 13 | 자동 등록 | 주문내역 캡처로 일괄 등록 | [auto-register/order-capture.md](features/auto-register/order-capture.md) | 13주 | 구현했지만 미검증 (sandbox/mmminsung02, 자동 테스트만 통과, 실제 Claude·실제 캡처 평가 전) |
+| 14 | 자동 등록 | 앱에서 산 옷 자동 등록 | [auto-register/in-app.md](features/auto-register/in-app.md) | 14주 | 구현했지만 미검증 (sandbox/mmminsung02, 자동 테스트만 통과, 실제 쇼핑몰 주문 완료 페이지 미확인) |
+| 15 | 자동 등록 | 영수증 사진 등록 | [auto-register/receipt.md](features/auto-register/receipt.md) | 14주 (시간 부족하면 후속) | 구현했지만 미검증 (sandbox/mmminsung02, 자동 테스트만 통과, 실제 영수증 평가 전) |
 | 도전 | 비교·AI | 미리 입어보기 (AI 가상 피팅) | [compare/virtual-fitting.md](features/compare/virtual-fitting.md) | 1~15를 마치고 시간이 남으면 | 구현 전 |
 
 **0단계 (지금, 8주차): 기술 검증과 계정 준비.** 위험이 가장 큰 부분을 먼저 확인한다. 자세한 내용은 [progress.md](progress.md)의 '다음 할 일'에 있다.
