@@ -11,6 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.team12.closet.data.ClerkRepository
 import com.team12.closet.data.Cloth
+import com.team12.closet.data.ImportsRepository
 import com.team12.closet.data.ProductsRepository
 import com.team12.closet.data.ShopUrls
 import com.team12.closet.data.ShopsRepository
@@ -27,6 +28,8 @@ fun ShopTab(
     openRequest: String? = null,
     onOpenRequestHandled: () -> Unit = {},
     clerk: ClerkRepository? = null,
+    // 결제 완료 → '옷장에 추가할까요?' (auto-register/in-app.md). 없으면 묻지 않는다
+    imports: ImportsRepository? = null,
     // 다른 탭 화면 뒤에 살려 둔 동안은 false (보던 페이지를 그대로 두려고, 2026-11-16)
     active: Boolean = true,
     // 브라우저가 열렸는지 알린다. 열려 있으면 하단 탭을 숨긴다
@@ -47,7 +50,16 @@ fun ShopTab(
     val script =
         remember {
             {
-                listOf("bootstrap.js", "product.js", "translate.js").joinToString("\n") { name ->
+                listOf("bootstrap.js", "product.js", "translate.js", "order.js").joinToString("\n") { name ->
+                    context.assets.open(name).use { it.readBytes().decodeToString() }
+                }
+            }
+        }
+    // 결제가 끝난 주문 완료 주소에는 이것만 넣는다 (PageInjector)
+    val orderScript =
+        remember {
+            {
+                listOf("bootstrap.js", "order.js").joinToString("\n") { name ->
                     context.assets.open(name).use { it.readBytes().decodeToString() }
                 }
             }
@@ -77,6 +89,8 @@ fun ShopTab(
             imageUrl = imageUrl,
             translator = translator,
             clerk = clerk,
+            imports = imports,
+            orderScript = orderScript.takeIf { imports != null },
             onGoElsewhere = onGoElsewhere,
             active = active,
         )

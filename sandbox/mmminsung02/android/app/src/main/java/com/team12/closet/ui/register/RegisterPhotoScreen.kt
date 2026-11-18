@@ -45,7 +45,7 @@ fun RegisterPhotoRoute(
     val context = LocalContext.current
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris ->
-            viewModel.upload(uris.mapNotNull { readPhoto(context, it) })
+            viewModel.upload(uris.mapNotNull { readPickedPhoto(context, it) })
         }
     RegisterPhotoScreen(
         viewModel = viewModel,
@@ -56,7 +56,8 @@ fun RegisterPhotoRoute(
     )
 }
 
-private fun readPhoto(
+/** 사진 선택기가 준 주소에서 바이트를 읽는다. 못 읽으면 null */
+fun readPickedPhoto(
     context: Context,
     uri: Uri,
 ): PickedPhoto? {

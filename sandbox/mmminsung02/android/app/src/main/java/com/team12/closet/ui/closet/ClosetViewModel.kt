@@ -7,6 +7,7 @@ import com.team12.closet.data.Cloth
 import com.team12.closet.data.ClothFilter
 import com.team12.closet.data.ClothUpdate
 import com.team12.closet.data.ClothesRepository
+import com.team12.closet.data.PickedPhoto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -73,6 +74,15 @@ class ClosetViewModel(
 
     suspend fun delete(id: Long): ApiResult<Unit> {
         val result = repository.deleteCloth(id)
+        if (result is ApiResult.Ok) load()
+        return result
+    }
+
+    suspend fun attachPhoto(
+        id: Long,
+        photo: PickedPhoto,
+    ): ApiResult<Cloth> {
+        val result = repository.attachPhoto(id, photo)
         if (result is ApiResult.Ok) load()
         return result
     }

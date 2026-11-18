@@ -39,4 +39,5 @@ class ServerConnection(
     val products = NetworkProductsRepository(retrofit.create(ProductsApi::class.java))
     val translate = NetworkTranslateRepository(retrofit.create(TranslateApi::class.java))
     val clerk = NetworkClerkRepository(retrofit.create(ClerkApi::class.java))
+    val imports = NetworkImportsRepository(retrofit.create(ImportsApi::class.java), baseUrl)
 }

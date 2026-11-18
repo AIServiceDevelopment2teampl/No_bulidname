@@ -38,6 +38,7 @@ import com.team12.closet.data.ClothesPage
 import com.team12.closet.data.ClothesRepository
 import com.team12.closet.data.GoogleSignIn
 import com.team12.closet.data.GoogleSignInResult
+import com.team12.closet.data.ImportsRepository
 import com.team12.closet.data.MyShop
 import com.team12.closet.data.PhotoLoader
 import com.team12.closet.data.PickedPhoto
@@ -53,8 +54,13 @@ import com.team12.closet.ui.account.MyScreen
 import com.team12.closet.ui.closet.ClosetScreen
 import com.team12.closet.ui.closet.ClosetViewModel
 import com.team12.closet.ui.closet.ClothDetailScreen
+import com.team12.closet.ui.register.ImportRoute
+import com.team12.closet.ui.register.ImportViewModel
+import com.team12.closet.ui.register.RegisterMethod
+import com.team12.closet.ui.register.RegisterMethodScreen
 import com.team12.closet.ui.register.RegisterPhotoRoute
 import com.team12.closet.ui.register.RegisterPhotoViewModel
+import com.team12.closet.ui.register.importKind
 import com.team12.closet.ui.share.ShareResultScreen
 import com.team12.closet.ui.shop.DockDestination
 import com.team12.closet.ui.shop.ShopTab
@@ -95,6 +101,8 @@ fun ClosetApp(
     photoLoader: PhotoLoader = PhotoLoader { null },
     // 없으면 AI 점원 대화·어울리는 옷 없이 상품 정보만 (테스트·미리보기)
     clerkRepository: ClerkRepository? = null,
+    // 없으면 사진으로 등록만 되고 결제 완료 카드도 뜨지 않는다 (테스트·미리보기)
+    importsRepository: ImportsRepository? = null,
 ) {
     var chosenTheme by remember { mutableStateOf(themeStore.load()) }
     val darkTheme = chosenTheme?.let { it == AppTheme.DARK } ?: isSystemInDarkTheme()
@@ -115,6 +123,7 @@ fun ClosetApp(
                 onSharedHandled = onSharedHandled,
                 photoLoader = photoLoader,
                 clerkRepository = clerkRepository,
+                importsRepository = importsRepository,
                 currentTheme = if (darkTheme) AppTheme.DARK else AppTheme.LIGHT,
                 onThemeChange = {
                     themeStore.save(it)
@@ -137,6 +146,7 @@ private fun MainTabs(
     onSharedHandled: () -> Unit,
     photoLoader: PhotoLoader,
     clerkRepository: ClerkRepository?,
+    importsRepository: ImportsRepository?,
     currentTheme: AppTheme,
     onThemeChange: (AppTheme) -> Unit,
 ) {
@@ -220,6 +230,7 @@ private fun MainTabs(
                     openRequest = openLink,
                     onOpenRequestHandled = { openLink = null },
                     clerk = clerkRepository,
+                    imports = importsRepository,
                     active = selected == MainTab.SHOPPING,
                     onBrowserOpenChange = { browserOpen = it },
                     onGoElsewhere = { destination ->
@@ -238,7 +249,7 @@ private fun MainTabs(
                 Surface(color = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         when (selected) {
-                            MainTab.CLOSET -> ClosetTab(sessionKey, clothesRepository)
+                            MainTab.CLOSET -> ClosetTab(sessionKey, clothesRepository, importsRepository)
                             MainTab.HOME ->
                                 HomeScreen(onShop = { selected = MainTab.SHOPPING }, onCloset = { selected = MainTab.CLOSET })
                             MainTab.MY -> MyScreen(currentTheme, onThemeChange, authRepository, clothesRepository)
@@ -255,22 +266,53 @@ private fun MainTabs(
 private fun ClosetTab(
     sessionKey: String,
     clothesRepository: ClothesRepository,
+    importsRepository: ImportsRepository?,
 ) {
     var registering by rememberSaveable { mutableStateOf(false) }
+    // 등록 방법 (시안 '등록 방법 고르기'). null이면 고르는 화면
+    var method by rememberSaveable { mutableStateOf<RegisterMethod?>(null) }
+    var registerVisit by rememberSaveable { mutableStateOf(0) }
     var openClothId by rememberSaveable { mutableStateOf<Long?>(null) }
     // ViewModel은 화면을 떠나도 남는다. 로그인(세션)마다 새로 만들어, 다음 사람이 앞사람 옷을 보지 않게 한다
     val closetViewModel = viewModel(key = "closet-$sessionKey") { ClosetViewModel(clothesRepository) }
 
     val detailCloth = openClothId?.let { closetViewModel.cloth(it) }
+
+    fun finishRegister() {
+        registering = false
+        method = null
+        closetViewModel.load()
+    }
+    val importKind = method?.importKind()
     when {
+        // 서버 사진 읽기가 없으면(테스트·미리보기) 고르는 화면 없이 사진 등록으로 바로 간다
+        registering && method == null && importsRepository != null -> {
+            RegisterMethodScreen(onChoose = { method = it }, onBack = { registering = false })
+        }
+
+        registering && importKind != null && importsRepository != null -> {
+            // 들어갈 때마다 새로 시작한다 (앞에 고른 후보가 남지 않게)
+            val importViewModel =
+                viewModel(key = "import-$sessionKey-${importKind.code}-$registerVisit") {
+                    ImportViewModel(importsRepository, importKind)
+                }
+            ImportRoute(
+                viewModel = importViewModel,
+                imageUrl = { importsRepository.imageUrl(it) },
+                onDone = {
+                    registerVisit++
+                    finishRegister()
+                },
+            )
+        }
+
         registering -> {
             val registerViewModel = viewModel(key = "register-$sessionKey") { RegisterPhotoViewModel(clothesRepository) }
             RegisterPhotoRoute(
                 viewModel = registerViewModel,
                 onDone = {
                     registerViewModel.reset()
-                    registering = false
-                    closetViewModel.load()
+                    finishRegister()
                 },
             )
         }

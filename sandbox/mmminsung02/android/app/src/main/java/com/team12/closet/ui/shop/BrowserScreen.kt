@@ -53,8 +53,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.team12.closet.data.ApiResult
 import com.team12.closet.data.ClerkRepository
 import com.team12.closet.data.Cloth
+import com.team12.closet.data.ImportsRepository
 import com.team12.closet.data.ShopUrls
 import com.team12.closet.data.TranslateRepository
+import com.team12.closet.ui.register.ImportPicks
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
@@ -91,6 +93,7 @@ class PageBridge(
     private val onProduct: (String) -> Unit,
     private val onTranslate: (requestId: String, textsJson: String) -> Unit,
     private val onTranslateState: (String) -> Unit,
+    private val onOrder: (String) -> Unit = {},
 ) {
     private val main = Handler(Looper.getMainLooper())
 
@@ -110,6 +113,12 @@ class PageBridge(
     @JavascriptInterface
     fun onTranslateState(stateJson: String) {
         main.post { onTranslateState.invoke(stateJson) }
+    }
+
+    /** order.js: 주문 완료 페이지의 주문 상품 (auto-register/in-app.md) */
+    @JavascriptInterface
+    fun onOrder(orderJson: String) {
+        main.post { onOrder.invoke(orderJson) }
     }
 }
 
@@ -137,6 +146,9 @@ fun BrowserScreen(
     translation: TranslationUi = remember { TranslationUi() },
     // AI 점원 (compare/ai-clerk.md). 없으면 대화·어울리는 옷 없이 상품 정보만
     clerk: ClerkRepository? = null,
+    // 결제 완료 → '옷장에 추가할까요?' 카드. 없으면 묻지 않는다
+    imports: ImportsRepository? = null,
+    orderScript: (() -> String)? = null,
     // 버블 메뉴의 홈·내 옷장·마이. 없으면 버블 메뉴에 쇼핑몰 목록만 (테스트)
     onGoElsewhere: ((DockDestination) -> Unit)? = null,
     // 다른 탭 화면 뒤에 살려 둔 동안(false)은 뒤로 버튼을 가로채지 않는다
@@ -151,6 +163,15 @@ fun BrowserScreen(
     // 떠 있는 버블 위치·숨김. 패널을 열었다 닫아도 남는다
     val dock = remember { DockState() }
     val onProduct: (String) -> Unit = { json -> scope.launch { lookup?.onProductPage(json) } }
+    // 결제 완료 카드. 페이지를 옮겨도 사용자가 닫거나 저장할 때까지 남긴다
+    var orderPicks by remember { mutableStateOf<ImportPicks?>(null) }
+    val onOrder: (String) -> Unit = { json ->
+        scope.launch {
+            val batch = (imports?.fromOrder(json) as? ApiResult.Ok)?.value
+            // 이미 저장한 주문(새로고침 등)이면 다시 묻지 않는다
+            if (batch != null && batch.status == "pending" && orderPicks?.batch?.id != batch.id) orderPicks = ImportPicks(batch)
+        }
+    }
     // 페이지 하나가 보낼 수 있는 번역 요청 수. 악성 페이지가 끝없이 요청해 비용을 쓰지 못하게 (서버에도 상한)
     val translateRequests = remember { intArrayOf(0) }
     val onNewPage: () -> Unit = {
@@ -183,6 +204,7 @@ fun BrowserScreen(
                 onTranslateState = { json ->
                     runCatching { bridgeJson.decodeFromString<TranslateState>(json) }.getOrNull()?.let { translation.state = it }
                 },
+                onOrder = { json -> onOrder(json) },
             )
         }
     // 사용자가 번역을 껐으면 새 페이지에서도 시작하지 않는다
@@ -251,7 +273,7 @@ fun BrowserScreen(
 
         Box(modifier = Modifier.weight(1f).fillMaxWidth().onSizeChanged { areaSize = it }) {
             AndroidView(
-                factory = { ctx -> createWebView(ctx, state, pageScript, bridge, onNewPage).also { webView = it } },
+                factory = { ctx -> createWebView(ctx, state, pageScript, orderScript, bridge, onNewPage).also { webView = it } },
                 modifier = Modifier.fillMaxSize().testTag("browser_web"),
             )
             if (state.loadFailed) {
@@ -295,6 +317,10 @@ fun BrowserScreen(
                 )
             }
         }
+    }
+
+    orderPicks?.let { picks ->
+        OrderCard(picks = picks, imports = imports, onClosed = { orderPicks = null })
     }
 
     state.askToOpen?.let { url ->
@@ -345,6 +371,7 @@ private fun createWebView(
     context: Context,
     state: BrowserState,
     script: () -> String,
+    orderScript: (() -> String)?,
     bridge: PageBridge,
     onNewPage: () -> Unit,
 ): WebView {
@@ -352,7 +379,7 @@ private fun createWebView(
     view.settings.javaScriptEnabled = true
     view.settings.domStorageEnabled = true
     view.addJavascriptInterface(bridge, "DupeCheckBridge")
-    val injector = PageInjector(script) { js -> view.evaluateJavascript(js, null) }
+    val injector = PageInjector(script, orderScript) { js -> view.evaluateJavascript(js, null) }
     view.webViewClient =
         object : WebViewClient() {
             override fun shouldOverrideUrlLoading(

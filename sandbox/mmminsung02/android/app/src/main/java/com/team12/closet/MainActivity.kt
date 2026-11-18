@@ -67,6 +67,7 @@ class MainActivity : ComponentActivity() {
                 onSharedHandled = { shared = null },
                 photoLoader = photoLoader,
                 clerkRepository = server.clerk,
+                importsRepository = server.imports,
             )
         }
     }

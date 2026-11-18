@@ -1,5 +1,8 @@
 package com.team12.closet.ui.closet
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +28,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,6 +36,7 @@ import com.team12.closet.data.ApiResult
 import com.team12.closet.data.Cloth
 import com.team12.closet.data.ClothLabels
 import com.team12.closet.data.ClothUpdate
+import com.team12.closet.ui.register.readPickedPhoto
 import kotlinx.coroutines.launch
 
 @Composable
@@ -50,6 +55,18 @@ fun ClothDetailScreen(
     var error by rememberSaveable { mutableStateOf<String?>(null) }
     var askDelete by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    // 사진 없는 옷(영수증 등록 등)에 사진 붙이기. 붙이면 유사 검색 대상이 된다
+    val pickPhoto =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            val photo = uri?.let { readPickedPhoto(context, it) } ?: return@rememberLauncherForActivityResult
+            busy = true
+            error = null
+            scope.launch {
+                (viewModel.attachPhoto(cloth.id, photo) as? ApiResult.Error)?.let { error = it.message }
+                busy = false
+            }
+        }
 
     fun run(action: suspend () -> ApiResult<*>) {
         busy = true
@@ -78,6 +95,24 @@ fun ClothDetailScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             ClothImage(viewModel.imageUrl(cloth), modifier = Modifier.fillMaxWidth().height(200.dp))
+            if (cloth.needsPhoto) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    WarnBadge("사진 필요")
+                    Text(
+                        "사진을 붙이면 비슷한 옷 찾기에 들어가요",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f),
+                    )
+                    OutlinedButton(
+                        onClick = { pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                        enabled = !busy,
+                        modifier = Modifier.testTag("attach_photo"),
+                    ) { Text("사진 붙이기") }
+                }
+            }
+            SOURCE_LABELS[cloth.source]?.let {
+                Text(it, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
             if (!cloth.confirmed) {
                 Text(
                     "자동 분류 결과예요. 맞는지 확인하고 저장해 주세요.",
@@ -161,3 +196,11 @@ private fun DetailField(
         modifier = modifier.testTag("field_$tag"),
     )
 }
+
+// 시안 '옷 상세': 어디서 등록했는지 (사진 등록은 표시하지 않는다)
+private val SOURCE_LABELS =
+    mapOf(
+        "order_capture" to "주문내역 캡처로 등록",
+        "receipt" to "영수증으로 등록",
+        "in_app" to "앱에서 산 옷",
+    )

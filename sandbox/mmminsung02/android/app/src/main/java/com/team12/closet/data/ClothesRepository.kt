@@ -11,6 +11,7 @@ import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -29,6 +30,12 @@ interface ClothesRepository {
     suspend fun deleteCloth(id: Long): ApiResult<Unit>
 
     suspend fun deleteAllMyData(): ApiResult<Unit>
+
+    /** 사진 없는 옷(영수증 등록 등)에 사진을 붙인다 → 유사 검색 대상이 된다 (auto-register/receipt.md) */
+    suspend fun attachPhoto(
+        id: Long,
+        photo: PickedPhoto,
+    ): ApiResult<Cloth> = ApiResult.Error("사진을 붙일 수 없어요")
 
     /** 서버가 준 상대 주소(/v1/clothes/1/image)를 이미지 로더가 쓸 전체 주소로 */
     fun imageUrl(path: String?): String?
@@ -60,6 +67,13 @@ interface ClothesApi {
 
     @DELETE("v1/me/data")
     suspend fun deleteMyData(): Response<Unit>
+
+    @Multipart
+    @PUT("v1/clothes/{id}/image")
+    suspend fun attachPhoto(
+        @Path("id") id: Long,
+        @Part image: MultipartBody.Part,
+    ): Response<Cloth>
 }
 
 class NetworkClothesRepository(
@@ -107,6 +121,13 @@ class NetworkClothesRepository(
 
     override suspend fun deleteAllMyData() = callNoBody { api.deleteMyData() }
 
+    override suspend fun attachPhoto(
+        id: Long,
+        photo: PickedPhoto,
+    ) = call {
+        api.attachPhoto(id, MultipartBody.Part.createFormData("image", photo.name, photo.bytes.toRequestBody(photo.mimeType.toMediaType())))
+    }
+
     override fun imageUrl(path: String?): String? = path?.let { baseUrl.trimEnd('/') + it }
 
     private suspend fun <T : Any> call(request: suspend () -> Response<T>): ApiResult<T> {
@@ -135,6 +156,7 @@ class NetworkClothesRepository(
         when (response.code()) {
             404 -> "옷을 찾을 수 없어요"
             400 -> errorDetail(response) ?: "값을 확인해 주세요"
+            409, 413 -> errorDetail(response) ?: "사진을 붙일 수 없어요"
             else -> TRY_LATER
         }
 
