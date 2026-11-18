@@ -48,7 +48,7 @@
 | 번역 | LLM API로 전부 하거나, 페이지 문장은 번역 API로 하고 상품 구조화만 LLM으로 | 미결정 |
 | LLM API | Claude API, 우선 Claude Haiku 5.5 (`claude-haiku-5-5`). 공식 `anthropic` Python SDK. 키는 서버에만 둔다 | 확정 (모델은 AI 점원 품질 보고 바꿀 수 있음) |
 | DB | 서버 SQLite | 확정 |
-| 서버 배포 | Vultr 서울 리전 (CLIP 실행에 메모리 필요, 4GB 예정). 선불 크레딧으로 결제. 약 11/10~12/13만 켜 둔다 | 확정 (학교 결제 승인 대기, 요금제는 메모리 측정 후) |
+| 서버 배포 | Google Cloud Compute Engine 서울 리전(`asia-northeast3-c`) e2-medium(4GB), Ubuntu 24.04, 고정 IP. HTTPS는 Caddy + `https://34-64-87-151.sslip.io/`(도메인 없이 자동 인증서). 설치는 `sandbox/moneyhipo/deploy/setup.sh`. 무료 체험 크레딧(₩402,977, 2027-02-18 만료)으로 내고 과제가 끝나면 지운다 | 확정 (2026-11-19 배포) |
 | 앱 배포 | Google Play (비공개 테스트 → 프로덕션) | 확정 |
 | 테스트 | 서버 pytest, 주입 JS는 Node + jsdom, 앱은 JUnit·Compose UI 테스트 | 확정 (초안) |
 
@@ -153,7 +153,7 @@
 | FAISS | 벡터 검색 | |
 | (OCR은 Claude API로) | 캡처·영수증 글자 인식 | 2026-11-11 결정, 별도 서비스 없음 |
 | Claude API (Anthropic) | 번역, 구조화, 리포트, 점원 | 선불 크레딧, 학교 지원금. 사용료 발생 |
-| Vultr | AI 서버 | 선불 크레딧(약 $40 신청 예정), 학교 지원금. 해외 업체라 인보이스만 나오고 세금계산서는 없음 |
+| Google Cloud | AI 서버 | 무료 체험 크레딧. 유료 계정으로 업그레이드하지 않으면 크레딧을 넘어도 청구되지 않는다 |
 | Google Play Console | 앱 배포 | 개인 개발자 계정 등록비 있음 |
 | 가상 피팅 API (미결정) | 미리 입어보기 (도전 목표) | 장당 과금(약 $0.06~0.08, 공식 가격 확인 필요). 업체가 받은 이미지를 얼마나 보관하는지 확인한다 |
 

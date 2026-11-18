@@ -32,7 +32,7 @@
 - 데이터를 수집하거나 공유하나요: **예**
 - 전송 중 암호화: **예** (서버는 HTTPS로 연다. 지금 개발용 `http://` 주소는 배포 전 바꿔야 함)
 - 데이터 삭제 요청 방법 제공: **예**, 웹 계정 삭제 URL
-- **공유: 없음.** Vultr·Anthropic·Google은 우리를 대신해 처리하는 서비스 제공업체라 Play 기준 '공유'가 아니다
+- **공유: 없음.** Google Cloud(서버)·Anthropic·Google은 우리를 대신해 처리하는 서비스 제공업체라 Play 기준 '공유'가 아니다
 
 | 데이터 유형 | 수집 | 필수/선택 | 목적 |
 |-------------|------|-----------|------|
@@ -79,3 +79,4 @@ DupeCheck은 무료이고 광고가 없습니다. 대학 수업 팀 프로젝트
 - **비공개 테스트**: 14일을 세는 트랙. 테스터 이메일 목록(15명 정도)을 새로 만들고, 아버님 계정에 원래 있던 목록은 체크하지 않는다. 국가 대한민국. 같은 이메일을 Google Cloud OAuth **대상 → 테스트 사용자**에도 넣는다
 - 첫 AAB: `dupecheck-0.1.3-vc4.aab` (versionCode 4, versionName 0.1.3). `0b240cd`에서 applicationId와 앱 이름만 바꿔 빌드하고 업로드 키로 서명했다. 서버 주소가 개발용(`http://10.0.2.2:8000/`)이라 **옷 등록·목록은 동작하지 않는다**. 14일을 먼저 시작하기 위한 빌드이고, 서버를 HTTPS로 띄운 뒤 업데이트한다
 - 두 번째 AAB (2026-11-11): `dupecheck-0.1.5-vc6.aab` (versionCode 6, versionName 0.1.5, `5fed076`). `sandbox/mmminsung02/android`에서 `bundleRelease -PversionCode=6 -PversionName=0.1.5 -PgoogleWebClientId=...` → jarsigner로 업로드 키 서명(비밀번호 파일의 `alias:`·`password:` 줄). 서버 주소는 아직 기본값이라 게스트로 둘러보기만 된다
+- 세 번째 AAB (2026-11-19): `dupecheck-0.1.9-vc10.aab` (versionCode 10, versionName 0.1.9, `7fb03f6`). 두 번째와 같은 방법에 `-PserverBaseUrl=https://34-64-87-151.sslip.io/`을 더함. 서버 기능이 처음 동작하는 Play 빌드

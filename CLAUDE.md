@@ -14,7 +14,7 @@
 - AI: CLIP, FAISS, Claude API (우선 Claude Haiku 5.5). OCR(캡처 글자 읽기)도 Claude가 사진을 직접 읽는다 (2026-11-11 결정)
 - DB: 서버 SQLite, 앱 Room
 - 테스트: pytest (서버), Node + jsdom (WebView 주입 JS), JUnit·Compose UI 테스트 (앱)
-- 배포: Google Play (비공개 테스트 → 프로덕션), 서버는 Vultr (서울 리전, 선불 크레딧)
+- 배포: Google Play (비공개 테스트 → 프로덕션), 서버는 Google Cloud Compute Engine (서울 리전, 무료 체험 크레딧, `sandbox/moneyhipo/deploy/setup.sh`)
 
 ## 데이터셋
 - DeepFashion-MultiModal 압축 파일을 로컬 `DeepFashin_dataset/`에 확보했다. 폴더는 `.gitignore` 대상이며 저장소에 추가하지 않는다.
