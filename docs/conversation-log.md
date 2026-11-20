@@ -376,6 +376,8 @@ moneyhipo가 집에서 찍은 실제 옷 사진 29장에 종류·색 라벨을 �
 ## 2026-11-20 (moneyhipo)
 1. git pull로 mmminsung02 변경(게스트 로그인 안내, 자동 등록 서버 올리기 준비 + README 요청) 받음, 남은 할 일·팀원 요청 정리
 2. **README 요청 '자동 등록 서버 다시 올리기 + Claude 키'** 처리: 이 PC에서 묶음 만듦 → 사용자가 브라우저 SSH로 올림(서버에 11-18 옛 묶음이 있어 지우고 다시 올림) → `~/deploy` 비우고 `setup.sh` → `/health` ok, `/v1/imports` 404 → 405/401. 학교 Claude 키는 사용자가 nano로 직접 넣음(키는 채팅·저장소에 안 남김)
+3. **문서 정리**(사용자 요청): progress.md 작업 로그 중 11-15까지 53줄을 `docs/old/progress-worklog-history.md`로 날짜순으로 옮김(링크 경로 고침), 남은 14줄도 날짜순으로. 다음 할 일 1번을 '새 AAB로 폰 확인'으로 새로 씀. README 끝난 요청 2줄(게스트 검수, 서버 올리기)을 `docs/old/readme-requests-done.md`로 옮기고 mmminsung02에게 폰 확인 알림 줄 추가. 로컬 서버 묶음 파일 지움
 
 ### 다음 세션 AI에게
 - 서버에 Claude 키가 들어가 Claude 기능이 켜졌지만 실제 폰으로는 아직 확인 안 했다(progress.md 다음 할 일 1번)
+- 이 PC에는 실행되는 Python·Node가 없다(`.venv`가 가리키는 Python313이 지워짐). 문서 일괄 수정은 PowerShell로 했다
