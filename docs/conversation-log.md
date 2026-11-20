@@ -372,3 +372,10 @@ moneyhipo가 집에서 찍은 실제 옷 사진 29장에 종류·색 라벨을 �
 - 자동 등록은 아직 서버에 안 올렸다. progress.md 다음 할 일 1번
 - 이 PC(.venv)에는 `anthropic` SDK와 키가 없어 실제 Claude로 캡처를 읽어 보지 못했다
 
+
+## 2026-11-20 (moneyhipo)
+1. git pull로 mmminsung02 변경(게스트 로그인 안내, 자동 등록 서버 올리기 준비 + README 요청) 받음, 남은 할 일·팀원 요청 정리
+2. **README 요청 '자동 등록 서버 다시 올리기 + Claude 키'** 처리: 이 PC에서 묶음 만듦 → 사용자가 브라우저 SSH로 올림(서버에 11-18 옛 묶음이 있어 지우고 다시 올림) → `~/deploy` 비우고 `setup.sh` → `/health` ok, `/v1/imports` 404 → 405/401. 학교 Claude 키는 사용자가 nano로 직접 넣음(키는 채팅·저장소에 안 남김)
+
+### 다음 세션 AI에게
+- 서버에 Claude 키가 들어가 Claude 기능이 켜졌지만 실제 폰으로는 아직 확인 안 했다(progress.md 다음 할 일 1번)
