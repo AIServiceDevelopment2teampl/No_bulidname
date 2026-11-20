@@ -36,6 +36,8 @@ fun ShopTab(
     onBrowserOpenChange: (Boolean) -> Unit = {},
     // 브라우저 버블 메뉴의 홈·내 옷장·마이
     onGoElsewhere: ((DockDestination) -> Unit)? = null,
+    // 게스트면 로그인 화면으로 가는 동작. 서버 기능 자리에 로그인 안내를 보여 준다 (2026-11-20)
+    onLogin: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     var openUrl by rememberSaveable { mutableStateOf<String?>(openRequest) }
@@ -66,7 +68,7 @@ fun ShopTab(
         }
     // 추가 화면에 다녀와도 보던 페이지로 돌아오도록 브라우저 상태는 여기서 들고 있는다
     val browserState = remember(openUrl) { openUrl?.let { BrowserState(it) } }
-    val lookup = remember(openUrl) { ProductLookup(products) }
+    val lookup = remember(openUrl) { ProductLookup(products, loginRequired = onLogin != null) }
     val browserOpen = browserState != null
     LaunchedEffect(browserOpen) { onBrowserOpenChange(browserOpen) }
     DisposableEffect(Unit) { onDispose { onBrowserOpenChange(false) } }
@@ -93,6 +95,7 @@ fun ShopTab(
             orderScript = orderScript.takeIf { imports != null },
             onGoElsewhere = onGoElsewhere,
             active = active,
+            onLogin = onLogin,
         )
     }
 }

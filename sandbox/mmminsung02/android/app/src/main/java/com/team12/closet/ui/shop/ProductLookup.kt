@@ -25,11 +25,16 @@ sealed interface ProductState {
     data class Failed(
         val message: String,
     ) : ProductState
+
+    /** 게스트: 서버 계정이 없어 상품을 살펴보지 않는다 (2026-11-20) */
+    data object LoginRequired : ProductState
 }
 
 @Stable
 class ProductLookup(
     private val repository: ProductsRepository,
+    // 게스트면 서버에 보내지 않고 로그인 안내만 한다
+    private val loginRequired: Boolean = false,
 ) {
     var state by mutableStateOf<ProductState?>(null)
         private set
@@ -45,6 +50,10 @@ class ProductLookup(
     suspend fun onProductPage(pageJson: String) {
         if (pageJson == currentPage) return
         currentPage = pageJson
+        if (loginRequired) {
+            state = ProductState.LoginRequired
+            return
+        }
         state = ProductState.Loading
         val product =
             when (val result = repository.extract(pageJson)) {

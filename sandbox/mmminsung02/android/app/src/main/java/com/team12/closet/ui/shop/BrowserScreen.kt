@@ -153,6 +153,8 @@ fun BrowserScreen(
     onGoElsewhere: ((DockDestination) -> Unit)? = null,
     // 다른 탭 화면 뒤에 살려 둔 동안(false)은 뒤로 버튼을 가로채지 않는다
     active: Boolean = true,
+    // 게스트면 로그인 화면으로 가는 동작. 있으면 번역·상품 비교를 서버에 보내지 않고 로그인 안내를 한다 (2026-11-20)
+    onLogin: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -185,7 +187,7 @@ fun BrowserScreen(
             PageBridge(
                 onProduct = { json -> onProduct(json) },
                 onTranslate = { id, textsJson ->
-                    if (++translateRequests[0] > MAX_TRANSLATE_REQUESTS_PER_PAGE) {
+                    if (onLogin != null || ++translateRequests[0] > MAX_TRANSLATE_REQUESTS_PER_PAGE) {
                         webView?.evaluateJavascript(jsCall("fail", id), null)
                         return@PageBridge
                     }
@@ -265,7 +267,7 @@ fun BrowserScreen(
                 }
             }
         }
-        TranslationBar(translation) { on ->
+        TranslationBar(translation, loginRequired = onLogin != null) { on ->
             translation.enabled = on
             webView?.evaluateJavascript(jsCall(if (on) "showTranslation" else "showOriginal"), null)
         }
@@ -297,6 +299,7 @@ fun BrowserScreen(
                     imageUrl = imageUrl,
                     onClose = { panelOpen = false },
                     clerk = clerkSession,
+                    onLogin = { onLogin?.invoke() },
                     modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.6f),
                 )
             } else {

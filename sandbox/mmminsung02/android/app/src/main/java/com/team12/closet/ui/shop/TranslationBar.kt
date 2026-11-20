@@ -53,6 +53,8 @@ fun languageName(lang: String) =
 @Composable
 fun TranslationBar(
     ui: TranslationUi,
+    // 게스트: 번역 요청을 보내지 않아 실패하면 로그인 안내를 보여 준다 (2026-11-20)
+    loginRequired: Boolean = false,
     onToggle: (Boolean) -> Unit,
 ) {
     val state = ui.state ?: return
@@ -63,7 +65,7 @@ fun TranslationBar(
                 when (state.status) {
                     "korean" -> "한국어 페이지예요"
                     "translating" -> "$from → 한국어로 바꾸는 중…"
-                    "error" -> "번역하지 못했어요. 원문을 보여 드려요"
+                    "error" -> if (loginRequired) "Google로 로그인하면 한국어로 바꿔 드려요" else "번역하지 못했어요. 원문을 보여 드려요"
                     "original" -> "원문을 보고 있어요"
                     else -> "$from → 한국어로 바꿨어요"
                 }

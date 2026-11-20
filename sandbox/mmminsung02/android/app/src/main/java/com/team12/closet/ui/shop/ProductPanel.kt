@@ -41,6 +41,7 @@ import com.team12.closet.data.ProductField
 import com.team12.closet.data.ProductInfo
 import com.team12.closet.data.SimilarCloth
 import com.team12.closet.data.SimilarResult
+import com.team12.closet.ui.account.LoginRequired
 import com.team12.closet.ui.closet.ClothImage
 import com.team12.closet.ui.closet.displayName
 import com.team12.closet.ui.compare.PurchaseReportSection
@@ -90,6 +91,7 @@ fun ProductBubble(
         when (state) {
             ProductState.Loading -> "상품을 살펴보는 중…"
             is ProductState.Failed -> "상품 정보를 읽지 못했어요"
+            ProductState.LoginRequired -> "로그인하면 내 옷장과 비교해요"
             is ProductState.Ready -> state.similar?.let { headline(it) } ?: "상품 정보 보기"
         }
     Row(
@@ -122,6 +124,8 @@ fun ProductPanel(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     clerk: ClerkSession? = null,
+    // 게스트면 상품 비교 대신 로그인 안내 (ProductState.LoginRequired)
+    onLogin: () -> Unit = {},
 ) {
     Surface(
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
@@ -151,6 +155,12 @@ fun ProductPanel(
                         )
                     ProductState.Loading -> CircularProgressIndicator()
                     is ProductState.Failed -> Text(state.message, color = MaterialTheme.colorScheme.error)
+                    ProductState.LoginRequired ->
+                        LoginRequired(
+                            "Google로 로그인하면 이 상품을 내 옷장과 비교해 드려요",
+                            onLogin,
+                            Modifier.fillMaxWidth(),
+                        )
                     is ProductState.Ready -> {
                         when {
                             state.similar != null -> SimilarClothesSection(state.similar, imageUrl)

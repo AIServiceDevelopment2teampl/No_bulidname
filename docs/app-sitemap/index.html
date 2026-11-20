@@ -442,7 +442,9 @@
     <ul class="tree">
       <li><span class="n">앱 실행</span>
         <ul>
-          <li data-go="login-start"><span class="n">로그인</span> <span class="d">Google로 계속하기</span><span class="tag has">시안 있음</span></li>
+          <li data-go="login-start"><span class="n">로그인</span> <span class="d">Google로 계속하기</span><span class="tag has">시안 있음</span>
+            <ul><li data-go="guest-login"><span class="n">게스트로 둘러보기</span> <span class="d">쇼핑몰 구경만. 내 옷장·상품 비교·번역·AI 점원·공유 결과 자리에 로그인 안내</span><span class="tag has">시안 있음</span></li></ul>
+          </li>
           <li data-go="home-base"><span class="n">홈</span> <span class="d">베이스 / 초안 (미결정)</span><span class="tag has">시안 있음</span>
             <ul>
               <li data-go="shop-list"><span class="n">쇼핑하기 → 쇼핑몰 목록</span> <span class="d">국내 + 해외 쇼핑몰(번역 필요 표시) + 배송 태그, 주소 입력, 내 쇼핑몰</span><span class="tag has">시안 있음</span>
@@ -504,6 +506,7 @@
         </div>
         <div class="stack" style="margin-top:auto;position:relative">
           <button class="btn social" style="height:48px;font-weight:600" data-go="home-in"><svg class="i" style="width:20px;height:20px"><use href="#google"/></svg>Google로 계속하기</button>
+          <span class="link" style="text-align:center;font-size:13px;margin-top:4px" data-go="guest-login">게스트로 둘러보기</span>
         </div>
         <div class="foot" style="margin-bottom:60px;line-height:1.6">처음이면 Google 계정으로 바로 가입돼요.<br>계속하면 <span class="link">이용약관</span>과 <span class="link">개인정보처리방침</span>에 동의하게 돼요.</div>
       </div>
@@ -1003,6 +1006,21 @@
         </div>
         <div style="font-size:11px;color:var(--sub);margin:10px 2px 0">구매는 직접 판단해 주세요. 비교는 사진과 적힌 정보로만 했어요.</div>
       </div>
+    </div>
+  </section>
+
+  <!-- 게스트 · 로그인 안내 (2026-11-20) -->
+  <section class="item"><h3>게스트 · 로그인 안내</h3>
+    <div class="phone" id="guest-login">
+      <div data-tpl="t-status"></div>
+      <div class="appbar"><h1>내 옷장</h1></div>
+      <div class="body" style="justify-content:center;align-items:center;text-align:center;gap:12px;padding-bottom:120px">
+        <div style="font-size:15px;line-height:1.5">Google로 로그인하면<br>내 옷장을 쓸 수 있어요</div>
+        <div style="font-size:12px;color:var(--sub)">게스트로 둘러보는 중에는 쇼핑몰 구경만 할 수 있어요</div>
+        <button class="btn primary" style="padding:0 20px" data-go="login-start">Google로 로그인하기</button>
+        <div class="note" style="margin-top:18px;text-align:left;font-size:11px;line-height:1.6">같은 안내가 나오는 곳<br>· 인앱 브라우저 상품 말풍선 '로그인하면 내 옷장과 비교해요' → 패널: 'Google로 로그인하면 이 상품을 내 옷장과 비교해 드려요'<br>· 번역 막대: 'Google로 로그인하면 한국어로 바꿔 드려요'<br>· 공유로 받은 캡처: 'Google로 로그인하면 캡처한 상품을 내 옷장과 비교해 드려요'<br>게스트는 서버에 요청하지 않는다. AI 점원 버튼·결제 완료 카드는 나오지 않는다</div>
+      </div>
+      <nav class="nav" data-nav="closet"></nav>
     </div>
   </section>
 </div>

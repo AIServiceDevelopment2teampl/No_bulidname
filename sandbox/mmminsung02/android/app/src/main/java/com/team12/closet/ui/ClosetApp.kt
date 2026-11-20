@@ -1,7 +1,10 @@
 package com.team12.closet.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -13,19 +16,23 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.team12.closet.R
 import com.team12.closet.data.AddShopResult
@@ -49,6 +56,7 @@ import com.team12.closet.data.Shop
 import com.team12.closet.data.ShopsRepository
 import com.team12.closet.data.TranslateRepository
 import com.team12.closet.data.UploadOutcome
+import com.team12.closet.ui.account.LoginRequired
 import com.team12.closet.ui.account.LoginScreen
 import com.team12.closet.ui.account.MyScreen
 import com.team12.closet.ui.closet.ClosetScreen
@@ -72,6 +80,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 
 // 하단 탭 4개 (docs/00-overview.md 화면 구성). 각 화면은 기능을 구현하면서 채운다
 enum class MainTab(
@@ -114,6 +123,7 @@ fun ClosetApp(
         } else {
             MainTabs(
                 sessionKey = session!!.token,
+                guest = session!!.guest,
                 clothesRepository = clothesRepository,
                 authRepository = authRepository,
                 shopsRepository = shopsRepository,
@@ -137,6 +147,7 @@ fun ClosetApp(
 @Composable
 private fun MainTabs(
     sessionKey: String,
+    guest: Boolean,
     clothesRepository: ClothesRepository,
     authRepository: AuthRepository,
     shopsRepository: ShopsRepository,
@@ -156,6 +167,9 @@ private fun MainTabs(
     var screenshot by remember { mutableStateOf<SharedItem.Screenshot?>(null) }
     val snackbar = remember { SnackbarHostState() }
     var problem by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    // 게스트는 서버 계정이 없다. 서버 기능 자리에 로그인 안내를 두고, 누르면 로그인 화면으로 (2026-11-20)
+    val onLogin: (() -> Unit)? = if (guest) ({ scope.launch { authRepository.logout() } }) else null
     LaunchedEffect(shared) {
         when (shared) {
             null -> return@LaunchedEffect
@@ -177,6 +191,16 @@ private fun MainTabs(
     }
 
     screenshot?.let { item ->
+        if (onLogin != null) {
+            GuestShareScreen(
+                onLogin = onLogin,
+                onBack = {
+                    screenshot = null
+                    selected = MainTab.HOME
+                },
+            )
+            return
+        }
         ShareResultScreen(
             shared = item,
             products = productsRepository,
@@ -229,8 +253,9 @@ private fun MainTabs(
                     translator = translateRepository,
                     openRequest = openLink,
                     onOpenRequestHandled = { openLink = null },
-                    clerk = clerkRepository,
-                    imports = importsRepository,
+                    clerk = clerkRepository.takeUnless { guest },
+                    imports = importsRepository.takeUnless { guest },
+                    onLogin = onLogin,
                     active = selected == MainTab.SHOPPING,
                     onBrowserOpenChange = { browserOpen = it },
                     onGoElsewhere = { destination ->
@@ -249,7 +274,12 @@ private fun MainTabs(
                 Surface(color = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         when (selected) {
-                            MainTab.CLOSET -> ClosetTab(sessionKey, clothesRepository, importsRepository)
+                            MainTab.CLOSET ->
+                                if (onLogin != null) {
+                                    LoginRequired("Google로 로그인하면 내 옷장을 쓸 수 있어요", onLogin)
+                                } else {
+                                    ClosetTab(sessionKey, clothesRepository, importsRepository)
+                                }
                             MainTab.HOME ->
                                 HomeScreen(onShop = { selected = MainTab.SHOPPING }, onCloset = { selected = MainTab.CLOSET })
                             MainTab.MY -> MyScreen(currentTheme, onThemeChange, authRepository, clothesRepository)
@@ -257,6 +287,27 @@ private fun MainTabs(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+/** 게스트가 캡처를 공유했을 때. 사진을 서버에 올리지 않는다 */
+@Composable
+private fun GuestShareScreen(
+    onLogin: () -> Unit,
+    onBack: () -> Unit,
+) {
+    BackHandler(onBack = onBack)
+    // 상단은 ShareResultScreen과 같게 둔다
+    Surface(modifier = Modifier.fillMaxSize()) {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp)) {
+                TextButton(onClick = onBack, modifier = Modifier.testTag("share_back")) { Text("←") }
+                Text("공유로 받은 상품", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            }
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                LoginRequired("Google로 로그인하면 캡처한 상품을 내 옷장과 비교해 드려요", onLogin)
             }
         }
     }
