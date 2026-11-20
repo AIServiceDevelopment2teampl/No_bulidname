@@ -80,3 +80,4 @@ DupeCheck은 무료이고 광고가 없습니다. 대학 수업 팀 프로젝트
 - 첫 AAB: `dupecheck-0.1.3-vc4.aab` (versionCode 4, versionName 0.1.3). `0b240cd`에서 applicationId와 앱 이름만 바꿔 빌드하고 업로드 키로 서명했다. 서버 주소가 개발용(`http://10.0.2.2:8000/`)이라 **옷 등록·목록은 동작하지 않는다**. 14일을 먼저 시작하기 위한 빌드이고, 서버를 HTTPS로 띄운 뒤 업데이트한다
 - 두 번째 AAB (2026-11-11): `dupecheck-0.1.5-vc6.aab` (versionCode 6, versionName 0.1.5, `5fed076`). `sandbox/mmminsung02/android`에서 `bundleRelease -PversionCode=6 -PversionName=0.1.5 -PgoogleWebClientId=...` → jarsigner로 업로드 키 서명(비밀번호 파일의 `alias:`·`password:` 줄). 서버 주소는 아직 기본값이라 게스트로 둘러보기만 된다
 - 세 번째 AAB (2026-11-19): `dupecheck-0.1.9-vc10.aab` (versionCode 10, versionName 0.1.9, `7fb03f6`). 두 번째와 같은 방법에 `-PserverBaseUrl=https://34-64-87-151.sslip.io/`을 더함. 서버 기능이 처음 동작하는 Play 빌드
+- 네 번째 AAB (2026-11-20): `dupecheck-0.1.10-vc11.aab` (versionCode 11, versionName 0.1.10, `c2141d5`). 세 번째와 같은 방법. 자동 등록(기능 13~15)·게스트 로그인 안내가 들어간 폰 확인용
