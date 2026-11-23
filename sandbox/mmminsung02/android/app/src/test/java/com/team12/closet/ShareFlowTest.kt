@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -74,6 +75,35 @@ class ShareFlowTest {
 
         composeRule.onNodeWithTag("browser").assertIsDisplayed()
         assertEquals("https://zozo.jp/shop/beams/goods/7781/", shadowOf(findWebView()!!).lastLoadedUrl)
+    }
+
+    @Test
+    fun linkSharedWhileBrowserIsOpenReplacesThePage() {
+        // 브라우저에서 쇼핑몰 A를 보는 중에 다른 앱에서 상품 B 링크를 공유받는다 (2026-11-23 검수에서 찾음)
+        val incoming = mutableStateOf<SharedItem?>(null)
+        composeRule.setContent {
+            var item by incoming
+            ClosetApp(
+                FakeClothesRepository(),
+                InMemoryThemeStore(),
+                FakeAuthRepository(),
+                FakeGoogleSignIn(),
+                FakeShopsRepository(),
+                products,
+                shared = item,
+                onSharedHandled = { item = null },
+                photoLoader = loader,
+            )
+        }
+        composeRule.onNodeWithTag("tab_SHOPPING").performClick()
+        composeRule.onNodeWithTag("shop_https://zozo.jp/").performClick()
+        composeRule.onNodeWithTag("browser").assertIsDisplayed()
+
+        incoming.value = SharedItem.Link("https://www.asos.com/p/123")
+        composeRule.waitForIdle()
+
+        assertEquals("https://www.asos.com/p/123", shadowOf(findWebView()!!).lastLoadedUrl)
+        composeRule.onNodeWithTag("browser_url").assertTextContains("asos.com", substring = true)
     }
 
     @Test

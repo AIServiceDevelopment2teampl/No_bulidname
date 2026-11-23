@@ -17,6 +17,9 @@
     ].join("|"),
     "i"
   );
+  // 주문 완료 주소 (앱 PageInjector.isOrderDone과 같은 규칙). 상품 페이지의 '주문 완료 후 1~3일 출고' 같은 문구로 잘못 감지하지 않게
+  var ORDER_DONE_PATH = /(order|checkout|purchase|cart).*(complete|thank|confirmation|success|finish|done)/i;
+  var NEVER_PATH = /(login|signin|sign-in|logon|\/auth|password|payment|billing|\/pay\/)/i;
   var ORDER_NO = /(주문\s*번호|ご?注文番号|order\s*(number|no\.?|#|id))\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9-]{3,})/i;
   var PRICE = /([₩¥$€£]\s?\d[\d,.]*|\d[\d,]*\s?(원|円))/;
   // 이 글자가 있는 칸은 개인 정보·결제 정보 칸이라 읽지 않는다
@@ -41,6 +44,7 @@
   function detect() {
     var body = document.body;
     if (!body) return false;
+    if (!ORDER_DONE_PATH.test(location.pathname) || NEVER_PATH.test(location.pathname)) return false;
     return DONE.test(text(body));
   }
 

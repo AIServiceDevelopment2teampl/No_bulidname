@@ -5,7 +5,8 @@ package com.team12.closet.ui.shop
  * WebView는 한 번 로드에 onPageFinished를 여러 번 부를 수 있어서 로드 번호로 막는다.
  * 로그인·결제 페이지에는 넣지 않는다 (architecture.md 보안 규칙).
  * 예외: 결제가 끝난 '주문 완료' 주소에는 주문 상품만 읽는 스크립트(orderOnlyScript, order.js)만 넣는다
- * (auto-register/in-app.md). 번역·상품 스크립트는 넣지 않아 페이지 글자가 서버로 가지 않는다
+ * (auto-register/in-app.md). 민감 주소 목록에 안 걸리는 완료 주소(예: zozo `/_cart/order/complete.html`)도 같다.
+ * 번역·상품 스크립트는 넣지 않아 받는 사람 이름·주소·전화가 서버로 가지 않는다 (2026-11-20)
  */
 class PageInjector(
     private val script: () -> String,
@@ -21,13 +22,13 @@ class PageInjector(
 
     fun onPageFinished(url: String) {
         if (injectedLoad == load) return
-        if (isSensitive(url)) {
+        if (isOrderDone(url)) {
             val orderScript = orderOnlyScript ?: return
-            if (!isOrderDone(url)) return
             injectedLoad = load
             evaluate(orderScript())
             return
         }
+        if (isSensitive(url)) return
         injectedLoad = load
         evaluate(script())
     }

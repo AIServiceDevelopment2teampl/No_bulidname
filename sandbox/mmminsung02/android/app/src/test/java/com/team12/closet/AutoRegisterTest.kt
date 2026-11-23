@@ -203,7 +203,19 @@ class AutoRegisterTest {
             injector.onPageStarted()
             injector.onPageFinished(url)
         }
-        // 완료 페이지 셋만 order.js. 로그인·결제·결제 전 화면에는 아무것도 넣지 않는다 (zozo 완료 주소는 민감 주소가 아니라 전체)
-        assertEquals(listOf("ALL", "ORDER", "ORDER"), injected)
+        // 완료 페이지 셋은 order.js만 (번역·상품 스크립트 없음, 받는 사람 정보가 서버로 가지 않게). 로그인·결제 전 화면에는 아무것도
+        assertEquals(listOf("ORDER", "ORDER", "ORDER"), injected)
+    }
+
+    @Test
+    fun orderCompletePageGetsNothingWhenOrderScriptIsOff() {
+        // 자동 등록이 없는 화면(테스트·미리보기)에서도 주문 완료 페이지에 번역·상품 스크립트를 넣지 않는다
+        val injected = mutableListOf<String>()
+        val injector = PageInjector({ "ALL" }, null) { injected += it }
+        listOf("https://zozo.jp/_cart/order/complete.html", "https://zozo.jp/shop/beams/goods/7781/").forEach { url ->
+            injector.onPageStarted()
+            injector.onPageFinished(url)
+        }
+        assertEquals(listOf("ALL"), injected)
     }
 }

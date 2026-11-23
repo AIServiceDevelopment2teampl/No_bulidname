@@ -86,3 +86,18 @@ test("주문 완료면 서버 입력 모양으로 앱 다리에 한 번 보낸�
   assert.deepStrictEqual(Object.keys(sent[0]).sort(), ["items", "order_number", "site", "url"]);
   assert.strictEqual(sent[0].url, "https://zozo.jp/_cart/order/complete.html");
 });
+
+test("주문 완료 주소가 아니면 '주문 완료' 문구가 있어도 감지하지 않는다 (상품 페이지·주문내역 목록)", () => {
+  const PAGE = `<!doctype html><html lang="ko"><body>
+    <h1>오버핏 코튼 셔츠</h1><p>주문 완료 후 1~3일 이내 출고</p>
+    <ul><li><a href="/goods/1"><img src="https://img.example.kr/1.jpg"></a><span>추천 셔츠</span><span>29,000원</span></li></ul>
+  </body></html>`;
+  for (const url of ["https://shop.example.kr/goods/123", "https://shop.example.kr/mypage/orders"]) {
+    const sent = [];
+    const dom = new JSDOM(PAGE, { url, runScripts: "outside-only" });
+    dom.window.DupeCheckBridge = { onOrder: (json) => sent.push(json) };
+    dom.window.eval(script);
+    assert.strictEqual(dom.window.__dupecheck.order.detect(), false, url);
+    assert.strictEqual(sent.length, 0, url);
+  }
+});

@@ -136,6 +136,9 @@ for (const url of [
   "https://www.asos.com/identity/login?returnUrl=/",
   "https://zozo.jp/_cart/checkout/",
   "https://shop.example.com/payment/confirm",
+  // 주문 완료 페이지에는 받는 사람 이름·주소·전화가 있다 (2026-11-20 결정: 번역하지 않음)
+  "https://zozo.jp/_cart/order/complete.html?token=abc",
+  "https://shop.example.kr/order/thanks",
 ]) {
   test(`결제·로그인 URL에서는 서버로 보내는 요청이 0건이다: ${url}`, () => {
     const { d, bridge } = open(PAGE, url);
@@ -144,6 +147,19 @@ for (const url of [
     assert.strictEqual(d.querySelector("h1").textContent, "Wool coat");
   });
 }
+
+test("페이지가 한 화면 안에서 주문 완료 주소로 바뀌면(SPA) 그때부터 보내지 않는다", () => {
+  const { w, d, bridge } = open();
+  const before = bridge.requests.length;
+
+  w.history.pushState({}, "", "/order/complete");
+  const p = d.createElement("p");
+  p.textContent = "Ship to John Smith";
+  d.body.appendChild(p);
+  w.__dupecheck.translate.flush();
+
+  assert.strictEqual(bridge.requests.length, before);
+});
 
 test("페이지가 한 화면 안에서 결제 주소로 바뀌면(SPA) 그때부터 보내지 않는다", () => {
   const { w, d, bridge } = open();

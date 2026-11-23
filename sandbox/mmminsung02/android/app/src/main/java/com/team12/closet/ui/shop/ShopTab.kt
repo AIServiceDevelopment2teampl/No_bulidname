@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -41,18 +42,21 @@ fun ShopTab(
 ) {
     val context = LocalContext.current
     var openUrl by rememberSaveable { mutableStateOf<String?>(openRequest) }
+    // 여는 요청 번호. 같은 주소를 다시 공유받아도 그 페이지를 새로 연다
+    var openCount by rememberSaveable { mutableStateOf(0) }
     LaunchedEffect(openRequest) {
         if (openRequest != null) {
             openUrl = openRequest
+            openCount++
             onOpenRequestHandled()
         }
     }
     var addFromBrowser by remember { mutableStateOf<Pair<String, String>?>(null) }
-    // 진입점 + 상품 감지 스크립트를 한 번에 넣는다
+    // 진입점 + 상품 감지 + 번역 스크립트를 한 번에 넣는다. order.js는 주문 완료 주소에만 (PageInjector)
     val script =
         remember {
             {
-                listOf("bootstrap.js", "product.js", "translate.js", "order.js").joinToString("\n") { name ->
+                listOf("bootstrap.js", "product.js", "translate.js").joinToString("\n") { name ->
                     context.assets.open(name).use { it.readBytes().decodeToString() }
                 }
             }
@@ -67,8 +71,8 @@ fun ShopTab(
             }
         }
     // 추가 화면에 다녀와도 보던 페이지로 돌아오도록 브라우저 상태는 여기서 들고 있는다
-    val browserState = remember(openUrl) { openUrl?.let { BrowserState(it) } }
-    val lookup = remember(openUrl) { ProductLookup(products, loginRequired = onLogin != null) }
+    val browserState = remember(openUrl, openCount) { openUrl?.let { BrowserState(it) } }
+    val lookup = remember(openUrl, openCount) { ProductLookup(products, loginRequired = onLogin != null) }
     val browserOpen = browserState != null
     LaunchedEffect(browserOpen) { onBrowserOpenChange(browserOpen) }
     DisposableEffect(Unit) { onDispose { onBrowserOpenChange(false) } }
@@ -81,21 +85,24 @@ fun ShopTab(
     if (browserState == null) {
         ShopListScreen(repository = repository, onOpen = { openUrl = it })
     } else {
-        BrowserScreen(
-            state = browserState,
-            onClose = { openUrl = null },
-            // 보고 있는 페이지의 사이트 첫 화면을 내 쇼핑몰로 넣는다
-            onAddToMyShops = { name, pageUrl -> addFromBrowser = name to "https://${ShopUrls.host(pageUrl)}/" },
-            script = script,
-            lookup = lookup,
-            imageUrl = imageUrl,
-            translator = translator,
-            clerk = clerk,
-            imports = imports,
-            orderScript = orderScript.takeIf { imports != null },
-            onGoElsewhere = onGoElsewhere,
-            active = active,
-            onLogin = onLogin,
-        )
+        // 새 주소를 열면 WebView·페이지 다리까지 새로 만든다. 브라우저가 열린 채 링크를 공유받아도 새 페이지가 열리게 (2026-11-23)
+        key(browserState) {
+            BrowserScreen(
+                state = browserState,
+                onClose = { openUrl = null },
+                // 보고 있는 페이지의 사이트 첫 화면을 내 쇼핑몰로 넣는다
+                onAddToMyShops = { name, pageUrl -> addFromBrowser = name to "https://${ShopUrls.host(pageUrl)}/" },
+                script = script,
+                lookup = lookup,
+                imageUrl = imageUrl,
+                translator = translator,
+                clerk = clerk,
+                imports = imports,
+                orderScript = orderScript.takeIf { imports != null },
+                onGoElsewhere = onGoElsewhere,
+                active = active,
+                onLogin = onLogin,
+            )
+        }
     }
 }

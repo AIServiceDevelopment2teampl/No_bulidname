@@ -10,6 +10,8 @@
   // 앱 PageInjector.kt와 같은 목록. 한 화면 안에서 주소만 바뀌는 사이트(SPA)도 있어 보낼 때마다 다시 본다
   var SENSITIVE_URL =
     /(login|signin|sign-in|sign_in|logon|\/auth[\/?]|account\/password|checkout|payment|\/pay[\/?]|billing|order-confirm)/i;
+  // 주문 완료 페이지에는 받는 사람 이름·주소·전화가 있어 번역하지 않는다 (2026-11-20, order.js와 같은 규칙)
+  var ORDER_DONE_PATH = /(order|checkout|purchase|cart).*(complete|thank|confirmation|success|finish|done)/i;
   var SKIP =
     'script, style, noscript, textarea, select, option, code, pre, template, ' +
     '[contenteditable=""], [contenteditable="true"], [translate="no"], .notranslate';
@@ -47,7 +49,7 @@
   }
 
   function sensitive() {
-    return SENSITIVE_URL.test(location.href);
+    return SENSITIVE_URL.test(location.href) || ORDER_DONE_PATH.test(location.pathname);
   }
 
   function report(status) {
