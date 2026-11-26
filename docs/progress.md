@@ -111,7 +111,7 @@
 3. **평가**: 기능 1은 옷장 사진을 더 찍어(특히 상의, 팀원 옷도) CLIP 모델 정하기 + 색 정확도 올릴 방법 (DeepFashion 400장은 FashionCLIP + v2가 88.0%, 실제 옷장 29장은 지금 설정이 82.8%로 순위가 반대, `sandbox/moneyhipo/eval/README.md`). 기능 4는 Recall@3 정답 세트와 단계 기준 점수
 4. 지원 쇼핑몰 정하기 + **기술 검증**: 후보 쇼핑몰마다 WebView에서 열림, 로그인·장바구니·결제 화면 진입, JS 주입으로 글자 읽기·바꾸기, JSON-LD Product 유무를 확인하고 결과를 여기에 기록
 5. sandbox 검수 후 `src/`·`tests/`로 옮기기 (앱·서버)
-6. 정식 출시: 비공개 테스트 14일이 끝나면 프로덕션 신청. 그 직전에 release 빌드 R8·디버그 기호 켜기 (README 요청)
+6. 정식 출시: 비공개 테스트 조건이 채워져 11-27 프로덕션 액세스 신청서를 씀(답은 [play-console-setup.md](features/release/play-console-setup.md)). 승인 전에 출시 빌드 준비: 앱 아이콘(지금 없음), 주문 완료 페이지 번역 막기(`8b6411d`), release 빌드 R8·디버그 기호 (README 요청) → 비공개 테스트에서 폰 확인 → 프로덕션
 
 ## 알려진 위험
 [architecture.md](architecture.md)의 '주요 위험' 참고. 가장 큰 두 가지:
